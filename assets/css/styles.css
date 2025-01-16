@@ -1,0 +1,67 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans|Roboto&display=swap);
+*{scroll-behavior:smooth;}
+body{
+font-family: open sans,roboto, sans-serif;
+line-height:1.625;
+  font-size: 15px;
+  color: #444;
+  margin: 0;
+  background-color: #efe9e9;
+}
+.card {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  transition: 0.3s;
+}
+.card:hover {
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+}
+.card-img-top {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+.form-control {
+  margin-bottom: 20px;
+}
+.breadcrumb {
+  background-color: #f8f9fa; /* Background color for the breadcrumb container */
+  border-radius: 0.25rem; /* Rounded corners for the breadcrumb container */
+  padding: 0.75rem 1rem; /* Padding inside the breadcrumb container */
+  margin-bottom: 1rem; /* Space below the breadcrumb container */
+}
+.breadcrumb-item + .breadcrumb-item::before {
+  content: '/';
+  color: #6c757d; /* Color for the separator */
+  padding: 0 0.5rem; /* Space around the separator */
+}
+.breadcrumb-item a {
+  color: #007bff; /* Link color */
+  text-decoration: none; /* Remove underline from links */
+}
+.breadcrumb-item a:hover {
+  color: #0056b3; /* Link color on hover */
+  text-decoration: underline; /* Underline on hover */
+}
+.breadcrumb-item.active {
+  color: #6c757d; /* Color for the active breadcrumb item */
+  font-weight: bold; /* Bold text for the active breadcrumb item */
+}
+.list-group-item {
+      padding: 1rem 1.5rem;
+      margin-bottom: 0.5rem;
+      border: none;
+      border-radius: 0.25rem;
+      background-color: #f8f9fa;
+    }
+.fixed-height-scroll {
+    max-height: 400px; /* Adjust the height as needed */
+    overflow-y: auto;
+}
+.list-group-item-image {
+  width: 30px; /* Adjust size as needed */
+  height: 30px; /* Adjust size as needed */
+  border-radius: 50%;
+  border: 2px solid #ddd; /* Optional: adds a border around the image */
+  margin-right: 10px; /* Space between image and text */
+  vertical-align: middle; /* Align image with text */
+}
