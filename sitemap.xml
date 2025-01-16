@@ -1,0 +1,48 @@
+---
+layout: null
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Sitemap for Posts -->
+  <sitemap>
+    <loc>{{ site.url }}/post-sitemap.xml</loc>
+    <lastmod>
+      {% assign last_modified_posts = site.posts | sort: 'last_modified_at' | last %}
+      {% if last_modified_posts %}
+        {{ last_modified_posts.last_modified_at | date: "%Y-%m-%dT%H:%M:%S%:z" }}
+      {% endif %}
+    </lastmod>
+  </sitemap>
+
+  <!-- Sitemap for Pages -->
+  <sitemap>
+    <loc>{{ site.url }}/page-sitemap.xml</loc>
+    <lastmod>
+      {% assign last_modified_pages = site.pages | sort: 'last_modified_at' | last %}
+      {% if last_modified_pages %}
+        {{ last_modified_pages.last_modified_at | date: "%Y-%m-%dT%H:%M:%S%:z" }}
+      {% endif %}
+    </lastmod>
+  </sitemap>
+
+  <!-- Sitemap for Tag Pages -->
+  <sitemap>
+    <loc>{{ site.url }}/post_tag-sitemap.xml</loc>
+    <lastmod>
+      {% assign latest_modified_date = nil %}
+      {% for tag in site.tags %}
+        {% for post in tag[1] %}
+          {% if latest_modified_date == nil or post.last_modified_at > latest_modified_date %}
+            {% assign latest_modified_date = post.last_modified_at %}
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+      {% if latest_modified_date %}
+        {{ latest_modified_date | date: "%Y-%m-%dT%H:%M:%S%:z" }}
+      {% endif %}
+    </lastmod>
+  </sitemap>
+
+</sitemapindex>
