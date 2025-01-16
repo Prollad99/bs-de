@@ -1,0 +1,33 @@
+---
+layout: null
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="/post_tag-sitemap.xsl"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Tags -->
+  {% for tag in site.tags %}
+    <url>
+      <loc>{{ site.url }}/tag/{{ tag[0] | replace: ' ', '-' }}/</loc>
+
+      {% assign latest_last_modified = nil %}
+
+      {% for post in tag[1] %}
+        {% assign include_file = post.include_file %}
+        {% assign file_info = site.data.include_files[include_file] %}
+        {% if file_info and file_info.last_modified %}
+          {% assign post_last_modified = file_info.last_modified %}
+          {% if latest_last_modified == nil or post_last_modified > latest_last_modified %}
+            {% assign latest_last_modified = post_last_modified %}
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+
+      {% if latest_last_modified %}
+        <lastmod>{{ latest_last_modified | date_to_xmlschema }}</lastmod>
+      {% endif %}
+
+    </url>
+  {% endfor %}
+
+</urlset>
