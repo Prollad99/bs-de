@@ -1,35 +1,35 @@
-function timeAgo(dateString) {
-    const now = new Date();
-    const date = new Date(dateString);
+function zeitVergangenheit(dateString) {
+    const jetzt = new Date();
+    const datum = new Date(dateString);
 
-    const nowUTC = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
-                            now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
-    const dateUTC = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
-                             date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+    const jetztUTC = Date.UTC(jetzt.getUTCFullYear(), jetzt.getUTCMonth(), jetzt.getUTCDate(),
+                            jetzt.getUTCHours(), jetzt.getUTCMinutes(), jetzt.getUTCSeconds());
+    const datumUTC = Date.UTC(datum.getUTCFullYear(), datum.getUTCMonth(), datum.getUTCDate(),
+                             datum.getUTCHours(), datum.getUTCMinutes(), datum.getUTCSeconds());
 
-    const seconds = Math.floor((nowUTC - dateUTC) / 1000);
-    let interval = Math.floor(seconds / 31536000);
+    const sekunden = Math.floor((jetztUTC - datumUTC) / 1000);
+    let intervall = Math.floor(sekunden / 31536000);
 
-    if (interval > 1) return `${interval} years ago`;
-    if (interval === 1) return `1 year ago`;
+    if (intervall > 1) return `${intervall} Jahre her`;
+    if (intervall === 1) return `Vor 1 Jahr`;
 
-    interval = Math.floor(seconds / 2592000);
-    if (interval > 1) return `${interval} months ago`;
-    if (interval === 1) return `1 month ago`;
+    intervall = Math.floor(sekunden / 2592000);
+    if (intervall > 1) return `${intervall} Monate her`;
+    if (intervall === 1) return `Vor 1 Monat`;
 
-    interval = Math.floor(seconds / 86400);
-    if (interval > 1) return `${interval} days ago`;
-    if (interval === 1) return `1 day ago`;
+    intervall = Math.floor(sekunden / 86400);
+    if (intervall > 1) return `${intervall} Tage her`;
+    if (intervall === 1) return `Vor 1 Tag`;
 
-    interval = Math.floor(seconds / 3600);
-    if (interval > 1) return `${interval} hours ago`;
-    if (interval === 1) return `1 hour ago`;
+    intervall = Math.floor(sekunden / 3600);
+    if (intervall > 1) return `${intervall} Stunden her`;
+    if (intervall === 1) return `Vor 1 Stunde`;
 
-    interval = Math.floor(seconds / 60);
-    if (interval > 1) return `${interval} minutes ago`;
-    if (interval === 1) return `1 minute ago`;
+    intervall = Math.floor(sekunden / 60);
+    if (intervall > 1) return `${intervall} Minuten her`;
+    if (intervall === 1) return `Vor 1 Minute`;
 
-    return `${Math.floor(seconds)} seconds ago`;
+    return `${Math.floor(sekunden)} Sekunden her`;
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const lastModifiedDate = element.getAttribute('data-last-modified');
         if (lastModifiedDate) {
             const lastModifiedDateUTC = new Date(lastModifiedDate).toISOString();
-            element.textContent = timeAgo(lastModifiedDateUTC);
+            element.textContent = zeitVergangenheit(lastModifiedDateUTC);
         }
     });
 });
