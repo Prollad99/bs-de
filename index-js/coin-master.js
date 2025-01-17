@@ -3,7 +3,7 @@ const cheerio = require('cheerio');
 const fs = require('fs').promises;
 const path = require('path');
 
-// Function to get the current date in YYYY-MM-DD format
+// Funktion, um das aktuelle Datum im Format YYYY-MM-DD zu erhalten
 function getCurrentDate() {
   const date = new Date();
   const year = date.getFullYear();
@@ -12,13 +12,13 @@ function getCurrentDate() {
   return `${year}-${month}-${day}`;
 }
 
-// Function to format the date in "MM-DD-YYYY" format
+// Funktion, um das Datum im Format "MM-DD-YYYY" zu formatieren
 function formatDateCustom(dateString) {
   const date = new Date(dateString);
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Get month and pad with 0 if needed
-  const day = String(date.getDate()).padStart(2, '0'); // Get day and pad with 0 if needed
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Monat holen und mit 0 auffüllen, falls nötig
+  const day = String(date.getDate()).padStart(2, '0'); // Tag holen und mit 0 auffüllen, falls nötig
   const year = date.getFullYear();
-  return `${month}-${day}-${year}`; // Return formatted date
+  return `${month}-${day}-${year}`; // Formatiertes Datum zurückgeben
 }
 
 const url = 'https://nueva-temporada.com/en/coin-master-free-spins-today/';
@@ -37,7 +37,7 @@ async function main() {
           existingLinks = JSON.parse(fileData);
         }
       } catch (error) {
-        console.error('Error reading existing links:', error);
+        console.error('Fehler beim Lesen der bestehenden Links:', error);
       }
     }
 
@@ -52,7 +52,7 @@ async function main() {
       newLinks.push({ href: link, date: date });
     });
 
-    // Combine new links with existing links, keeping the older dates if they exist
+    // Neue Links mit bestehenden Links kombinieren, wobei die älteren Daten beibehalten werden, wenn sie existieren
     const combinedLinks = [...newLinks, ...existingLinks]
       .reduce((acc, link) => {
         if (!acc.find(({ href }) => href === link.href)) {
@@ -60,9 +60,9 @@ async function main() {
         }
         return acc;
       }, [])
-      .slice(0, 100); // Limit to 100 links
+      .slice(0, 100); // Begrenzung auf 100 Links
 
-    console.log('Final links:', combinedLinks);
+    console.log('Finale Links:', combinedLinks);
 
     if (!await fs.access(dir).then(() => true).catch(() => false)) {
       await fs.mkdir(dir);
@@ -70,21 +70,21 @@ async function main() {
 
     await fs.writeFile(filePath, JSON.stringify(combinedLinks, null, 2), 'utf8');
 
-    // Generate HTML file with the custom date format and text
+    // HTML-Datei mit dem benutzerdefinierten Datumsformat und Text generieren
     let htmlContent = '<ul class="list-group mt-3 mb-4">\n';
     combinedLinks.forEach(link => {
-      const formattedDate = formatDateCustom(link.date); // Format date as MM-DD-YYYY
+      const formattedDate = formatDateCustom(link.date); // Datum im Format MM-DD-YYYY formatieren
       htmlContent += `  <li class="list-group-item d-flex justify-content-between align-items-center">\n`;
-      htmlContent += `    <span>Coin Master spin link ${formattedDate}</span>\n`; // Custom text with formatted date
-      htmlContent += `    <a href="${link.href}" class="btn btn-primary btn-sm">Collect</a>\n`;
+      htmlContent += `    <span>Coin Master Spin Link ${formattedDate}</span>\n`; // Benutzerdefinierter Text mit formatiertem Datum
+      htmlContent += `    <a href="${link.href}" class="btn btn-primary btn-sm">Sammeln</a>\n`;
       htmlContent += `  </li>\n`;
     });
     htmlContent += '</ul>';
 
     await fs.writeFile(htmlFilePath, htmlContent, 'utf8');
-    console.log(`HTML file saved to ${htmlFilePath}`);
+    console.log(`HTML-Datei wurde gespeichert unter ${htmlFilePath}`);
   } catch (err) {
-    console.error('Error fetching links:', err);
+    console.error('Fehler beim Abrufen der Links:', err);
     process.exit(1);
   }
 }
