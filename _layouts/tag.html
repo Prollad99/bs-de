@@ -1,0 +1,62 @@
+---
+layout: default
+---
+
+<div class="container">
+  <h1 class="my-4">{{ page.title | replace: '-', ' ' }}</h1>
+
+  <div class="row">
+    {% assign normalized_tag = page.tag | replace: '-', ' ' %}
+    {% assign sorted_tag_posts = site.tags[normalized_tag] | sort: 'title' %}
+    {% if sorted_tag_posts %}
+      {% for post in sorted_tag_posts %}
+        <div class="col-md-6 mb-4">
+          <div class="card shadow-sm">
+            <div class="row no-gutters">
+              <div class="col-4 d-flex flex-column align-items-center justify-content-center">
+                {% if post.image %}
+                  <img src="{{ post.image }}" class="card-img" alt="{{ post.title }}" style="max-width: 80px; max-height: 80px; margin: 10px;">
+                {% endif %}
+                <a href="{{ post.url }}" class="btn btn-primary btn-sm mt-2 mb-2">Jetzt sichern</a>
+              </div>
+              <div class="col-8">
+                <div class="card-body">
+                  <a href="{{ post.url }}">
+                    <h5 class="card-title" style="font-size: 1rem;">{{ post.title }}</h5>
+                  </a>
+                  <p class="card-text" style="font-size: 0.9rem;">
+                    {{ post.content | strip_html | truncatewords: 30 }}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer text-center">
+              <p class="text-muted">
+                <small>
+                  Von <strong>{{ post.author }}</strong> |
+                  {% assign include_file = post.include_file %}
+                  {% assign file_info = site.data.include_files[include_file] %}
+                  {% if file_info %}
+                    {% assign last_modified = file_info.last_modified %}
+                    {% if last_modified %}
+                      Zuletzt aktualisiert:
+                      <strong class="last-updated" data-last-modified="{{ last_modified }}"></strong>
+                    {% else %}
+                      Zuletzt aktualisiert: <strong>Nicht verfügbar</strong>
+                    {% endif %}
+                  {% else %}
+                    Zuletzt aktualisiert: <strong>{{ post.last_modified_at | date: "%d. %B %Y" }}</strong>
+                  {% endif %}
+                  <!-- Verstecktes Eingabefeld für include_file -->
+                  <input type="hidden" name="include_file" value="{{ post.include_file }}">
+                </small>
+              </p>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>Keine Beiträge für diesen Tag gefunden.</p>
+    {% endif %}
+  </div>
+</div>
