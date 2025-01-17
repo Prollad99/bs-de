@@ -1,8 +1,8 @@
-name: Links aktualisieren und bereitstellen
+name: Update Links and Deploy
 
 on:
   schedule:
-    - cron: '*/30 * * * *' # Läuft alle 30 Minuten
+    - cron: '*/30 * * * *' # Runs every 30 minutes
   push:
     branches:
       - main
@@ -16,10 +16,10 @@ jobs:
           - coin-master
 
     steps:
-      - name: Repository auschecken
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Node-Module cachen
+      - name: Cache node modules
         uses: actions/cache@v2
         with:
           path: ~/.npm
@@ -27,95 +27,84 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Abhängigkeiten installieren
+      - name: Install dependencies
         run: npm install jq axios cheerio
 
-      - name: Links abrufen und aktualisieren
+      - name: Fetch and Update Links
         run: |
           node index-js/${{ matrix.game }}.js
-          echo "Inhalt von links-json/${{ matrix.game }}.json:"
+          echo "Content of links-json/${{ matrix.game }}.json:"
           cat links-json/${{ matrix.game }}.json
-          echo "Inhalt von _includes/${{ matrix.game }}.html:"
+          echo "Content of _includes/${{ matrix.game }}.html:"
           cat _includes/${{ matrix.game }}.html
 
-      - name: Dynamischen Beitragstext generieren
+      - name: Generate Dynamic Post Content
         run: |
           GAME_NAME=${{ matrix.game }}
           GAME_NAME_CAPITALIZED=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
           PARAGRAPH_FILE="_includes/${GAME_NAME}_post.html"
-
-          PARAGRAPH="Entdecken Sie tägliche ${GAME_NAME_CAPITALIZED}-Belohnungen!\n\n
-          Sind Sie ein Fan von ${GAME_NAME_CAPITALIZED} und möchten Ihr Spielerlebnis verbessern? Sie sind an der richtigen Stelle! Diese Seite ist für alle ${GAME_NAME_CAPITALIZED}-Enthusiasten, die täglich kostenlose Belohnungen beanspruchen möchten. Hier finden Sie die neuesten Links, um Freispiele, Münzen, Chips und andere spannende Boni zu sammeln.\n\n
-          ${GAME_NAME_CAPITALIZED} ist ein unterhaltsames Spiel, das Millionen lieben. Ob Sie höhere Levels erreichen oder einfach den Nervenkitzel genießen möchten, unsere täglichen Belohnungslinks halten Sie im Spiel.\n\n
-          Hinweis: ${GAME_NAME_CAPITALIZED} ist eine kostenlose App für Unterhaltungszwecke. Bonuscollector.net ist unabhängig und nicht mit den Entwicklern von ${GAME_NAME_CAPITALIZED} verbunden.\n\n
-          Schauen Sie täglich vorbei, um keine Belohnung zu verpassen!"
-
+          PARAGRAPH="Discover Daily ${GAME_NAME_CAPITALIZED} Rewards!\n\n
+          Are you a fan of ${GAME_NAME_CAPITALIZED} and looking to enhance your gameplay? You've come to the right place! This page is dedicated to all ${GAME_NAME_CAPITALIZED} enthusiasts who are eager to claim free rewards every day. Here, you'll find the latest links to collect free spins, coins, chips, and other exciting bonuses to help you level up and enjoy the game even more.\n\n
+          ${GAME_NAME_CAPITALIZED} is an engaging and fun game that millions love to play. Whether you're aiming to reach higher levels or just enjoy the thrill of spinning, our daily reward links will keep you in the game without breaking a sweat.\n\n
+          Please note: ${GAME_NAME_CAPITALIZED} is a free-to-play app designed purely for entertainment purposes. Bonuscollector.net is an independent platform and is not affiliated with or endorsed by the creators or owners of ${GAME_NAME_CAPITALIZED}.\n\n
+          Check back daily to make sure you never miss a reward!"
           echo -e "$PARAGRAPH" > "$PARAGRAPH_FILE"
-          echo "Generierter Beitragstext für ${GAME_NAME}:"
-          cat "$PARAGRAPH_FILE"
 
-      - name: Dynamischen Footer generieren
+      - name: Generate Dynamic Footer Content
         run: |
           GAME_NAME=${{ matrix.game }}
           GAME_NAME_CAPITALIZED=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
           FOOTER_FILE="_includes/${GAME_NAME}_footer.html"
-
-          FOOTER="### So beanspruchen Sie Ihre ${GAME_NAME_CAPITALIZED}-Belohnungen\n\n
-          Das Beanspruchen Ihrer täglichen Belohnungen in ${GAME_NAME_CAPITALIZED} ist einfach! Folgen Sie diesen Schritten:\n
-          1. Suchen Sie die oben aufgeführten Belohnungslinks aus und wählen Sie die gewünschten aus.\n
-          2. Klicken Sie auf einen Link, und Sie werden automatisch zur ${GAME_NAME_CAPITALIZED}-App oder -Website weitergeleitet.\n
-          3. Melden Sie sich mit Ihrem Konto an, falls erforderlich.\n
-          4. Die Belohnung (z. B. Freispiele, Münzen oder Boni) wird sofort Ihrem Konto gutgeschrieben.\n\n
-          **Tipps zum Beanspruchen:**\n
-          - Stellen Sie sicher, dass Sie bei Ihrem ${GAME_NAME_CAPITALIZED}-Konto angemeldet sind, bevor Sie auf die Links klicken.\n
-          - Jeder Link kann normalerweise nur einmal eingelöst werden, also kommen Sie täglich für neue Links vorbei.\n
-          - Falls ein Link nicht funktioniert, ist er möglicherweise abgelaufen. Beanspruchen Sie Belohnungen, sobald sie veröffentlicht werden.\n\n
-          Viel Spaß mit Ihren kostenlosen Belohnungen und beim Spielen von ${GAME_NAME_CAPITALIZED}!\n\n
-          Hinweis: Diese Belohnungen werden offiziell von ${GAME_NAME_CAPITALIZED} bereitgestellt und stammen aus öffentlich zugänglichen Quellen. Bonuscollector.net übernimmt keine Verantwortung für Probleme beim Einlösen."
-
+          FOOTER="### How to Claim Your ${GAME_NAME_CAPITALIZED} Rewards\n\n
+          Claiming your daily rewards in ${GAME_NAME_CAPITALIZED} is quick and easy! Just follow these simple steps:\n
+          1. Browse through the reward links provided above and select the ones you want to claim.\n
+          2. Click on a link, and it will automatically redirect you to your ${GAME_NAME_CAPITALIZED} app or website.\n
+          3. Log in with your account if prompted.\n
+          4. The reward (e.g., free spins, coins, chips, or bonuses) will be added to your account instantly.\n\n
+          **Tips for Claiming Rewards:**\n
+          - Make sure you are logged into your ${GAME_NAME_CAPITALIZED} account before clicking the links.\n
+          - Each reward link can usually be claimed only once, so check back daily for fresh links.\n
+          - If a link does not work, it might have expired. Be sure to claim rewards as soon as they are posted.\n\n
+          Enjoy your free rewards and have fun playing ${GAME_NAME_CAPITALIZED}!\n\n
+          Please note: These rewards are provided officially by ${GAME_NAME_CAPITALIZED} and collected from publicly available sources. Bonuscollector.net is not responsible for any issues with claiming rewards."
           echo -e "$FOOTER" > "$FOOTER_FILE"
-          echo "Generierter Footer für ${GAME_NAME}:"
-          cat "$FOOTER_FILE"
 
-      - name: Letztes Änderungsdatum der Include-Datei aktualisieren
+      - name: Update Include File Last Modified Date
         run: |
           export TZ=UTC
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S")
           INCLUDE_FILES_YML="_data/include_files.yml"
 
           if git diff --quiet _includes/${{ matrix.game }}.html; then
-            echo "_includes/${{ matrix.game }}.html wurde nicht geändert. Überspringe Aktualisierung."
+            echo "_includes/${{ matrix.game }}.html has not been modified. Skipping last modified date update."
           else
             if grep -q "${{ matrix.game }}.html:" "$INCLUDE_FILES_YML"; then
               sed -i "/${{ matrix.game }}.html:/,/last_modified:/s|last_modified: .*|last_modified: $TIMESTAMP|" "$INCLUDE_FILES_YML"
             else
               echo -e "\n${{ matrix.game }}.html:\n  last_modified: $TIMESTAMP" >> "$INCLUDE_FILES_YML"
             fi
-            echo "Aktualisiertes Änderungsdatum für _includes/${{ matrix.game }}.html"
           fi
-          echo "Aktualisierter Inhalt von $INCLUDE_FILES_YML:"
-          cat $INCLUDE_FILES_YML
 
-      - name: Git konfigurieren
+      - name: Configure Git
         run: |
           git config --global user.email "prolladmail@gmail.com"
           git config --global user.name "Prollad99"
 
-      - name: Änderungen committen und pushen
+      - name: Commit and Push changes
         env:
           ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
         run: |
           git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.html _includes/${{ matrix.game }}_footer.html links-json/${{ matrix.game }}.json _data/include_files.yml
-git add package.json package-lock.json || true
-git commit -m "Aktualisiere ${{ matrix.game }}-Belohnungslinks, Inhalte und Änderungsdatum" || true
-git stash
-git pull --rebase || true
-git stash pop || true
-for i in {1..5}; do
-  git push https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git && break
-  echo "Versuch $i: Push fehlgeschlagen, erneuter Versuch in 5 Sekunden..."
-  sleep 5
-  git pull --rebase || true
-done
+          git add package.json package-lock.json || true
+          git commit -m "Aktualisiere ${{ matrix.game }}-Belohnungslinks, Inhalte und Änderungsdatum" || true
+          git stash
+          git pull --rebase || true
+          git stash pop || true
+          for i in {1..5}; do
+            git push https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git && break
+            echo "Versuch $i: Push fehlgeschlagen, erneuter Versuch in 5 Sekunden..."
+            sleep 5
+            git pull --rebase || true
+          done
