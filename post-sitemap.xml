@@ -2,17 +2,16 @@
 layout: null
 ---
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="/page-sitemap.xsl"?>
+<?xml-stylesheet type="text/xsl" href="/post-sitemap.xsl"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
-  <!-- Pages -->
-  {% for page in site.pages %}
+  <!-- Posts -->
+  {% for post in site.posts %}
     <url>
-      <loc>{{ site.url }}{{ page.url }}</loc>
-      {% if page.last_modified_at %}
-        <lastmod>{{ page.last_modified_at | date_to_xmlschema }}</lastmod>
+      <loc>{{ site.url }}{{ post.url }}</loc>
+      {% if post.include_file and site.data.include_files[post.include_file] %}
+        <lastmod>{{ site.data.include_files[post.include_file].last_modified | date_to_xmlschema }}</lastmod>
       {% endif %}
     </url>
   {% endfor %}
-
 </urlset>
