@@ -1,0 +1,16 @@
+---
+layout: default
+---
+
+<div class="card shadow-sm mb-2">
+  <div class="card-body">
+    <h1 class="card-title mb-4">{{ page.title }}</h1>
+
+    <!-- Autor und zuletzt aktualisiertes Datum -->
+    <p class="card-subtitle text-muted mb-3">
+      Von <strong>{{ page.author }}</strong> | Zuletzt aktualisiert: <strong>{{ page.last_modified_at | date: "%d. %B %Y" }}</strong>
+    </p>
+
+    <div class="card-text">{{ content }}</div>
+  </div>
+</div>
