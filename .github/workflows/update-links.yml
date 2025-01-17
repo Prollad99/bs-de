@@ -108,14 +108,14 @@ jobs:
           ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
         run: |
           git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.html _includes/${{ matrix.game }}_footer.html links-json/${{ matrix.game }}.json _data/include_files.yml
-          git add package.json package-lock.json || true
-          git commit -m "Aktualisiere ${matrix.game}-Belohnungslinks, Inhalte und Änderungsdatum" || true
-          git stash
-          git pull --rebase || true
-          git stash pop || true
-          for i in {1..5}; do
-            git push https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git && break
-            echo "Versuch $i: Push fehlgeschlagen, erneuter Versuch in 5 Sekunden..."
-            sleep 5
-            git pull --rebase || true
-          done
+git add package.json package-lock.json || true
+git commit -m "Aktualisiere ${{ matrix.game }}-Belohnungslinks, Inhalte und Änderungsdatum" || true
+git stash
+git pull --rebase || true
+git stash pop || true
+for i in {1..5}; do
+  git push https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git && break
+  echo "Versuch $i: Push fehlgeschlagen, erneuter Versuch in 5 Sekunden..."
+  sleep 5
+  git pull --rebase || true
+done
