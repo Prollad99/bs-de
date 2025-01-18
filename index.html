@@ -34,25 +34,32 @@ layout: default
           </div>
           <div class="card-footer text-center">
             <p class="text-muted">
-                <small>
-                  Von <strong>{{ post.author }}</strong> |
-                  {% assign include_file = post.include_file %}
-                  {% assign file_info = site.data.include_files[include_file] %}
-                  {% if file_info %}
-                    {% assign last_modified = file_info.last_modified %}
-                    {% if last_modified %}
-                      Zuletzt aktualisiert:
-                      <strong class="last-updated" data-last-modified="{{ last_modified }}"></strong>
-                    {% else %}
-                      Zuletzt aktualisiert: <strong>Nicht verfügbar</strong>
-                    {% endif %}
-                  {% else %}
-                    Zuletzt aktualisiert: <strong>{{ post.last_modified_at | date: "%d. %B %Y" }}</strong>
-                  {% endif %}
-                  <!-- Verstecktes Eingabefeld für include_file -->
-                  <input type="hidden" name="include_file" value="{{ post.include_file }}">
-                </small>
-              </p>
+  <small>
+    Von <strong>{{ post.author }}</strong> |
+    {% assign include_file = post.include_file %}
+    {% assign file_info = site.data.include_files[include_file] %}
+    {% if file_info %}
+      {% assign last_modified = file_info.last_modified %}
+      {% if last_modified %}
+        Zuletzt aktualisiert:
+        <strong class="last-updated" data-last-modified="{{ last_modified }}">
+          {% assign date_parts = last_modified | date: "%d %B %Y" | split: " " %}
+          {{ date_parts[0] }}. {{ site.data.months.months[date_parts[1]] }} {{ date_parts[2] }}
+        </strong>
+      {% else %}
+        Zuletzt aktualisiert: <strong>Nicht verfügbar</strong>
+      {% endif %}
+    {% else %}
+      Zuletzt aktualisiert: 
+      <strong>
+        {% assign date_parts = post.last_modified_at | date: "%d %B %Y" | split: " " %}
+        {{ date_parts[0] }}. {{ site.data.months.months[date_parts[1]] }} {{ date_parts[2] }}
+      </strong>
+    {% endif %}
+    <!-- Verstecktes Eingabefeld für include_file -->
+    <input type="hidden" name="include_file" value="{{ post.include_file }}">
+  </small>
+</p>
           </div>
         </div>
       </div>
