@@ -15,6 +15,7 @@ jobs:
         game:
           - coin-master
           - monopoly-go
+          - bingo-blitz
 
     steps:
       - name: Repository auschecken
