@@ -47,7 +47,7 @@ layout: default
                       Zuletzt aktualisiert: <strong>Nicht verfügbar</strong>
                     {% endif %}
                   {% else %}
-                    Zuletzt aktualisiert: <strong>{{ post.last_modified_at | date: "%d %B %Y" }}</strong>
+                    Zuletzt aktualisiert: <strong>{{ post.last_modified_at | date: "%d. %B %Y" }}</strong>
                   {% endif %}
                   <!-- Verstecktes Eingabefeld für include_file -->
                   <input type="hidden" name="include_file" value="{{ post.include_file }}">
