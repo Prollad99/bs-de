@@ -8,15 +8,27 @@ layout: default
     <h1 class="card-title mb-4">{{ page.title }}</h1>
 
     <p class="card-subtitle text-muted mb-3">
-      Von <strong>{{ page.author }}</strong> | 
-      {% assign include_file = page.include_file | prepend: "_includes/" %}
-      {% if site.data.include_files[page.include_file].last_modified %}
-        Zuletzt aktualisiert: 
-        <strong id="last-updated" data-last-modified="{{ site.data.include_files[page.include_file].last_modified | date: "%Y-%m-%dT%H:%M:%SZ" }}"></strong>
-      {% else %}
-        Zuletzt aktualisiert: <strong>{{ page.last_modified_at | date: "%d. %B %Y" }}</strong>
-      {% endif %}
-    </p>
+  Von <strong>{{ page.author }}</strong> | 
+  {% assign include_file = page.include_file | prepend: "_includes/" %}
+  {% if site.data.include_files[page.include_file].last_modified %}
+    Zuletzt aktualisiert: 
+    <strong id="last-updated" data-last-modified="{{ site.data.include_files[page.include_file].last_modified | date: "%Y-%m-%dT%H:%M:%SZ" }}">
+      {% assign last_modified = site.data.include_files[page.include_file].last_modified %}
+      {% assign day = last_modified | date: "%d" %}
+      {% assign month = last_modified | date: "%B" %}
+      {% assign year = last_modified | date: "%Y" %}
+      {{ day }}. {{ site.data.months.months[month] }} {{ year }}
+    </strong>
+  {% else %}
+    Zuletzt aktualisiert: 
+    <strong>
+      {% assign day = page.last_modified_at | date: "%d" %}
+      {% assign month = page.last_modified_at | date: "%B" %}
+      {% assign year = page.last_modified_at | date: "%Y" %}
+      {{ day }}. {{ site.data.months.months[month] }} {{ year }}
+    </strong>
+  {% endif %}
+</p>
 
     {% if page.title %}
     <!-- App-Installationsbereich -->
