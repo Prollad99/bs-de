@@ -3,6 +3,8 @@ title: "BonusCollector"
 baseurl: ""
 url: "https://bonuscollector.de"
 
+locale: de
+
 markdown: kramdown
 
 plugins:
