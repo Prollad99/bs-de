@@ -43,17 +43,21 @@ layout: default
       {% if last_modified %}
         Zuletzt aktualisiert:
         <strong class="last-updated" data-last-modified="{{ last_modified }}">
-          {% assign date_parts = last_modified | date: "%d %B %Y" | split: " " %}
-          {{ date_parts[0] }}. {{ site.data.months.months[date_parts[1]] }} {{ date_parts[2] }}
+          {% assign day = last_modified | date: "%d" %}
+          {% assign month = last_modified | date: "%B" %}
+          {% assign year = last_modified | date: "%Y" %}
+          {{ day }}. {{ site.data.months.months[month] }} {{ year }}
         </strong>
       {% else %}
         Zuletzt aktualisiert: <strong>Nicht verfügbar</strong>
       {% endif %}
     {% else %}
-      Zuletzt aktualisiert: 
+      Zuletzt aktualisiert:
       <strong>
-        {% assign date_parts = post.last_modified_at | date: "%d %B %Y" | split: " " %}
-        {{ date_parts[0] }}. {{ site.data.months.months[date_parts[1]] }} {{ date_parts[2] }}
+        {% assign day = post.last_modified_at | date: "%d" %}
+        {% assign month = post.last_modified_at | date: "%B" %}
+        {% assign year = post.last_modified_at | date: "%Y" %}
+        {{ day }}. {{ site.data.months.months[month] }} {{ year }}
       </strong>
     {% endif %}
     <!-- Verstecktes Eingabefeld für include_file -->
