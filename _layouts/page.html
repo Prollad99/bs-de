@@ -8,8 +8,15 @@ layout: default
 
     <!-- Autor und zuletzt aktualisiertes Datum -->
     <p class="card-subtitle text-muted mb-3">
-      Von <strong>{{ page.author }}</strong> | Zuletzt aktualisiert: <strong>{{ page.last_modified_at | date: "%d. %B %Y" }}</strong>
-    </p>
+  Von <strong>{{ page.author }}</strong> | 
+  Zuletzt aktualisiert: 
+  <strong>
+    {% assign day = page.last_modified_at | date: "%d" %}
+    {% assign month = page.last_modified_at | date: "%B" %}
+    {% assign year = page.last_modified_at | date: "%Y" %}
+    {{ day }}. {{ site.data.months.months[month] }} {{ year }}
+  </strong>
+</p>
 
     <div class="card-text">{{ content }}</div>
   </div>
