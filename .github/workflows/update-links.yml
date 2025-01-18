@@ -14,6 +14,7 @@ jobs:
       matrix:
         game:
           - coin-master
+          - monopoly-go
 
     steps:
       - name: Repository auschecken
