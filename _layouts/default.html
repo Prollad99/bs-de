@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>
-  {% assign months_de = "Januar,Februar,März,April,Mai,Juni,Juli,August,September,Oktober,November,Dezember" | split: "," %}
   {% if page.title %}
     {% if page.layout == "post" %}
-      {% assign current_month = "now" | date: "%-m" | minus: 1 %}
-      {{ page.title }} {{ months_de[current_month] }} {{ "now" | date: "%Y" }} - {{ site.title }}
+      {% assign current_month = "now" | date: "%B" %}
+      {% assign current_year = "now" | date: "%Y" %}
+      {{ page.title }} {{ site.data.months.months[current_month] }} {{ current_year }} - {{ site.title }}
     {% else %}
       {{ page.title }} - {{ site.title }}
     {% endif %}
