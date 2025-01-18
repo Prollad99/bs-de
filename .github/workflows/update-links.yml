@@ -18,6 +18,7 @@ jobs:
           - bingo-blitz
           - dice-dreams
           - match-masters
+          - solitaire-grand-harvest
 
     steps:
       - name: Repository auschecken
