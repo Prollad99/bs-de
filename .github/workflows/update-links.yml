@@ -17,6 +17,7 @@ jobs:
           - monopoly-go
           - bingo-blitz
           - dice-dreams
+          - match-masters
 
     steps:
       - name: Repository auschecken
