@@ -22,6 +22,7 @@ jobs:
           - slotpark
           - house-of-fun
           - slotomania
+          - bingo-bash
 
     steps:
       - name: Repository auschecken
