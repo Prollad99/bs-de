@@ -20,6 +20,7 @@ jobs:
           - match-masters
           - solitaire-grand-harvest
           - slotpark
+          - house-of-fun
 
     steps:
       - name: Repository auschecken
