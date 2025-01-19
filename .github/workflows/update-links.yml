@@ -23,6 +23,7 @@ jobs:
           - house-of-fun
           - slotomania
           - bingo-bash
+          - huuuge-casino
 
     steps:
       - name: Repository auschecken
