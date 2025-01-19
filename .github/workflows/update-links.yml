@@ -21,6 +21,7 @@ jobs:
           - solitaire-grand-harvest
           - slotpark
           - house-of-fun
+          - slotomania
 
     steps:
       - name: Repository auschecken
