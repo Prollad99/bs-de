@@ -24,6 +24,7 @@ jobs:
           - slotomania
           - bingo-bash
           - huuuge-casino
+          - wsop
 
     steps:
       - name: Repository auschecken
