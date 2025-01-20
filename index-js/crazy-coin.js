@@ -1,17 +1,14 @@
-const puppeteer = require('puppeteer');
+const axios = require('axios');
+const cheerio = require('cheerio');
 const fs = require('fs').promises;
 const path = require('path');
 
-// Function to get the current date in YYYY-MM-DD format
+// Helper functions
 function getCurrentDate() {
   const date = new Date();
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  return date.toISOString().split('T')[0];
 }
 
-// Function to format the date in "MM-DD-YYYY" format
 function formatDateCustom(dateString) {
   const date = new Date(dateString);
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -26,60 +23,46 @@ const dir = 'links-json';
 const filePath = path.join(dir, 'crazy-coin.json');
 const htmlFilePath = path.join('_includes', 'crazy-coin.html');
 
+async function fetchLinks() {
+  const response = await axios.get(url);
+  const $ = cheerio.load(response.data);
+
+  const links = [];
+  $('a[data-pl]').each((_, element) => {
+    const href = $(element).attr('data-pl');
+    if (href) {
+      links.push({ href, date: currentDate });
+    }
+  });
+
+  return links;
+}
+
 async function main() {
   try {
-    // Check for existing links
     let existingLinks = [];
     if (await fs.access(filePath).then(() => true).catch(() => false)) {
       const fileData = await fs.readFile(filePath, 'utf8');
-      if (fileData) {
-        existingLinks = JSON.parse(fileData);
-      }
+      if (fileData) existingLinks = JSON.parse(fileData);
     }
 
-    // Launch Puppeteer
-    const browser = await puppeteer.launch({
-      headless: 'new', // Use the new headless mode
-      args: ['--no-sandbox', '--disable-setuid-sandbox'], // Disable sandbox for CI/CD
-    });
-    const page = await browser.newPage();
-    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    const newLinks = await fetchLinks();
 
-    // Extract links
-    const newLinks = await page.evaluate(() => {
-      const links = [];
-      document.querySelectorAll('a[data-pl]').forEach((element) => {
-        const href = element.getAttribute('data-pl');
-        if (href) {
-          links.push({ href, date: new Date().toISOString().split('T')[0] });
-        }
-      });
-      return links;
-    });
-
-    await browser.close();
-
-    // Combine new links with existing ones
     const combinedLinks = [...newLinks, ...existingLinks]
       .reduce((acc, link) => {
-        if (!acc.find(({ href }) => href === link.href)) {
-          acc.push(link);
-        }
+        if (!acc.find(({ href }) => href === link.href)) acc.push(link);
         return acc;
       }, [])
-      .slice(0, 100); // Limit to 100 links
+      .slice(0, 100);
 
     console.log('Final links:', combinedLinks);
 
-    // Ensure output directory exists
     if (!await fs.access(dir).then(() => true).catch(() => false)) {
       await fs.mkdir(dir);
     }
 
-    // Save combined links to JSON
     await fs.writeFile(filePath, JSON.stringify(combinedLinks, null, 2), 'utf8');
 
-    // Generate HTML file with custom date format
     let htmlContent = '<ul class="list-group mt-3 mb-4">\n';
     combinedLinks.forEach(link => {
       const formattedDate = formatDateCustom(link.date);
