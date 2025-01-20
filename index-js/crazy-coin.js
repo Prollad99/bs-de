@@ -14,10 +14,10 @@ function getCurrentDate() {
 // Function to format the date in "MM-DD-YYYY" format
 function formatDateCustom(dateString) {
   const date = new Date(dateString);
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Get month and pad with 0 if needed
-  const day = String(date.getDate()).padStart(2, '0'); // Get day and pad with 0 if needed
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
   const year = date.getFullYear();
-  return `${month}-${day}-${year}`; // Return formatted date
+  return `${month}-${day}-${year}`;
 }
 
 const url = 'https://dmartgroup.com/get_data.php?show=OUYOSU';
@@ -28,31 +28,30 @@ const htmlFilePath = path.join('_includes', 'crazy-coin.html');
 
 async function main() {
   try {
+    // Check for existing links
     let existingLinks = [];
     if (await fs.access(filePath).then(() => true).catch(() => false)) {
-      try {
-        const fileData = await fs.readFile(filePath, 'utf8');
-        if (fileData) {
-          existingLinks = JSON.parse(fileData);
-        }
-      } catch (error) {
-        console.error('Error reading existing links:', error);
+      const fileData = await fs.readFile(filePath, 'utf8');
+      if (fileData) {
+        existingLinks = JSON.parse(fileData);
       }
     }
 
     // Launch Puppeteer
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+      headless: 'new', // Use the new headless mode
+      args: ['--no-sandbox', '--disable-setuid-sandbox'], // Disable sandbox for CI/CD
+    });
     const page = await browser.newPage();
-    await page.goto(url, { waitUntil: 'networkidle2' });
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
 
-    // Extract links using Puppeteer
+    // Extract links
     const newLinks = await page.evaluate(() => {
       const links = [];
-      const elements = document.querySelectorAll('a[data-pl]');
-      elements.forEach(element => {
-        const link = element.getAttribute('data-pl');
-        if (link) {
-          links.push({ href: link });
+      document.querySelectorAll('a[data-pl]').forEach((element) => {
+        const href = element.getAttribute('data-pl');
+        if (href) {
+          links.push({ href, date: new Date().toISOString().split('T')[0] });
         }
       });
       return links;
@@ -60,7 +59,7 @@ async function main() {
 
     await browser.close();
 
-    // Combine new links with existing links, keeping the older dates if they exist
+    // Combine new links with existing ones
     const combinedLinks = [...newLinks, ...existingLinks]
       .reduce((acc, link) => {
         if (!acc.find(({ href }) => href === link.href)) {
@@ -72,26 +71,25 @@ async function main() {
 
     console.log('Final links:', combinedLinks);
 
-    // Ensure the directory exists
+    // Ensure output directory exists
     if (!await fs.access(dir).then(() => true).catch(() => false)) {
       await fs.mkdir(dir);
     }
 
-    // Save the combined links to a JSON file
+    // Save combined links to JSON
     await fs.writeFile(filePath, JSON.stringify(combinedLinks, null, 2), 'utf8');
 
-    // Generate HTML file with the custom date format and text
+    // Generate HTML file with custom date format
     let htmlContent = '<ul class="list-group mt-3 mb-4">\n';
     combinedLinks.forEach(link => {
-      const formattedDate = formatDateCustom(link.date); // Format date as MM-DD-YYYY
+      const formattedDate = formatDateCustom(link.date);
       htmlContent += `  <li class="list-group-item d-flex justify-content-between align-items-center">\n`;
-      htmlContent += `    <span>Crazy Coins Free Spins ${formattedDate}</span>\n`; // Custom text with formatted date
+      htmlContent += `    <span>Crazy Coins Free Spins ${formattedDate}</span>\n`;
       htmlContent += `    <a href="${link.href}" class="btn btn-primary btn-sm">Sammeln</a>\n`;
       htmlContent += `  </li>\n`;
     });
     htmlContent += '</ul>';
 
-    // Save the generated HTML to a file
     await fs.writeFile(htmlFilePath, htmlContent, 'utf8');
     console.log(`HTML file saved to ${htmlFilePath}`);
   } catch (err) {
