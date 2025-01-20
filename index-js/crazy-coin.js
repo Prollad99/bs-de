@@ -1,5 +1,4 @@
-const axios = require('axios');
-const cheerio = require('cheerio');
+const puppeteer = require('puppeteer');
 const fs = require('fs').promises;
 const path = require('path');
 
@@ -41,17 +40,25 @@ async function main() {
       }
     }
 
-    const { data } = await axios.get(url);
-    const $ = cheerio.load(data);
-    const newLinks = [];
+    // Launch Puppeteer
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.goto(url, { waitUntil: 'networkidle2' });
 
-    // Extract URLs from the `data-pl` attribute of <a> tags
-    $('a[data-pl]').each((index, element) => {
-      const link = $(element).attr('data-pl');
-      const existingLink = existingLinks.find(l => l.href === link);
-      const date = existingLink ? existingLink.date : currentDate;
-      newLinks.push({ href: link, date: date });
+    // Extract links using Puppeteer
+    const newLinks = await page.evaluate(() => {
+      const links = [];
+      const elements = document.querySelectorAll('a[data-pl]');
+      elements.forEach(element => {
+        const link = element.getAttribute('data-pl');
+        if (link) {
+          links.push({ href: link });
+        }
+      });
+      return links;
     });
+
+    await browser.close();
 
     // Combine new links with existing links, keeping the older dates if they exist
     const combinedLinks = [...newLinks, ...existingLinks]
