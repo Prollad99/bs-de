@@ -25,6 +25,7 @@ jobs:
           - bingo-bash
           - huuuge-casino
           - wsop
+          - crazy-coin
 
     steps:
       - name: Repository auschecken
