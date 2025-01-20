@@ -45,8 +45,9 @@ async function main() {
     const $ = cheerio.load(data);
     const newLinks = [];
 
-    $('a[href*="cc.rwys.xyz"]').each((index, element) => {
-      const link = $(element).attr('href');
+    // Extract URLs from the `data-pl` attribute of <a> tags
+    $('a[data-pl]').each((index, element) => {
+      const link = $(element).attr('data-pl');
       const existingLink = existingLinks.find(l => l.href === link);
       const date = existingLink ? existingLink.date : currentDate;
       newLinks.push({ href: link, date: date });
@@ -64,10 +65,12 @@ async function main() {
 
     console.log('Final links:', combinedLinks);
 
+    // Ensure the directory exists
     if (!await fs.access(dir).then(() => true).catch(() => false)) {
       await fs.mkdir(dir);
     }
 
+    // Save the combined links to a JSON file
     await fs.writeFile(filePath, JSON.stringify(combinedLinks, null, 2), 'utf8');
 
     // Generate HTML file with the custom date format and text
@@ -81,6 +84,7 @@ async function main() {
     });
     htmlContent += '</ul>';
 
+    // Save the generated HTML to a file
     await fs.writeFile(htmlFilePath, htmlContent, 'utf8');
     console.log(`HTML file saved to ${htmlFilePath}`);
   } catch (err) {
