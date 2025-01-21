@@ -1,5 +1,4 @@
-const axios = require("axios");
-const cheerio = require("cheerio");
+const { chromium } = require("playwright");
 const fs = require("fs").promises;
 const path = require("path");
 
@@ -27,26 +26,21 @@ const dir = "links-json";
 const filePath = path.join(dir, "crazy-coin.json");
 const htmlFilePath = path.join("_includes", "crazy-coin.html");
 
-async function fetchLinksFromSourceCode() {
-  try {
-    const { data: html } = await axios.get(url);
+async function fetchLinksWithPlaywright() {
+  const browser = await chromium.launch({ headless: true });
+  const page = await browser.newPage();
+  await page.goto(url, { waitUntil: "domcontentloaded" });
 
-    // Load the HTML into Cheerio
-    const $ = cheerio.load(html);
+  // Extract links with `data-pl`
+  const links = await page.evaluate(() => {
+    return Array.from(document.querySelectorAll('a[data-pl]')).map((el) => ({
+      href: el.getAttribute("data-pl"),
+      date: new Date().toISOString().split("T")[0],
+    }));
+  });
 
-    // Extract links from elements with `data-pl` attributes
-    const links = $("a[data-pl]")
-      .map((_, element) => {
-        const href = $(element).attr("data-pl");
-        return { href, date: currentDate };
-      })
-      .get();
-
-    return links;
-  } catch (error) {
-    console.error("Error fetching links from source code:", error);
-    return [];
-  }
+  await browser.close();
+  return links;
 }
 
 async function main() {
@@ -63,7 +57,7 @@ async function main() {
       }
     }
 
-    const newLinks = await fetchLinksFromSourceCode();
+    const newLinks = await fetchLinksWithPlaywright();
     const updatedLinks = newLinks.map((link) => {
       const existingLink = existingLinks.find((l) => l.href === link.href);
       return {
