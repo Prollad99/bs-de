@@ -40,7 +40,11 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Abhängigkeiten installieren
-        run: npm install jq axios cheerio
+        run: npm install
+
+      # Install Playwright Browsers
+      - name: Installiere Playwright-Browser
+        run: npx playwright install
 
       - name: Links abrufen und aktualisieren
         run: |
