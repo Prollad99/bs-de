@@ -1,4 +1,5 @@
-const puppeteer = require("puppeteer");
+const axios = require("axios");
+const cheerio = require("cheerio");
 const fs = require("fs").promises;
 const path = require("path");
 
@@ -27,36 +28,25 @@ const filePath = path.join(dir, "crazy-coin.json");
 const htmlFilePath = path.join("_includes", "crazy-coin.html");
 
 async function fetchLinks() {
-  const browser = await puppeteer.launch({
-    headless: "new", // Use the faster headless mode
-    args: ["--no-sandbox", "--disable-setuid-sandbox"], // For environments without root privileges
-  });
-  const page = await browser.newPage();
+  try {
+    const { data } = await axios.get(url);
 
-  // Optimize performance by disabling unnecessary resource loading
-  await page.setRequestInterception(true);
-  page.on("request", (req) => {
-    if (["image", "stylesheet", "font", "media"].includes(req.resourceType())) {
-      req.abort();
-    } else {
-      req.continue();
-    }
-  });
+    // Load the HTML into Cheerio
+    const $ = cheerio.load(data);
 
-  await page.goto(url, { waitUntil: "domcontentloaded" });
+    // Extract links from elements with `data-pl` attributes
+    const links = $('[data-pl]')
+      .map((_, element) => {
+        const href = $(element).attr("data-pl");
+        return { href, date: null }; // Add a placeholder for the date
+      })
+      .get();
 
-  // Extract links from the page
-  const links = await page.evaluate(() => {
-    return Array.from(document.querySelectorAll('[data-pl]')).map((element) => {
-      return {
-        href: element.getAttribute("data-pl"),
-        date: null, // Placeholder; will be updated later
-      };
-    });
-  });
-
-  await browser.close();
-  return links;
+    return links;
+  } catch (error) {
+    console.error("Error fetching links:", error);
+    return [];
+  }
 }
 
 async function main() {
@@ -114,7 +104,7 @@ async function main() {
     await fs.writeFile(htmlFilePath, htmlContent, "utf8");
     console.log(`HTML file saved to ${htmlFilePath}`);
   } catch (err) {
-    console.error("Error fetching links:", err);
+    console.error("Error processing links:", err);
     process.exit(1);
   }
 }
