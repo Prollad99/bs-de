@@ -27,24 +27,24 @@ const dir = "links-json";
 const filePath = path.join(dir, "crazy-coin.json");
 const htmlFilePath = path.join("_includes", "crazy-coin.html");
 
-async function fetchLinks() {
+async function fetchLinksFromSourceCode() {
   try {
-    const { data } = await axios.get(url);
+    const { data: html } = await axios.get(url);
 
     // Load the HTML into Cheerio
-    const $ = cheerio.load(data);
+    const $ = cheerio.load(html);
 
     // Extract links from elements with `data-pl` attributes
-    const links = $('[data-pl]')
+    const links = $("a[data-pl]")
       .map((_, element) => {
         const href = $(element).attr("data-pl");
-        return { href, date: null }; // Add a placeholder for the date
+        return { href, date: currentDate };
       })
       .get();
 
     return links;
   } catch (error) {
-    console.error("Error fetching links:", error);
+    console.error("Error fetching links from source code:", error);
     return [];
   }
 }
@@ -63,7 +63,7 @@ async function main() {
       }
     }
 
-    const newLinks = await fetchLinks();
+    const newLinks = await fetchLinksFromSourceCode();
     const updatedLinks = newLinks.map((link) => {
       const existingLink = existingLinks.find((l) => l.href === link.href);
       return {
