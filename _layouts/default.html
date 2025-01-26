@@ -18,6 +18,15 @@
     {{ site.title }}
   {% endif %}
 </title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BNX1BVWWSF"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-BNX1BVWWSF');
+</script>
 
   {% if page.manifest %}
     <link rel="manifest" href="{{ page.manifest }}">
