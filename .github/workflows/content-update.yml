@@ -82,6 +82,7 @@ jobs:
         run: |
           git config user.email "prolladmail@gmail.com"
           git config user.name "Auto-Updater"
+          git pull --rebase origin main
           git add _includes/
-          git commit -m "Update ${{ matrix.game }} content"
+          git commit -m "Update ${{ matrix.game }} content" || echo "No changes to commit"
           git push https://x-access-token:$DEPLOY_KEY@github.com/Prollad99/bs-de.git HEAD:main
