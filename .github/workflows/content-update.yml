@@ -93,8 +93,11 @@ jobs:
           git fetch origin main
           
           # Rebase the local branch with remote to avoid stale references
-          git rebase origin/main || { echo 'Rebase failed, attempting merge instead...'; git merge origin/main; }
-          
+          git rebase origin/main || { 
+            echo 'Rebase failed, attempting merge instead...'; 
+            git merge origin/main; 
+          }
+
           # Stage all changes and commit
           git add -A
           git commit -m "Update ${{ matrix.game }} content" || echo "No changes to commit"
