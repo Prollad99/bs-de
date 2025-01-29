@@ -82,22 +82,28 @@ jobs:
           find artifacts/ -name '*.html' -exec cp -f {} _includes/ \;
 
       - name: Deploy Changes
-        env: 
-          DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-        run: |
-          git config user.email "prolladmail@gmail.com"
-          git config user.name "Auto-Updater"
+  env: 
+    DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+  run: |
+    git config user.email "prolladmail@gmail.com"
+    git config user.name "Auto-Updater"
 
-          # Add and commit all changes
-          git add -A
-          git commit -m "Update all game contents" || echo "No changes to commit"
+    # Ensure local branch matches latest origin/main
+    git fetch origin main
+    git reset --hard origin/main
 
-          # Fetch latest changes and rebase
-          git fetch origin main
-          git rebase origin/main || { 
-            echo 'Rebase failed, merging...'; 
-            git merge origin/main; 
-          }
+    # Copy generated files (already done in previous step)
+    # Remove artifacts directory to avoid accidental staging
+    rm -rf artifacts/
 
-          # Push changes safely
-          git push --force-with-lease https://x-access-token:$DEPLOY_KEY@github.com/Prollad99/bs-de.git HEAD:main
+    # Stage only the intended changes
+    git add _includes/
+
+    # Commit only if changes exist
+    git diff --cached --quiet || git commit -m "Update all game contents"
+
+    # Pull latest changes and rebase (handles race conditions)
+    git pull --rebase origin main
+
+    # Push changes safely
+    git push --force-with-lease https://x-access-token:$DEPLOY_KEY@github.com/Prollad99/bs-de.git HEAD:main
