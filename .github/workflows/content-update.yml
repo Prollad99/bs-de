@@ -82,7 +82,17 @@ jobs:
         run: |
           git config user.email "prolladmail@gmail.com"
           git config user.name "Auto-Updater"
+
+          # Ensure no unstaged changes before pulling
+          git add -A  # Stages all changes
+          git commit -m "Staged changes" || echo "No changes to commit"
+          
+          # Pull latest changes from the remote repository
           git pull --rebase origin main
+          
+          # Add and commit any new changes
           git add _includes/
           git commit -m "Update ${{ matrix.game }} content" || echo "No changes to commit"
+          
+          # Push the changes to the remote repository
           git push https://x-access-token:$DEPLOY_KEY@github.com/Prollad99/bs-de.git HEAD:main
