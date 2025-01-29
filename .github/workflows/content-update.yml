@@ -1,8 +1,8 @@
-name: Automatische Inhaltsaktualisierungen & SEO
+name: Automated Content Updates & SEO
 
 on:
   schedule:
-    - cron: '*/30 * * * *' # Alle 30 Minuten
+    - cron: '*/30 * * * *' # Every 30 minutes
   push:
     branches:
       - main
@@ -28,60 +28,60 @@ jobs:
           - crazy-coin
 
     steps:
-      - name: Repository auschecken
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Abhängigkeiten installieren
+      - name: Install Dependencies
         run: |
           npm install
           npx playwright install
 
-      - name: Spiel-Links aktualisieren
+      - name: Update Game Links
         run: node index-js/${{ matrix.game }}.js
 
-      - name: SEO-Inhalt generieren
+      - name: Generate SEO Content
         env:
           CURRENT_DATE: $(date +'%Y-%m-%d')
         run: |
           GAME_NAME=${{ matrix.game }}
           FORMATTED_NAME=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
-          # Beitragstext generieren
-          echo "### 🎮 $FORMATTED_NAME Gratis-Belohnungen (Aktualisiert: $CURRENT_DATE)
+          # Generate Post Content
+          echo "### 🎮 $FORMATTED_NAME Kostenlose Belohnungen (Aktualisiert: $CURRENT_DATE)
 
           Erhalte täglich aktualisierte $FORMATTED_NAME-Links für:
-          ✅ Kostenlose Spins
-          ✅ Bonus-Münzen
-          ✅ Zeitlich begrenzte Angebote
+          ✅ Kostenlose Spins  
+          ✅ Bonusmünzen  
+          ✅ Zeitlich begrenzte Angebote  
 
-          **Warum unsere Links nutzen?**
-          - Alle 30 Minuten aktualisiert
-          - Funktioniert auf allen Geräten
-          - Kein Login erforderlich
+          **Warum unsere Links verwenden?**  
+          - Alle 30 Minuten aktualisiert  
+          - Funktioniert auf allen Geräten  
+          - Kein Login erforderlich  
 
-          ⚠️ Voraussetzungen:
-          - Neueste Spielversion installiert
-          - Stabile Internetverbindung
+          ⚠️ Voraussetzungen:  
+          - Neueste Spielversion installiert  
+          - Stabile Internetverbindung  
 
-          *Überprüft und funktionsfähig seit $CURRENT_DATE*" > "_includes/${GAME_NAME}_post.html"
+          *Überprüft und funktionsfähig ab $CURRENT_DATE*" > "_includes/${GAME_NAME}_post.html"
 
-          # Fußzeile generieren
-          echo "## 🔍 So löst du $FORMATTED_NAME-Belohnungen ein
-          1. Klicke auf einen der oben genannten Links
-          2. Warte, bis das Spiel startet
-          3. Belohnungen werden automatisch eingelöst
+          # Generate Footer
+          echo "## 🔍 So löst du $FORMATTED_NAME-Belohnungen ein  
+          1. Klicke auf einen beliebigen Link oben  
+          2. Warte, bis das Spiel startet  
+          3. Deine Belohnungen werden automatisch eingelöst  
 
-          **Tipps:**
-          - Links verfallen nach 48 Stunden
-          - Seite aktualisieren für neue Updates
-          - Kontaktiere den Support bei fehlgeschlagenen Einlösungen" > "_includes/${GAME_NAME}_footer.html"
+          **Tipps:**  
+          - Links verfallen nach 48 Stunden  
+          - Aktualisiere die Seite für neue Updates  
+          - Kontaktiere den Support bei fehlgeschlagenen Ansprüchen" > "_includes/${GAME_NAME}_footer.html"
 
-      - name: Änderungen bereitstellen
+      - name: Deploy Changes
         env: 
           DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
         run: |
           git config user.email "prolladmail@gmail.com"
           git config user.name "Auto-Updater"
           git add _includes/
-          git commit -m "Aktualisiere ${{ matrix.game }} Inhalt"
+          git commit -m "Update ${{ matrix.game }} content"
           git push https://x-access-token:$DEPLOY_KEY@github.com/Prollad99/bs-de.git HEAD:main
