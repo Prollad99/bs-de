@@ -2,7 +2,7 @@ name: Automated Content Updates & SEO
 
 on:
   schedule:
-    - cron: '*/30 * * * *' # Every 30 minutes
+    - cron: '*/30 * * * *' # Run every 30 minutes
   push:
     branches:
       - main
@@ -85,19 +85,15 @@ jobs:
           git config user.email "prolladmail@gmail.com"
           git config user.name "Auto-Updater"
           
-          # Stage all changes and commit
-          git add -A
-          git commit -m "Staged changes" || echo "No changes to commit"
+          # Fetch latest changes
+          git fetch origin main
           
-          # Fetch all remote changes
-          git fetch origin
-
-          # Rebase with the remote main branch
-          git rebase origin/main || { echo 'Rebase failed, attempting merge instead...'; git merge origin/main; }
-
-          # Commit any new changes after rebase
-          git add _includes/
+          # Ensure local branch is up-to-date with the remote
+          git pull --rebase origin main
+          
+          # Stage all changes
+          git add -A
           git commit -m "Update ${{ matrix.game }} content" || echo "No changes to commit"
           
-          # Push changes
+          # Push changes safely (no force push)
           git push https://x-access-token:$DEPLOY_KEY@github.com/Prollad99/bs-de.git HEAD:main
