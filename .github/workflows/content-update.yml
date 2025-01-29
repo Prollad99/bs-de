@@ -7,8 +7,12 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  content-update:
+  generate-content:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -48,35 +52,34 @@ jobs:
           GAME_NAME=${{ matrix.game }}
           FORMATTED_NAME=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
-          # Generate Post Content with the actual date
-          echo "### 🎮 $FORMATTED_NAME Kostenlose Belohnungen (Aktualisiert: ${{ env.CURRENT_DATE }})
+          echo "### 🎮 $FORMATTED_NAME Kostenlose Belohnungen (Aktualisiert: ${{ env.CURRENT_DATE }}) ..." > "_includes/${GAME_NAME}_post.html"
+          echo "## 🔍 So löst du $FORMATTED_NAME-Belohnungen ein ..." > "_includes/${GAME_NAME}_footer.html"
 
-          Erhalte täglich aktualisierte $FORMATTED_NAME-Links für:
-          ✅ Kostenlose Spins  
-          ✅ Bonusmünzen  
-          ✅ Zeitlich begrenzte Angebote  
+      - name: Upload Generated Files
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.game }}-seo
+          path: |
+            _includes/${{ matrix.game }}_post.html
+            _includes/${{ matrix.game }}_footer.html
 
-          **Warum unsere Links verwenden?**  
-          - Alle 30 Minuten aktualisiert  
-          - Funktioniert auf allen Geräten  
-          - Kein Login erforderlich  
+  deploy:
+    runs-on: ubuntu-latest
+    needs: generate-content
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Ensures full history for rebase
 
-          ⚠️ Voraussetzungen:  
-          - Neueste Spielversion installiert  
-          - Stabile Internetverbindung  
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
 
-          *Überprüft und funktionsfähig ab ${{ env.CURRENT_DATE }}*" > "_includes/${GAME_NAME}_post.html"
-
-          # Generate Footer with the actual date
-          echo "## 🔍 So löst du $FORMATTED_NAME-Belohnungen ein  
-          1. Klicke auf einen beliebigen Link oben  
-          2. Warte, bis das Spiel startet  
-          3. Deine Belohnungen werden automatisch eingelöst  
-
-          **Tipps:**  
-          - Links verfallen nach 48 Stunden  
-          - Aktualisiere die Seite für neue Updates  
-          - Kontaktiere den Support bei fehlgeschlagenen Ansprüchen" > "_includes/${GAME_NAME}_footer.html"
+      - name: Move Generated Files
+        run: |
+          find artifacts/ -name '*.html' -exec cp -f {} _includes/ \;
 
       - name: Deploy Changes
         env: 
@@ -84,23 +87,17 @@ jobs:
         run: |
           git config user.email "prolladmail@gmail.com"
           git config user.name "Auto-Updater"
-          
-          # Ensure no unstaged changes before pulling
+
+          # Add and commit all changes
           git add -A
-          git commit -m "Auto-commit before pulling changes" || echo "No changes to commit"
-          
-          # Fetch the latest changes from the remote main branch
+          git commit -m "Update all game contents" || echo "No changes to commit"
+
+          # Fetch latest changes and rebase
           git fetch origin main
-          
-          # Rebase the local branch with remote to avoid stale references
           git rebase origin/main || { 
-            echo 'Rebase failed, attempting merge instead...'; 
+            echo 'Rebase failed, merging...'; 
             git merge origin/main; 
           }
 
-          # Stage all changes and commit
-          git add -A
-          git commit -m "Update ${{ matrix.game }} content" || echo "No changes to commit"
-          
-          # Push changes safely with lease (prevents overwriting remote changes)
+          # Push changes safely
           git push --force-with-lease https://x-access-token:$DEPLOY_KEY@github.com/Prollad99/bs-de.git HEAD:main
