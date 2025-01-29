@@ -82,17 +82,20 @@ jobs:
         run: |
           git config user.email "prolladmail@gmail.com"
           git config user.name "Auto-Updater"
-
-          # Ensure no unstaged changes before pulling
-          git add -A  # Stages all changes
+          
+          # Stage all changes and commit
+          git add -A
           git commit -m "Staged changes" || echo "No changes to commit"
           
-          # Pull latest changes from the remote repository
-          git pull --rebase origin main
-          
-          # Add and commit any new changes
+          # Fetch all remote changes
+          git fetch origin
+
+          # Rebase with the remote main branch
+          git rebase origin/main || { echo 'Rebase failed, attempting merge instead...'; git merge origin/main; }
+
+          # Commit any new changes after rebase
           git add _includes/
           git commit -m "Update ${{ matrix.game }} content" || echo "No changes to commit"
           
-          # Push the changes to the remote repository
+          # Push changes
           git push https://x-access-token:$DEPLOY_KEY@github.com/Prollad99/bs-de.git HEAD:main
