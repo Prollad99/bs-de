@@ -10,6 +10,11 @@ on:
 jobs:
   content-update:
     runs-on: ubuntu-latest
+    # Add concurrency control to prevent overlapping runs
+    concurrency: 
+      group: content-update-${{ github.ref }}
+      cancel-in-progress: true
+
     strategy:
       matrix:
         game:
@@ -30,6 +35,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Get full commit history
 
       - name: Install Dependencies
         run: |
@@ -41,13 +48,11 @@ jobs:
 
       - name: Generate SEO Content
         run: |
-          CURRENT_DATE=$(date +'%Y-%m-%d')  # Get current date in YYYY-MM-DD format
+          CURRENT_DATE=$(date +'%Y-%m-%d')
           GAME_NAME=${{ matrix.game }}
-          
-          # Format game name for display
           FORMATTED_NAME=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
-          # Generate post content with dynamic date
+          # Generate post content
           echo "### 🎮 $FORMATTED_NAME Kostenlose Belohnungen (Aktualisiert: $CURRENT_DATE)
 
           Erhalte täglich aktualisierte $FORMATTED_NAME-Links für:
@@ -84,13 +89,19 @@ jobs:
           git config user.email "prolladmail@gmail.com"
           git config user.name "Auto-Updater"
           
-          # Stage and commit changes
+          # Stage changes
           git add -A
-          git commit -m "Update ${{ matrix.game }} content for $(date +'%Y-%m-%d')" || echo "No changes to commit"
           
-          # Handle potential conflicts
+          # Check for changes before committing
+          if git diff-index --quiet HEAD --; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update ${{ matrix.game }} content for $(date +'%Y-%m-%d')"
+          fi
+
+          # Always fetch and rebase before pushing
           git fetch origin
-          git rebase origin/main || git merge origin/main
+          git rebase origin/main
           
-          # Push changes
-          git push https://x-access-token:$DEPLOY_KEY@github.com/Prollad99/bs-de.git HEAD:main
+          # Force push with lease to handle concurrent updates
+          git push --force-with-lease https://x-access-token:$DEPLOY_KEY@github.com/Prollad99/bs-de.git HEAD:main
