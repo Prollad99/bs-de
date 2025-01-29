@@ -1,8 +1,8 @@
-name: Automated Content Updates & SEO Optimization
+name: Automatische Inhaltsaktualisierungen & SEO
 
 on:
   schedule:
-    - cron: '*/15 * * * *' # Run every 15 minutes
+    - cron: '*/30 * * * *' # Alle 30 Minuten
   push:
     branches:
       - main
@@ -28,101 +28,60 @@ jobs:
           - crazy-coin
 
     steps:
-      - name: Checkout Repository
+      - name: Repository auschecken
         uses: actions/checkout@v3
 
-      - name: Cache Dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.npm
-            ~/.cache/playwright
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-
-      - name: Install Dependencies
+      - name: Abhängigkeiten installieren
         run: |
           npm install
-          npx playwright install --with-deps
+          npx playwright install
 
-      - name: Update Game Links
-        run: |
-          node index-js/${{ matrix.game }}.js
-          echo "Updated links saved for ${{ matrix.game }}"
+      - name: Spiel-Links aktualisieren
+        run: node index-js/${{ matrix.game }}.js
 
-      - name: Generate SEO-Optimized Posts
+      - name: SEO-Inhalt generieren
         env:
-          CURRENT_DATE: $(date +'%d.%m.%Y')
+          CURRENT_DATE: $(date +'%Y-%m-%d')
         run: |
           GAME_NAME=${{ matrix.game }}
-          FORMATTED_GAME_NAME=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
-          
-          POST_FILE="_includes/${GAME_NAME}_post.html"
-          
-          SEO_CONTENT="### 🎮 $FORMATTED_GAME_NAME Kostenlose Belohnungen (Aktualisiert: $CURRENT_DATE)
+          FORMATTED_NAME=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
-          **Sichere dir täglich $FORMATTED_GAME_NAME Boni!** Als erfahrene Spieler wissen wir, wie wichtig kostenlose Ressourcen für dein Spielerlebnis sind. Hier findest du:
+          # Beitragstext generieren
+          echo "### 🎮 $FORMATTED_NAME Gratis-Belohnungen (Aktualisiert: $CURRENT_DATE)
 
-          ✅ **100% verifizierte Links** (automatisch alle 15 Minuten aktualisiert)  
-          ✅ **Exklusive VIP-Boni**, die nicht in sozialen Medien verfügbar sind  
-          ✅ **Multi-Plattform-Support** (Android, iOS, Facebook)  
+          Erhalte täglich aktualisierte $FORMATTED_NAME-Links für:
+          ✅ Kostenlose Spins
+          ✅ Bonus-Münzen
+          ✅ Zeitlich begrenzte Angebote
 
-          **Top 3 $FORMATTED_GAME_NAME Tipps 2024:**  
-          1. Nutze unsere Links zwischen 8-10 Uhr CET für maximale Belohnungen  
-          2. Kombiniere sie mit täglichen Login-Boni für den 2-fachen Effekt  
-          3. Aktiviere Push-Benachrichtigungen für zeitlich begrenzte Angebote  
+          **Warum unsere Links nutzen?**
+          - Alle 30 Minuten aktualisiert
+          - Funktioniert auf allen Geräten
+          - Kein Login erforderlich
 
-          ⚠️ **Wichtig:** Erfordert Version $((RANDOM%5+2)).$((RANDOM%50)).+  
-          [Jetzt aktualisieren](https://play.google.com/store/apps/details?id=com.$GAME_NAME) | [iOS-Version](https://apps.apple.com/app/$GAME_NAME)  
+          ⚠️ Voraussetzungen:
+          - Neueste Spielversion installiert
+          - Stabile Internetverbindung
 
-          **Nutzerstatistik:**  
-          🏆 Durchschnittliche Bonussteigerung: $((RANDOM%300+150))%  
-          ⏱️ Wöchentlich gesparte Zeit: $((RANDOM%10+5)) Stunden  
+          *Überprüft und funktionsfähig seit $CURRENT_DATE*" > "_includes/${GAME_NAME}_post.html"
 
-          *»Zuletzt bestätigt: vor 2 Minuten von Benutzer #$((RANDOM%10000+1))«*"
+          # Fußzeile generieren
+          echo "## 🔍 So löst du $FORMATTED_NAME-Belohnungen ein
+          1. Klicke auf einen der oben genannten Links
+          2. Warte, bis das Spiel startet
+          3. Belohnungen werden automatisch eingelöst
 
-          echo "$SEO_CONTENT" > "$POST_FILE"
+          **Tipps:**
+          - Links verfallen nach 48 Stunden
+          - Seite aktualisieren für neue Updates
+          - Kontaktiere den Support bei fehlgeschlagenen Einlösungen" > "_includes/${GAME_NAME}_footer.html"
 
-      - name: Create Conversion-Optimized Footers
-        run: |
-          GAME_NAME=${{ matrix.game }}
-          FORMATTED_GAME_NAME=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
-
-          FOOTER_FILE="_includes/${GAME_NAME}_footer.html"
-          
-          SCHEMA_JSON='<script type="application/ld+json">
-          {
-            "@context": "https://schema.org",
-            "@type": "VideoGame",
-            "name": "$FORMATTED_GAME_NAME Belohnungen",
-            "description": "Kostenlose Ressourcen für $FORMATTED_GAME_NAME",
-            "applicationCategory": "CasinoGame",
-            "author": {
-              "@type": "Organization",
-              "name": "BonusCollector"
-            }
-          }
-          </script>'
-
-          FOOTER_CONTENT="## ⚡ $FORMATTED_GAME_NAME Profi-Strategien
-
-          **Maximiere deine Gewinne:**  
-          🔄 Verwende 3 Geräte gleichzeitig für 3-fache Boni  
-          🕒 Beste Einlösezeiten: 8-9 Uhr & 18-19 Uhr CET  
-          🛑 Vermeide diese 3 häufigen Fehler:  
-          1. Zu schnelles Klicken (warte 3 Sekunden zwischen den Links)  
-          2. Fehlende Kontoverifizierung  
-          3. Nutzung veralteter App-Versionen  
-
-          $SCHEMA_JSON"
-
-          echo "$FOOTER_CONTENT" > "$FOOTER_FILE"
-
-      - name: Deploy Changes
+      - name: Änderungen bereitstellen
         env: 
           DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
         run: |
-          git config --global user.email "prolladmail@gmail.com"
-          git config --global user.name "BonusCollector SEO Bot"
-          git add _includes/*.html links-json/*.json
-          git commit -m "SEO Update: ${{ matrix.game }} (v$(date +%s))"
+          git config user.email "prolladmail@gmail.com"
+          git config user.name "Auto-Updater"
+          git add _includes/
+          git commit -m "Aktualisiere ${{ matrix.game }} Inhalt"
           git push https://x-access-token:$DEPLOY_KEY@github.com/Prollad99/bs-de.git HEAD:main
