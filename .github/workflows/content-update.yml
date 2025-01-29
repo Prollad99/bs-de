@@ -85,6 +85,10 @@ jobs:
           git config user.email "prolladmail@gmail.com"
           git config user.name "Auto-Updater"
           
+          # Ensure no unstaged changes before pulling
+          git add -A
+          git commit -m "Auto-commit before pulling changes" || echo "No changes to commit"
+          
           # Fetch latest changes
           git fetch origin main
           
