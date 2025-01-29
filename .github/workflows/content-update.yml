@@ -40,14 +40,14 @@ jobs:
         run: node index-js/${{ matrix.game }}.js
 
       - name: Generate SEO Content
-        env:
-          CURRENT_DATE: $(date +'%Y-%m-%d')  # Store the current date in an environment variable
         run: |
+          CURRENT_DATE=$(date +'%Y-%m-%d')  # Store the current date in a variable
           GAME_NAME=${{ matrix.game }}
           FORMATTED_NAME=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
           # Generate Post Content with the actual date
-          echo "### 🎮 $FORMATTED_NAME Kostenlose Belohnungen (Aktualisiert: $CURRENT_DATE)
+          cat <<EOF > "_includes/${GAME_NAME}_post.html"
+          ### 🎮 $FORMATTED_NAME Kostenlose Belohnungen (Aktualisiert: $CURRENT_DATE)
 
           Erhalte täglich aktualisierte $FORMATTED_NAME-Links für:
           ✅ Kostenlose Spins  
@@ -63,10 +63,12 @@ jobs:
           - Neueste Spielversion installiert  
           - Stabile Internetverbindung  
 
-          *Überprüft und funktionsfähig ab $CURRENT_DATE*" > "_includes/${GAME_NAME}_post.html"
+          *Überprüft und funktionsfähig ab $CURRENT_DATE*
+          EOF
 
           # Generate Footer with the actual date
-          echo "## 🔍 So löst du $FORMATTED_NAME-Belohnungen ein  
+          cat <<EOF > "_includes/${GAME_NAME}_footer.html"
+          ## 🔍 So löst du $FORMATTED_NAME-Belohnungen ein  
           1. Klicke auf einen beliebigen Link oben  
           2. Warte, bis das Spiel startet  
           3. Deine Belohnungen werden automatisch eingelöst  
@@ -74,7 +76,8 @@ jobs:
           **Tipps:**  
           - Links verfallen nach 48 Stunden  
           - Aktualisiere die Seite für neue Updates  
-          - Kontaktiere den Support bei fehlgeschlagenen Ansprüchen" > "_includes/${GAME_NAME}_footer.html"
+          - Kontaktiere den Support bei fehlgeschlagenen Ansprüchen  
+          EOF
 
       - name: Deploy Changes
         env: 
