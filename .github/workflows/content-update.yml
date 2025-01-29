@@ -70,7 +70,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Ensures full history for rebase
+          fetch-depth: 0
 
       - name: Download All Artifacts
         uses: actions/download-artifact@v3
@@ -79,31 +79,31 @@ jobs:
 
       - name: Move Generated Files
         run: |
+          # Copy HTML files to their destination
           find artifacts/ -name '*.html' -exec cp -f {} _includes/ \;
+          
+          # Clean up artifacts directory
+          rm -rf artifacts/
 
       - name: Deploy Changes
-  env: 
-    DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-  run: |
-    git config user.email "prolladmail@gmail.com"
-    git config user.name "Auto-Updater"
+        env: 
+          DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+        run: |
+          git config user.email "prolladmail@gmail.com"
+          git config user.name "Auto-Updater"
 
-    # Ensure local branch matches latest origin/main
-    git fetch origin main
-    git reset --hard origin/main
+          # Reset to latest remote state
+          git fetch origin main
+          git reset --hard origin/main
 
-    # Copy generated files (already done in previous step)
-    # Remove artifacts directory to avoid accidental staging
-    rm -rf artifacts/
+          # Stage only intended changes
+          git add _includes/
 
-    # Stage only the intended changes
-    git add _includes/
+          # Commit if changes exist
+          git diff --cached --quiet || git commit -m "Update all game contents - ${{ env.CURRENT_DATE }}"
 
-    # Commit only if changes exist
-    git diff --cached --quiet || git commit -m "Update all game contents"
+          # Rebase with remote
+          git pull --rebase origin main
 
-    # Pull latest changes and rebase (handles race conditions)
-    git pull --rebase origin main
-
-    # Push changes safely
-    git push --force-with-lease https://x-access-token:$DEPLOY_KEY@github.com/Prollad99/bs-de.git HEAD:main
+          # Push changes safely
+          git push --force-with-lease https://x-access-token:$DEPLOY_KEY@github.com/Prollad99/bs-de.git HEAD:main
