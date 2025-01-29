@@ -41,12 +41,12 @@ jobs:
 
       - name: Generate SEO Content
         env:
-          CURRENT_DATE: $(date +'%Y-%m-%d')
+          CURRENT_DATE: $(date +'%Y-%m-%d')  # Store the current date in an environment variable
         run: |
           GAME_NAME=${{ matrix.game }}
           FORMATTED_NAME=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
-          # Generate Post Content
+          # Generate Post Content with the actual date
           echo "### 🎮 $FORMATTED_NAME Kostenlose Belohnungen (Aktualisiert: $CURRENT_DATE)
 
           Erhalte täglich aktualisierte $FORMATTED_NAME-Links für:
@@ -65,7 +65,7 @@ jobs:
 
           *Überprüft und funktionsfähig ab $CURRENT_DATE*" > "_includes/${GAME_NAME}_post.html"
 
-          # Generate Footer
+          # Generate Footer with the actual date
           echo "## 🔍 So löst du $FORMATTED_NAME-Belohnungen ein  
           1. Klicke auf einen beliebigen Link oben  
           2. Warte, bis das Spiel startet  
