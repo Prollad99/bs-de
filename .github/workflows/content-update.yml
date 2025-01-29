@@ -41,13 +41,14 @@ jobs:
 
       - name: Generate SEO Content
         run: |
-          CURRENT_DATE=$(date +'%Y-%m-%d')  # Store the current date in a variable
+          CURRENT_DATE=$(date +'%Y-%m-%d')  # Get current date in YYYY-MM-DD format
           GAME_NAME=${{ matrix.game }}
+          
+          # Format game name for display
           FORMATTED_NAME=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
-          # Generate Post Content with the actual date
-          cat <<EOF > "_includes/${GAME_NAME}_post.html"
-          ### 🎮 $FORMATTED_NAME Kostenlose Belohnungen (Aktualisiert: $CURRENT_DATE)
+          # Generate post content with dynamic date
+          echo "### 🎮 $FORMATTED_NAME Kostenlose Belohnungen (Aktualisiert: $CURRENT_DATE)
 
           Erhalte täglich aktualisierte $FORMATTED_NAME-Links für:
           ✅ Kostenlose Spins  
@@ -63,12 +64,10 @@ jobs:
           - Neueste Spielversion installiert  
           - Stabile Internetverbindung  
 
-          *Überprüft und funktionsfähig ab $CURRENT_DATE*
-          EOF
+          *Überprüft und funktionsfähig ab $CURRENT_DATE*" > "_includes/${GAME_NAME}_post.html"
 
-          # Generate Footer with the actual date
-          cat <<EOF > "_includes/${GAME_NAME}_footer.html"
-          ## 🔍 So löst du $FORMATTED_NAME-Belohnungen ein  
+          # Generate footer content
+          echo "## 🔍 So löst du $FORMATTED_NAME-Belohnungen ein  
           1. Klicke auf einen beliebigen Link oben  
           2. Warte, bis das Spiel startet  
           3. Deine Belohnungen werden automatisch eingelöst  
@@ -76,8 +75,7 @@ jobs:
           **Tipps:**  
           - Links verfallen nach 48 Stunden  
           - Aktualisiere die Seite für neue Updates  
-          - Kontaktiere den Support bei fehlgeschlagenen Ansprüchen  
-          EOF
+          - Kontaktiere den Support bei fehlgeschlagenen Ansprüchen" > "_includes/${GAME_NAME}_footer.html"
 
       - name: Deploy Changes
         env: 
@@ -86,19 +84,13 @@ jobs:
           git config user.email "prolladmail@gmail.com"
           git config user.name "Auto-Updater"
           
-          # Stage all changes and commit
+          # Stage and commit changes
           git add -A
-          git commit -m "Staged changes" || echo "No changes to commit"
+          git commit -m "Update ${{ matrix.game }} content for $(date +'%Y-%m-%d')" || echo "No changes to commit"
           
-          # Fetch all remote changes
+          # Handle potential conflicts
           git fetch origin
-
-          # Rebase with the remote main branch
-          git rebase origin/main || { echo 'Rebase failed, attempting merge instead...'; git merge origin/main; }
-
-          # Commit any new changes after rebase
-          git add _includes/
-          git commit -m "Update ${{ matrix.game }} content" || echo "No changes to commit"
+          git rebase origin/main || git merge origin/main
           
           # Push changes
           git push https://x-access-token:$DEPLOY_KEY@github.com/Prollad99/bs-de.git HEAD:main
