@@ -93,11 +93,11 @@ jobs:
           git fetch origin main
           
           # Ensure local branch is up-to-date with the remote
-          git pull --rebase origin main
+          git pull --rebase origin main || { echo 'Rebase failed, attempting merge instead...'; git merge origin/main; }
           
           # Stage all changes
           git add -A
           git commit -m "Update ${{ matrix.game }} content" || echo "No changes to commit"
           
-          # Push changes safely (no force push)
-          git push https://x-access-token:$DEPLOY_KEY@github.com/Prollad99/bs-de.git HEAD:main
+          # Push changes safely with lease (prevents overwriting remote changes)
+          git push --force-with-lease https://x-access-token:$DEPLOY_KEY@github.com/Prollad99/bs-de.git HEAD:main
