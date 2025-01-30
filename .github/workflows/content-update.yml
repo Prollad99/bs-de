@@ -1,18 +1,14 @@
-name: Automated Content Updates & SEO
+name: Aktualisiere Links und Bereitstellung
 
 on:
   schedule:
-    - cron: '*/30 * * * *' # Run every 30 minutes
+    - cron: '*/30 * * * *' # Läuft alle 30 Minuten
   push:
     branches:
       - main
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  generate-content:
+  links-aktualisieren:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -32,65 +28,99 @@ jobs:
           - crazy-coin
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+      - name: Repository auschecken
+        uses: actions/checkout@v2
 
-      - name: Install Dependencies
-        run: |
-          npm install
-          npx playwright install
-
-      - name: Get Current Date
-        id: date
-        run: echo "CURRENT_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-
-      - name: Update Game Links
-        run: node index-js/${{ matrix.game }}.js
-
-      - name: Generate SEO Content
-        run: |
-          GAME_NAME=${{ matrix.game }}
-          FORMATTED_NAME=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
-
-          echo "### 🎮 $FORMATTED_NAME Kostenlose Belohnungen (Aktualisiert: ${{ env.CURRENT_DATE }}) ..." > "_includes/${GAME_NAME}_post.html"
-          echo "## 🔍 So löst du $FORMATTED_NAME-Belohnungen ein ..." > "_includes/${GAME_NAME}_footer.html"
-
-      - name: Upload Generated Files
-        uses: actions/upload-artifact@v4  # <<-- Updated to v4
+      - name: Node-Module zwischenspeichern
+        uses: actions/cache@v2
         with:
-          name: ${{ matrix.game }}-seo
-          path: |
-            _includes/${{ matrix.game }}_post.html
-            _includes/${{ matrix.game }}_footer.html
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: generate-content
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+      - name: Abhängigkeiten installieren
+        run: npm install
 
-      - name: Download All Artifacts
-        uses: actions/download-artifact@v4  # <<-- Updated to v4
-        with:
-          path: artifacts
+      # Install Playwright Browsers
+      - name: Installiere Playwright-Browser
+        run: npx playwright install
 
-      - name: Move Generated Files
+      - name: Links abrufen und aktualisieren
         run: |
-          find artifacts/ -name '*.html' -exec cp -f {} _includes/ \;
-          rm -rf artifacts/
+          node index-js/${{ matrix.game }}.js
+          echo "Inhalt von links-json/${{ matrix.game }}.json:"
+          cat links-json/${{ matrix.game }}.json
+          echo "Inhalt von _includes/${{ matrix.game }}.html:"
+          cat _includes/${{ matrix.game }}.html
 
-      - name: Deploy Changes
-        env: 
-          DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+      - name: Dynamische Beitragsinhalte generieren
         run: |
-          git config user.email "prolladmail@gmail.com"
-          git config user.name "Auto-Updater"
-          git fetch origin main
-          git reset --hard origin/main
-          git add _includes/
-          git diff --cached --quiet || git commit -m "Update all game contents - ${{ env.CURRENT_DATE }}"
-          git pull --rebase origin main
-          git push --force-with-lease https://x-access-token:$DEPLOY_KEY@github.com/Prollad99/bs-de.git HEAD:main
+          SPIEL_NAME=${{ matrix.game }}
+          SPIEL_NAME_KAPITALISIERT=$(echo "$SPIEL_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
+
+          ABSATZ_DATEI="_includes/${SPIEL_NAME}_post.html"
+          ABSATZ="Entdecke tägliche ${SPIEL_NAME_KAPITALISIERT}-Belohnungen!\n\n
+          Bist du ein Fan von ${SPIEL_NAME_KAPITALISIERT} und möchtest dein Spielerlebnis verbessern? Du bist hier genau richtig! Diese Seite ist allen ${SPIEL_NAME_KAPITALISIERT}-Enthusiasten gewidmet, die täglich kostenlose Belohnungen einfordern möchten. Hier findest du die neuesten Links, um Freispiele, Münzen, Chips und andere spannende Boni zu sammeln, damit du das Spiel noch mehr genießen kannst.\n\n
+          ${SPIEL_NAME_KAPITALISIERT} ist ein unterhaltsames Spiel, das von Millionen geliebt wird. Ob du höhere Level erreichen oder einfach nur den Nervenkitzel genießen möchtest – unsere täglichen Belohnungslinks halten dich im Spiel.\n\n
+          Hinweis: ${SPIEL_NAME_KAPITALISIERT} ist eine kostenlose App, die ausschließlich zu Unterhaltungszwecken entwickelt wurde. Bonuscollector.net ist eine unabhängige Plattform und steht in keiner Verbindung zu den Entwicklern oder Eigentümern von ${SPIEL_NAME_KAPITALISIERT}.\n\n
+          Schau täglich vorbei, um sicherzustellen, dass du keine Belohnung verpasst!"
+          echo -e "$ABSATZ" > "$ABSATZ_DATEI"
+
+      - name: Dynamische Footer-Inhalte generieren
+        run: |
+          SPIEL_NAME=${{ matrix.game }}
+          SPIEL_NAME_KAPITALISIERT=$(echo "$SPIEL_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
+
+          FOOTER_DATEI="_includes/${SPIEL_NAME}_footer.html"
+          FOOTER="### So holst du dir deine ${SPIEL_NAME_KAPITALISIERT}-Belohnungen\n\n
+          Das Einfordern deiner täglichen Belohnungen in ${SPIEL_NAME_KAPITALISIERT} ist schnell und einfach! Folge einfach diesen Schritten:\n
+          1. Durchsuche die oben bereitgestellten Belohnungslinks und wähle die aus, die du einfordern möchtest.\n
+          2. Klicke auf einen Link, und er leitet dich automatisch zu deiner ${SPIEL_NAME_KAPITALISIERT}-App oder Website weiter.\n
+          3. Melde dich mit deinem Konto an, falls du dazu aufgefordert wirst.\n
+          4. Die Belohnung (z. B. Freispiele, Münzen, Chips oder Boni) wird sofort deinem Konto hinzugefügt.\n\n
+          **Tipps zum Einfordern von Belohnungen:**\n
+          - Stelle sicher, dass du in deinem ${SPIEL_NAME_KAPITALISIERT}-Konto angemeldet bist, bevor du auf die Links klickst.\n
+          - Jeder Belohnungslink kann in der Regel nur einmal eingelöst werden, also schaue täglich für neue Links vorbei.\n
+          - Wenn ein Link nicht funktioniert, ist er möglicherweise abgelaufen. Fordere Belohnungen daher so schnell wie möglich ein.\n\n
+          Viel Spaß mit deinen kostenlosen Belohnungen und genieße das Spielen von ${SPIEL_NAME_KAPITALISIERT}!\n\n
+          Hinweis: Diese Belohnungen werden offiziell von ${SPIEL_NAME_KAPITALISIERT} bereitgestellt und stammen aus öffentlich zugänglichen Quellen. Bonuscollector.net ist nicht verantwortlich für Probleme beim Einlösen der Belohnungen."
+          echo -e "$FOOTER" > "$FOOTER_DATEI"
+
+      - name: Letztes Änderungsdatum der Include-Datei aktualisieren
+        run: |
+          export TZ=UTC
+          ZEITSTEMPEL=$(date -u +"%Y-%m-%d %H:%M:%S")
+          INCLUDE_FILES_YML="_data/include_files.yml"
+
+          if git diff --quiet _includes/${{ matrix.game }}.html; then
+            echo "_includes/${{ matrix.game }}.html wurde nicht geändert. Aktualisierung des letzten Änderungsdatums übersprungen."
+          else
+            if grep -q "${{ matrix.game }}.html:" "$INCLUDE_FILES_YML"; then
+              sed -i "/${{ matrix.game }}.html:/,/last_modified:/s|last_modified: .*|last_modified: $ZEITSTEMPEL|" "$INCLUDE_FILES_YML"
+            else
+              echo -e "\n${{ matrix.game }}.html:\n  last_modified: $ZEITSTEMPEL" >> "$INCLUDE_FILES_YML"
+            fi
+          fi
+
+      - name: Git konfigurieren
+        run: |
+          git config --global user.email "prolladmail@gmail.com"
+          git config --global user.name "Prollad99"
+
+      - name: Änderungen committen und pushen
+        env:
+          ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+        run: |
+          git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.html _includes/${{ matrix.game }}_footer.html links-json/${{ matrix.game }}.json _data/include_files.yml
+          git add package.json package-lock.json || true
+          git commit -m "Aktualisiere ${{ matrix.game }}-Belohnungslinks, Inhalte und Änderungsdatum" || true
+          git stash
+          git pull --rebase || true
+          git stash pop || true
+          for i in {1..5}; do
+            git push https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git && break
+            echo "Versuch $i: Push fehlgeschlagen, erneuter Versuch in 5 Sekunden..."
+            sleep 5
+            git pull --rebase || true
+          done
