@@ -56,7 +56,7 @@ jobs:
           echo "## 🔍 So löst du $FORMATTED_NAME-Belohnungen ein ..." > "_includes/${GAME_NAME}_footer.html"
 
       - name: Upload Generated Files
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4  # <<-- Updated to v4
         with:
           name: ${{ matrix.game }}-seo
           path: |
@@ -73,16 +73,13 @@ jobs:
           fetch-depth: 0
 
       - name: Download All Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4  # <<-- Updated to v4
         with:
           path: artifacts
 
       - name: Move Generated Files
         run: |
-          # Copy HTML files to their destination
           find artifacts/ -name '*.html' -exec cp -f {} _includes/ \;
-          
-          # Clean up artifacts directory
           rm -rf artifacts/
 
       - name: Deploy Changes
@@ -91,19 +88,9 @@ jobs:
         run: |
           git config user.email "prolladmail@gmail.com"
           git config user.name "Auto-Updater"
-
-          # Reset to latest remote state
           git fetch origin main
           git reset --hard origin/main
-
-          # Stage only intended changes
           git add _includes/
-
-          # Commit if changes exist
           git diff --cached --quiet || git commit -m "Update all game contents - ${{ env.CURRENT_DATE }}"
-
-          # Rebase with remote
           git pull --rebase origin main
-
-          # Push changes safely
           git push --force-with-lease https://x-access-token:$DEPLOY_KEY@github.com/Prollad99/bs-de.git HEAD:main
