@@ -26,6 +26,7 @@ jobs:
           - huuuge-casino
           - wsop
           - crazy-coin
+          - gametwist
 
     steps:
       - name: Repository auschecken
