@@ -35,34 +35,34 @@ pagination: true
           </div>
           <div class="card-footer text-center">
             <p class="text-muted">
-              <small>
-                Von <strong>{{ post.author }}</strong> |
-                {% assign include_file = post.include_file %}
-                {% assign file_info = site.data.include_files[include_file] %}
-                {% if file_info %}
-                  {% assign last_modified = file_info.last_modified %}
-                  {% if last_modified %}
-                    Zuletzt aktualisiert:
-                    <strong class="last-updated" data-last-modified="{{ last_modified }}">
-                      {% assign day = last_modified | date: "%d" %}
-                      {% assign month = last_modified | date: "%B" %}
-                      {% assign year = last_modified | date: "%Y" %}
-                      {{ day }}. {{ site.data.months.months[month] }} {{ year }}
-                    </strong>
-                  {% else %}
-                    Zuletzt aktualisiert: <strong>Nicht verfügbar</strong>
-                  {% endif %}
-                {% else %}
-                  Zuletzt aktualisiert:
-                  <strong>
-                    {% assign day = post.last_modified_at | date: "%d" %}
-                    {% assign month = post.last_modified_at | date: "%B" %}
-                    {% assign year = post.last_modified_at | date: "%Y" %}
-                    {{ day }}. {{ site.data.months.months[month] }} {{ year }}
-                  </strong>
-                {% endif %}
-                <input type="hidden" name="include_file" value="{{ post.include_file }}">
-              </small>
+            <small>
+            Von <strong>{{ post.author }}</strong> |
+            {% assign include_file = post.include_file %}
+            {% assign file_info = site.data.include_files[include_file] %}
+            {% if file_info %}
+            {% assign last_modified = file_info.last_modified %}
+            {% if last_modified %}
+            Zuletzt aktualisiert:
+            <strong class="last-updated" data-last-modified="{{ last_modified }}">
+            {% assign day = last_modified | date: "%d" %}
+            {% assign month = last_modified | date: "%B" %}
+            {% assign year = last_modified | date: "%Y" %}
+            {{ day }}. {{ site.data.months.months[month] }} {{ year }}
+            </strong>
+            {% else %}
+            Zuletzt aktualisiert: <strong>Nicht verfügbar</strong>
+            {% endif %}
+            {% else %}
+            Zuletzt aktualisiert:
+            <strong>
+            {% assign day = post.last_modified_at | date: "%d" %}
+            {% assign month = post.last_modified_at | date: "%B" %}
+            {% assign year = post.last_modified_at | date: "%Y" %}
+            {{ day }}. {{ site.data.months.months[month] }} {{ year }}
+            </strong>
+            {% endif %}
+            <input type="hidden" name="include_file" value="{{ post.include_file }}">
+            </small>
             </p>
           </div>
         </div>
@@ -74,8 +74,7 @@ pagination: true
     <div id="pagination-data" data-next-page="{{ paginator.next_page_path }}"></div>
   {% endif %}
 
-  <!-- Skeleton Loaders -->
-  <div id="skeleton-loader" style="display: none;">
+  <template id="skeleton-template">
     {% for i in (1..3) %}
       <div class="col-md-6 mb-4">
         <div class="card shadow-sm">
@@ -88,13 +87,14 @@ pagination: true
               <div class="card-body">
                 <div class="skeleton-title"></div>
                 <div class="skeleton-text"></div>
+                <div class="skeleton-text"></div>
               </div>
             </div>
           </div>
         </div>
       </div>
     {% endfor %}
-  </div>
+  </template>
 </div>
 
-  <script src="{{ '/assets/js/pagination.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/pagination.js' | relative_url }}"></script>
