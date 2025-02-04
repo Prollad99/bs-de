@@ -43,6 +43,7 @@ jobs:
       - name: Abhängigkeiten installieren
         run: npm install
 
+      # Install Playwright Browsers
       - name: Installiere Playwright-Browser
         run: npx playwright install
 
@@ -51,6 +52,23 @@ jobs:
           node index-js/${{ matrix.game }}.js
           echo "Inhalt von links-json/${{ matrix.game }}.json:"
           cat links-json/${{ matrix.game }}.json
+          echo "Inhalt von _includes/${{ matrix.game }}.html:"
+          cat _includes/${{ matrix.game }}.html
+
+      - name: Dynamische Beitragsinhalte generieren
+        run: |
+          SPIEL_NAME=${{ matrix.game }}
+          SPIEL_NAME_KAPITALISIERT=$(echo "$SPIEL_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
+
+          ABSATZ_DATEI="_includes/${SPIEL_NAME}_post.html"
+          ABSATZ="**Willkommen, ${SPIEL_NAME_KAPITALISIERT}-Fans!**  \n
+          Suchst du nach den neuesten Gratis-Belohnungen für ${SPIEL_NAME_KAPITALISIERT}? Dann bist du hier genau richtig! Wir aktualisieren täglich die besten Links für Freispiele, Münzen und andere Boni, damit du dein Spielerlebnis optimal genießen kannst.  \n\n
+          
+          ### Was ist ${SPIEL_NAME_KAPITALISIERT} und warum sind Belohnungen wichtig?  \n
+          ${SPIEL_NAME_KAPITALISIERT} ist ein beliebtes Spiel, das von Millionen gespielt wird. Mit täglichen Belohnungen kannst du länger spielen, schneller leveln und das Beste aus deinem Spielerlebnis herausholen.  \n\n
+          
+          ### 🚀 Tägliche Belohnungslinks für ${SPIEL_NAME_KAPITALISIERT}"
+          echo -e "$ABSATZ" > "$ABSATZ_DATEI"
 
       - name: Dynamische Footer-Inhalte generieren
         run: |
@@ -58,24 +76,22 @@ jobs:
           SPIEL_NAME_KAPITALISIERT=$(echo "$SPIEL_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
           FOOTER_DATEI="_includes/${SPIEL_NAME}_footer.html"
-
-          FOOTER="### (Diese Liste wird täglich aktualisiert – speichere die Seite und schaue regelmäßig vorbei!)
-
-          🏆 Profi-Tipps für ${SPIEL_NAME_KAPITALISIERT} Spieler
-          - **Nutze Belohnungen strategisch**: Warte auf knifflige Spielmomente, um Boni einzulösen.
-          - **Verbinde dich mit Freunden**: Viele Spiele bieten Extra-Belohnungen für das Einladen von Freunden.
-          - **Bleibe auf dem Laufenden**: Folge offiziellen ${SPIEL_NAME_KAPITALISIERT}-Social-Media-Seiten für weitere Geheimtipps.
-
-          ❓ Häufig gestellte Fragen (FAQ)
-          - **Wie oft kann ich die Belohnungslinks nutzen?**  
-            👉 Jeder Link ist normalerweise nur einmal gültig. Täglich neue Links nutzen!
-
-          - **Warum funktioniert ein Link nicht?**  
-            👉 Einige Links haben eine begrenzte Laufzeit. Falls ein Link abgelaufen ist, probiere die neuesten aus.
-
-          📌 **Fazit**  
+          FOOTER="*(Diese Liste wird täglich aktualisiert – speichere die Seite und schaue regelmäßig vorbei!)*  \n\n
+          
+          ### 🏆 Profi-Tipps für ${SPIEL_NAME_KAPITALISIERT} Spieler  \n
+          - **Nutze Belohnungen strategisch**: Warte auf knifflige Spielmomente, um Boni einzulösen.  \n
+          - **Verbinde dich mit Freunden**: Viele Spiele bieten Extra-Belohnungen für das Einladen von Freunden.  \n
+          - **Bleibe auf dem Laufenden**: Folge offiziellen ${SPIEL_NAME_KAPITALISIERT}-Social-Media-Seiten für weitere Geheimtipps.  \n\n
+          
+          ### ❓ Häufig gestellte Fragen (FAQ)  \n
+          **Wie oft kann ich die Belohnungslinks nutzen?**  \n
+          👉 Jeder Link ist normalerweise nur einmal gültig. Täglich neue Links nutzen!  \n\n
+          
+          **Warum funktioniert ein Link nicht?**  \n
+          👉 Einige Links haben eine begrenzte Laufzeit. Falls ein Link abgelaufen ist, probiere die neuesten aus.  \n\n
+          
+          ### 📌 Fazit  \n
           Vergiss nicht, täglich zurückzukommen, um neue Belohnungen zu erhalten! Speichere diese Seite oder teile sie mit deinen Freunden. Viel Spaß beim Spielen von ${SPIEL_NAME_KAPITALISIERT}!"
-
           echo -e "$FOOTER" > "$FOOTER_DATEI"
 
       - name: Letztes Änderungsdatum der Include-Datei aktualisieren
@@ -84,13 +100,13 @@ jobs:
           ZEITSTEMPEL=$(date -u +"%Y-%m-%d %H:%M:%S")
           INCLUDE_FILES_YML="_data/include_files.yml"
 
-          if git diff --quiet _includes/${{ matrix.game }}_footer.html; then
-            echo "_includes/${{ matrix.game }}_footer.html wurde nicht geändert. Aktualisierung des letzten Änderungsdatums übersprungen."
+          if git diff --quiet _includes/${{ matrix.game }}.html; then
+            echo "_includes/${{ matrix.game }}.html wurde nicht geändert. Aktualisierung des letzten Änderungsdatums übersprungen."
           else
-            if grep -q "${{ matrix.game }}_footer.html:" "$INCLUDE_FILES_YML"; then
-              sed -i "/${{ matrix.game }}_footer.html:/,/last_modified:/s|last_modified: .*|last_modified: $ZEITSTEMPEL|" "$INCLUDE_FILES_YML"
+            if grep -q "${{ matrix.game }}.html:" "$INCLUDE_FILES_YML"; then
+              sed -i "/${{ matrix.game }}.html:/,/last_modified:/s|last_modified: .*|last_modified: $ZEITSTEMPEL|" "$INCLUDE_FILES_YML"
             else
-              echo -e "\n${{ matrix.game }}_footer.html:\n  last_modified: $ZEITSTEMPEL" >> "$INCLUDE_FILES_YML"
+              echo -e "\n${{ matrix.game }}.html:\n  last_modified: $ZEITSTEMPEL" >> "$INCLUDE_FILES_YML"
             fi
           fi
 
@@ -103,9 +119,9 @@ jobs:
         env:
           ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
         run: |
-          git add _includes/${{ matrix.game }}_footer.html _data/include_files.yml
+          git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.html _includes/${{ matrix.game }}_footer.html links-json/${{ matrix.game }}.json _data/include_files.yml
           git add package.json package-lock.json || true
-          git commit -m "Aktualisiere ${SPIEL_NAME}-Footer mit verbesserten Inhalten" || true
+          git commit -m "Aktualisiere ${{ matrix.game }}-Belohnungslinks, Inhalte und Änderungsdatum" || true
           git stash
           git pull --rebase || true
           git stash pop || true
