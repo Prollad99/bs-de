@@ -7,10 +7,13 @@ locale: de
 
 markdown: kramdown
 
+paginate: 12
+paginate_path: "/page:num/"
+
 plugins:
   - jekyll-sitemap
   - jekyll-last-modified-at
-  - jekyll-redirect-from
+  - jekyll-paginate
 
 collections:
   pages:
