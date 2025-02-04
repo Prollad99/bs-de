@@ -1,63 +1,76 @@
-document.addEventListener("DOMContentLoaded", function () {
-    let isFetching = false;
-    let nextPage = document.querySelector("#pagination-data")?.getAttribute("data-next-page");
-    const postsContainer = document.getElementById("posts-container");
-    const skeletonLoader = document.getElementById("skeleton-loader");
+document.addEventListener("DOMContentLoaded", function() {
+  let isLoading = false;
+  let nextPageUrl = document.getElementById('pagination-data')?.dataset.nextPage;
+  const postsContainer = document.getElementById('posts-container');
+  const skeletonTemplate = document.getElementById('skeleton-template');
 
-    function loadMorePosts() {
-      if (!nextPage || isFetching) return;
-
-      isFetching = true;
-
-      // Show skeleton loaders
-      skeletonLoader.style.display = "flex";
-      const loaderClone = skeletonLoader.cloneNode(true);
-      loaderClone.id = "";
-      postsContainer.appendChild(loaderClone);
-
-      fetch(nextPage)
-        .then(response => response.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(html, "text/html");
-
-          // Get new posts and append them
-          const newPosts = doc.querySelectorAll(".col-md-6");
-          newPosts.forEach(post => {
-            post.style.opacity = "0";
-            post.style.transition = "opacity 0.5s ease-in-out";
-            postsContainer.appendChild(post);
-            setTimeout(() => { post.style.opacity = "1"; }, 50);
-          });
-
-          // Remove skeleton loader
-          loaderClone.remove();
-
-          // Update nextPage with the new page path
-          nextPage = doc.querySelector("#pagination-data")?.getAttribute("data-next-page");
-
-          if (!nextPage) {
-            window.removeEventListener("scroll", handleScroll);
-          }
-
-          isFetching = false;
-        })
-        .catch(error => {
-          console.error("Error loading more posts:", error);
-          isFetching = false;
-        });
-    }
-
-    function handleScroll() {
-      const scrollPosition = window.innerHeight + window.scrollY;
-      const documentHeight = document.documentElement.offsetHeight;
-
-      if (scrollPosition >= documentHeight - 200) {
-        loadMorePosts();
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !isLoading && nextPageUrl) {
+        loadNextPage();
       }
-    }
+    });
+  }, { threshold: 0.1 });
 
-    if (nextPage) {
-      window.addEventListener("scroll", handleScroll);
+  function showSkeleton() {
+    const skeleton = skeletonTemplate.content.cloneNode(true);
+    postsContainer.appendChild(skeleton);
+  }
+
+  function removeSkeleton() {
+    const skeletons = postsContainer.querySelectorAll('.skeleton-image, .skeleton-button, .skeleton-title, .skeleton-text');
+    skeletons.forEach(skeleton => {
+      skeleton.closest('.col-md-6').remove();
+    });
+  }
+
+  async function loadNextPage() {
+    if (!nextPageUrl || isLoading) return;
+    
+    isLoading = true;
+    showSkeleton();
+    
+    try {
+      const response = await fetch(nextPageUrl);
+      const html = await response.text();
+      const parser = new DOMParser();
+      const nextPageDoc = parser.parseFromString(html, 'text/html');
+
+      const newPosts = nextPageDoc.querySelectorAll('#posts-container > .col-md-6');
+      const newPagination = nextPageDoc.getElementById('pagination-data');
+
+      removeSkeleton();
+
+      newPosts.forEach(post => {
+        post.style.opacity = '0';
+        postsContainer.appendChild(post);
+        setTimeout(() => post.style.opacity = '1', 50);
+      });
+
+      nextPageUrl = newPagination?.dataset.nextPage;
+      if (!nextPageUrl) observer.disconnect();
+
+    } catch (error) {
+      console.error('Error loading next page:', error);
+      removeSkeleton();
     }
+    
+    isLoading = false;
+  }
+
+  // Observe the last post element for intersection
+  if (postsContainer.children.length > 0) {
+    observer.observe(postsContainer.lastElementChild);
+  }
+
+  // Re-observe when new elements are added
+  const mutationObserver = new MutationObserver((mutations) => {
+    mutations.forEach(() => {
+      if (postsContainer.children.length > 0) {
+        observer.observe(postsContainer.lastElementChild);
+      }
+    });
   });
+
+  mutationObserver.observe(postsContainer, { childList: true });
+});
