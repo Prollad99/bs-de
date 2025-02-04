@@ -7,8 +7,8 @@ pagination: true
   <h1 class="my-4">Spieleliste</h1>
 
   <div class="row" id="posts-container">
-    {% assign sorted_posts = site.posts | sort: 'title' %}
-    
+    {% assign sorted_posts = paginator.posts | sort: 'title' %}
+
     {% for post in sorted_posts %}
       <div class="col-md-6 mb-4">
         <div class="card shadow-sm">
