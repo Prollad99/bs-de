@@ -7,16 +7,10 @@ pagination: true
   <h1 class="my-4">Spieleliste</h1>
 
   <div class="row" id="posts-container">
-    {% assign all_sorted_posts = site.posts | sort: 'title' %}
-    {% assign sorted_paginated_posts = "" | split: "" %}
+    {% assign sorted_posts = site.posts | sort: 'title' %}
+    {% assign paginated_posts = sorted_posts | slice: paginator.per_page | where_exp: "post", "paginator.posts contains post" %}
 
-    {% for post in all_sorted_posts %}
-      {% if paginator.posts contains post %}
-        {% assign sorted_paginated_posts = sorted_paginated_posts | push: post %}
-      {% endif %}
-    {% endfor %}
-
-    {% for post in sorted_paginated_posts %}
+    {% for post in paginated_posts %}
       <div class="col-md-6 mb-4">
         <div class="card shadow-sm">
           <div class="row no-gutters">
