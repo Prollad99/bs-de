@@ -65,3 +65,44 @@ line-height:1.625;
   margin-right: 10px; /* Space between image and text */
   vertical-align: middle; /* Align image with text */
 }
+
+.skeleton-image {
+    width: 80px;
+    height: 80px;
+    background: #ddd;
+    border-radius: 8px;
+    margin: 10px;
+    animation: shimmer 1.5s infinite linear;
+  }
+
+  .skeleton-button {
+    width: 60px;
+    height: 20px;
+    background: #ddd;
+    border-radius: 4px;
+    margin-top: 10px;
+    animation: shimmer 1.5s infinite linear;
+  }
+
+  .skeleton-title {
+    width: 80%;
+    height: 18px;
+    background: #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    animation: shimmer 1.5s infinite linear;
+  }
+
+  .skeleton-text {
+    width: 100%;
+    height: 14px;
+    background: #ddd;
+    border-radius: 4px;
+    animation: shimmer 1.5s infinite linear;
+  }
+
+  @keyframes shimmer {
+    0% { background-color: #eee; }
+    50% { background-color: #ddd; }
+    100% { background-color: #eee; }
+  }
