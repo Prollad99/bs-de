@@ -8,10 +8,12 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!nextPage || isFetching) return;
 
       isFetching = true;
-      
+
       // Show skeleton loaders
       skeletonLoader.style.display = "flex";
-      postsContainer.appendChild(skeletonLoader.cloneNode(true));
+      const loaderClone = skeletonLoader.cloneNode(true);
+      loaderClone.id = "";
+      postsContainer.appendChild(loaderClone);
 
       fetch(nextPage)
         .then(response => response.text())
@@ -19,19 +21,21 @@ document.addEventListener("DOMContentLoaded", function () {
           const parser = new DOMParser();
           const doc = parser.parseFromString(html, "text/html");
 
+          // Get new posts and append them
           const newPosts = doc.querySelectorAll(".col-md-6");
-
-          // Remove skeleton loaders
-          document.querySelectorAll("#skeleton-loader").forEach(loader => loader.remove());
-
           newPosts.forEach(post => {
-            post.style.opacity = "0"; 
+            post.style.opacity = "0";
             post.style.transition = "opacity 0.5s ease-in-out";
             postsContainer.appendChild(post);
             setTimeout(() => { post.style.opacity = "1"; }, 50);
           });
 
+          // Remove skeleton loader
+          loaderClone.remove();
+
+          // Update nextPage with the new page path
           nextPage = doc.querySelector("#pagination-data")?.getAttribute("data-next-page");
+
           if (!nextPage) {
             window.removeEventListener("scroll", handleScroll);
           }
@@ -48,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const scrollPosition = window.innerHeight + window.scrollY;
       const documentHeight = document.documentElement.offsetHeight;
 
-      if (scrollPosition >= documentHeight - 100) {
+      if (scrollPosition >= documentHeight - 200) {
         loadMorePosts();
       }
     }
