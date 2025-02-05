@@ -60,12 +60,19 @@ jobs:
           SPIEL_NAME_KAPITALISIERT=$(echo "$SPIEL_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
           ABSATZ_DATEI="_includes/${SPIEL_NAME}_post.html"
-          ABSATZ="Sind Sie ein ${SPIEL_NAME_KAPITALISIERT} Fan? Holen Sie sich täglich kostenlose Münzen, Spins, Chips und Boni mit diesen aktualisierten Reward-Links. Wir aktualisieren diese Seite täglich mit neuen Reward-Links, damit Sie nie eine Gelegenheit verpassen, Ihr Spiel zu verbessern.\n\n
-          ## Wie Sie Ihre Belohnungen einfordern können\n\n
-          - Wählen Sie einen Prämienlink aus der Liste aus.\n
-          - Tippen Sie auf den Link und melden Sie sich bei Ihrem ${SPIEL_NAME_KAPITALISIERT} Konto an.\n
-          - Ihre Belohnungen werden sofort gutgeschrieben!\n\n
-          ## Tägliche Belohnungslinks für ${SPIEL_NAME_KAPITALISIERT}"
+          ABSATZ="Bist du ein engagierter **${SPIEL_NAME_KAPITALISIERT}**-Spieler? Suchst du nach der einfachsten Möglichkeit, kostenlose Münzen, Spins und andere Boni zu sammeln? Dann bist du hier genau richtig! Wir aktualisieren diese Seite täglich mit neuen Belohnungslinks, damit du keine Chance verpasst, schneller aufzuleveln und das Spiel in vollen Zügen zu genießen.\n\n
+          ## **Was sind Belohnungslinks?**\n
+          Belohnungslinks sind offizielle Aktionen der **${SPIEL_NAME_KAPITALISIERT}**-Entwickler, die den Spielern kostenlose In-Game-Gegenstände wie Spins, Münzen und exklusive Boni bieten. Sie sind eine großartige Möglichkeit, dein Gameplay zu verbessern, ohne Geld auszugeben.\n\n
+          Jeden Tag stellen wir dir die neuesten und zuverlässigsten Belohnungslinks zur Verfügung, damit du deine Belohnungen problemlos einlösen und deine Reise ohne Unterbrechungen fortsetzen kannst.\n\n
+          ---\n\n
+          ## **So kannst du deine kostenlosen Belohnungen einlösen**\n
+          Das Einlösen deiner täglichen Belohnungen ist ganz einfach und erfordert nur wenige Schritte:\n
+          1. **Wähle einen Belohnungslink aus der Liste unten aus.**\n
+          2. **Tippe auf den Link und melde dich in deinem ${SPIEL_NAME_KAPITALISIERT}-Konto an.**\n
+          3. **Die Belohnung wird sofort deinem Konto gutgeschrieben!**\n\n
+          Schau regelmäßig auf dieser Seite vorbei, da die Links schnell ablaufen können. Verpasse keine Gelegenheit!\n\n
+          ---\n\n
+          ## **Heutige ${SPIEL_NAME_KAPITALISIERT} Belohnungslinks**"
           echo -e "$ABSATZ" > "$ABSATZ_DATEI"
 
       - name: Dynamische Footer-Inhalte generieren
@@ -74,9 +81,29 @@ jobs:
           SPIEL_NAME_KAPITALISIERT=$(echo "$SPIEL_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
           FOOTER_DATEI="_includes/${SPIEL_NAME}_footer.html"
-          FOOTER="## Warum sollten Sie unsere Reward Updates verfolgen?\n\n
-          Wir aktualisieren die Links ständig, um sicherzustellen, dass Sie die neuesten Belohnungen erhalten. Alle Belohnungen stammen aus offiziellen ${SPIEL_NAME_KAPITALISIERT} Aktionen, so dass Sie sie einfach und sicher einfordern können.\n\n
-          Hinweis: Diese Links können ablaufen, also fordern Sie Ihre Belohnungen schnell ein. Wir sind nicht mit den Entwicklern von ${SPIEL_NAME_KAPITALISIERT} verbunden; diese Seite ist eine Ressource für Spieler."
+          FOOTER="---\n\n
+          ## **Warum du unsere täglichen Belohnungs-Updates verfolgen solltest**\n
+          Wir helfen Spielern wie dir, das Beste aus ihrem Spielerlebnis herauszuholen. Hier sind die Gründe, warum sich ein Lesezeichen für unsere Seite lohnt:\n
+          - **Tägliche Updates:** Hier findest du immer die neuesten Belohnungslinks.\n
+          - **Sicher und zuverlässig:** Alle Belohnungen stammen aus offiziellen **${SPIEL_NAME_KAPITALISIERT}**-Aktionen.\n
+          - **Komplett kostenlos:** Keine versteckten Kosten oder Tricks – nur kostenlose Belohnungen!\n\n
+          ---\n\n
+          ## **Profi-Tipps für die Nutzung kostenloser Belohnungen**\n
+          Nutze deine Belohnungen optimal mit diesen hilfreichen Tipps:\n
+          - **Setze kostenlose Spins strategisch ein:** Spare dir deine Spins für besondere Events auf, um deine Gewinnchancen zu maximieren.\n
+          - **Plane deine Münzenausgaben:** Investiere deine Münzen klug, um schneller aufzuleveln und Premium-Funktionen freizuschalten.\n
+          - **Täglich einloggen:** Viele Belohnungen sind zeitlich begrenzt, also logge dich regelmäßig ein, um keine Angebote zu verpassen.\n\n
+          ---\n\n
+          ## **Häufig gestellte Fragen (FAQs)**\n\n
+          ### **1. Sind diese Belohnungslinks sicher?**\n
+          Ja! Alle unsere Links stammen aus offiziellen **${SPIEL_NAME_KAPITALISIERT}**-Aktionen und sind daher sicher und zuverlässig.\n\n
+          ### **2. Wie oft werden die Belohnungslinks aktualisiert?**\n
+          Wir aktualisieren unsere Seite täglich, um dir die neuesten aktiven Links bereitzustellen. Setze ein Lesezeichen und schaue jeden Tag vorbei!\n\n
+          ### **3. Was passiert, wenn ein Link nicht funktioniert?**\n
+          Einige Links können schnell ablaufen oder sind nur für eine begrenzte Anzahl an Einlösungen verfügbar. Falls ein Link nicht funktioniert, schaue später wieder vorbei, um neue zu finden.\n\n
+          ---\n\n
+          ## **Haftungsausschluss**\n
+          Wir stehen in keiner Verbindung zu den Entwicklern von **${SPIEL_NAME_KAPITALISIERT}**. Alle Inhalte dienen ausschließlich Informationszwecken und sollen Spielern helfen, kostenlose Belohnungen einfach zu erhalten."
           echo -e "$FOOTER" > "$FOOTER_DATEI"
 
       - name: Letztes Änderungsdatum der Include-Datei aktualisieren
