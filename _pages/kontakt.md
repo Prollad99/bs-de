@@ -6,4 +6,9 @@ date: 2025-01-16
 permalink: /kontakt/
 ---
 
-<iframe frameborder="0" height="729" marginheight="0" marginwidth="0" src="https://docs.google.com/forms/d/e/1FAIpQLScZKCGkZKbRaa3M6EK6EyUPvO3v2J1jJ2enSkX_ViymIVDb6Q/viewform?embedded=true" width="100%">Loading…</iframe>
+Wir freuen uns, von Ihnen zu hören! Wenn Sie Fragen, Anregungen oder Feedback haben, kontaktieren Sie uns gerne über die untenstehenden Informationen.  
+
+### **Kontaktinformationen**  
+- **E-Mail:** prolladmail@gmail.com  
+
+Wir bemühen uns, alle Anfragen so schnell wie möglich zu beantworten. Vielen Dank, dass Sie **BonusCollector.de** nutzen!
