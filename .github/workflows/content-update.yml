@@ -1,8 +1,8 @@
-Name: Update Links and Deployment
+name: Update Links and Deployment
 
 on:
   schedule:
-    - cron: '*/30 * * * *'  # Runs every 30 minutes
+    - cron: "*/30 * * * *"  # Runs every 30 minutes
   push:
     branches:
       - main
@@ -60,19 +60,10 @@ jobs:
           GAME_NAME_CAPITALIZED=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
           POST_FILE="_includes/${GAME_NAME}_post.html"
-          POST_CONTENT="Willkommen auf der täglichen ${GAME_NAME_CAPITALIZED}-Belohnungsseite!\n\n
-          Wenn Sie ein engagierter Fan von ${GAME_NAME_CAPITALIZED} sind, haben wir etwas Besonderes für Sie! Hier finden Sie aktualisierte Links zu kostenlosen Drehungen, Münzen, Chips und anderen Boni, die Ihr Spielerlebnis verbessern.\n\n
-          **Was macht ${GAME_NAME_CAPITALIZED} so besonders?**\n
-          ${GAME_NAME_CAPITALIZED} hat die Herzen von Millionen Spielern auf der ganzen Welt erobert. Mit seinem fesselnden Gameplay, herausfordernden Wettbewerben und spannenden Events ist es ein Muss für alle, die Spaß, Strategie und Belohnungen lieben.\n\n
-          **Tägliche Belohnungen:**\n
-          - Frische Belohnungslinks, die regelmäßig aktualisiert werden.\n
-          - Verpassen Sie keinen Bonus – setzen Sie ein Lesezeichen für diese Seite und schauen Sie täglich vorbei.\n
-          - Sichern Sie sich Drehungen, Münzen und exklusive Boni, bevor sie ablaufen!\n\n
-          **Warum unsere Plattform nutzen?**\n
-          - Einfaches, benutzerfreundliches Erlebnis.\n
-          - Überprüfte und aktive Belohnungslinks.\n
-          - Schneller Zugriff ohne komplizierte Schritte.\n\n
-          *Hinweis: ${GAME_NAME_CAPITALIZED} ist eine kostenlose App, die zu Unterhaltungszwecken entwickelt wurde. Wir stehen in keiner Verbindung zu den Entwicklern oder Eigentümern des Spiels.*"
+          POST_CONTENT="Entdecke tägliche ${GAME_NAME_CAPITALIZED} Belohnungen!\n\n
+          Bist du ein Fan von ${GAME_NAME_CAPITALIZED}, der sein Spielerlebnis verbessern möchte? Du bist hier genau richtig! Diese Seite ist allen ${GAME_NAME_CAPITALIZED}-Fans gewidmet, die kostenlose tägliche Belohnungen sammeln möchten.\n\n
+          Hinweis: ${GAME_NAME_CAPITALIZED} ist eine kostenlose App, die zu Unterhaltungszwecken entwickelt wurde. Bonuscollector.de ist eine unabhängige Plattform und steht nicht in Verbindung mit den Entwicklern oder Eigentümern des Spiels.\n\n
+          Komm täglich vorbei, damit du keine Belohnungen verpasst!"
           echo -e "$POST_CONTENT" > "$POST_FILE"
 
       - name: Generate Dynamic Footer Content
@@ -81,21 +72,16 @@ jobs:
           GAME_NAME_CAPITALIZED=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
           FOOTER_FILE="_includes/${GAME_NAME}_footer.html"
-          FOOTER_CONTENT="### So maximieren Sie Ihre ${GAME_NAME_CAPITALIZED}-Belohnungen\n\n
-          Folgen Sie diesen einfachen Schritten, um Ihre täglichen Boni zu beanspruchen:\n
-          1. Durchsuchen Sie die oben aufgeführten verifizierten Belohnungslinks.\n
-          2. Klicken Sie auf einen Link, um zum Spiel oder zur offiziellen Seite weitergeleitet zu werden.\n
-          3. Stellen Sie sicher, dass Sie in Ihr ${GAME_NAME_CAPITALIZED}-Konto eingeloggt sind.\n
-          4. Genießen Sie Ihre Belohnungen sofort nach dem Einlösen.\n\n
-          **Fehlerbehebung:**\n
-          - Wenn ein Belohnungslink nicht funktioniert, ist er möglicherweise bereits abgelaufen.\n
-          - Stellen Sie sicher, dass Ihr Spiel auf die neueste Version aktualisiert ist.\n
-          - Löschen Sie Ihren Cache und versuchen Sie es erneut, falls Probleme auftreten.\n\n
-          **Sicherheitstipps:**\n
-          - Teilen Sie Ihre Spielanmeldedaten niemals mit anderen.\n
-          - Klicken Sie nur auf vertrauenswürdige Links aus überprüften Quellen.\n\n
-          *Hinweis: Die Belohnungslinks können schnell ablaufen, besuchen Sie daher täglich die Seite für die neuesten Updates.*\n
-          Viel Spaß beim Spielen!"
+          FOOTER_CONTENT="### So beanspruchst du deine ${GAME_NAME_CAPITALIZED} Belohnungen\n\n
+          1. Durchsuche die obigen Belohnungslinks und wähle die aus, die du beanspruchen möchtest.\n
+          2. Klicke auf einen Link, um zur ${GAME_NAME_CAPITALIZED}-App oder -Website weitergeleitet zu werden.\n
+          3. Melde dich an deinem Konto an, falls du dazu aufgefordert wirst.\n
+          4. Deine Belohnung (kostenlose Spins, Münzen, Chips oder Boni) wird deinem Konto hinzugefügt.\n\n
+          **Tipps zum Beanspruchen von Belohnungen:**\n
+          - Stelle sicher, dass du in deinem ${GAME_NAME_CAPITALIZED}-Konto angemeldet bist, bevor du auf die Links klickst.\n
+          - Die meisten Links können nur einmal beansprucht werden. Schaue also täglich für neue vorbei.\n
+          - Wenn ein Link nicht funktioniert, ist er möglicherweise abgelaufen. Beanspruche deine Belohnungen so schnell wie möglich.\n\n
+          Viel Spaß beim Sammeln deiner Belohnungen und beim Spielen von ${GAME_NAME_CAPITALIZED}!"
           echo -e "$FOOTER_CONTENT" > "$FOOTER_FILE"
 
       - name: Update Last Modified Timestamp
