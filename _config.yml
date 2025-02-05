@@ -7,7 +7,7 @@ locale: de
 
 markdown: kramdown
 
-paginate: 9
+paginate: 7
 paginate_path: "/page:num/"
 
 plugins:
