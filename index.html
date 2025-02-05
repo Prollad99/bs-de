@@ -1,64 +1,110 @@
 ---
 layout: default
-pagination: true
+pagination: 
+  enabled: true
 ---
 
 <div class="container">
   <h1 class="my-4">Spieleliste</h1>
 
   <div class="row" id="posts-container">
-    {% assign sorted_posts = site.posts | sort: 'title' %}
-    {% for post in paginator.posts %}
-      {% assign sorted_post = sorted_posts | where: "url", post.url | first %}
-      {% if sorted_post %}
-        <div class="col-md-6 mb-4">
-          <div class="card shadow-sm">
-            <div class="row no-gutters">
-              <div class="col-4 d-flex flex-column align-items-center justify-content-center">
-                {% if sorted_post.image %}
-                  <img src="{{ sorted_post.image }}" class="card-img" alt="{{ sorted_post.title }}" style="max-width: 80px; max-height: 80px; margin: 10px;">
-                {% endif %}
-                <a href="{{ sorted_post.url }}" class="btn btn-primary btn-sm mt-2 mb-2">Jetzt beanspruchen</a>
-              </div>
-              <div class="col-8">
-                <div class="card-body">
-                  <a href="{{ sorted_post.url }}">
-                    <h5 class="card-title" style="font-size: 1rem;">{{ sorted_post.title }}</h5>
-                  </a>
-                  <p class="card-text" style="font-size: 0.9rem;">
-                    {% if sorted_post.description %}
-                      {{ sorted_post.description }}
-                    {% else %}
-                      {{ sorted_post.content | strip_html | truncatewords: 25 }}
-                    {% endif %}
-                  </p>
-                </div>
-              </div>
+    {% assign sorted_posts = paginator.posts | sort_natural: 'title' %}
+
+    {% for post in sorted_posts %}
+      <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+          <div class="row no-gutters">
+            <div class="col-4 d-flex flex-column align-items-center justify-content-center">
+              {% if post.image %}
+                <img src="{{ post.image }}" class="card-img" alt="{{ post.title }}" style="max-width: 80px; max-height: 80px; margin: 10px;">
+              {% endif %}
+              <a href="{{ post.url }}" class="btn btn-primary btn-sm mt-2 mb-2">Jetzt beanspruchen</a>
             </div>
-            <div class="card-footer text-center">
-              <p class="text-muted">
-                <small>
-                  Von <strong>{{ sorted_post.author }}</strong> |
-                  {% assign last_modified = sorted_post.last_modified_at | default: "Nicht verfügbar" %}
-                  Zuletzt aktualisiert: <strong class="last-updated" {% if last_modified != "Nicht verfügbar" %}data-last-modified="{{ last_modified }}"{% endif %}>
-                    {% if last_modified != "Nicht verfügbar" %}
-                      {{ last_modified | date: "%d. %B %Y" }}
-                    {% else %}
-                      Nicht verfügbar
-                    {% endif %}
-                  </strong>
-                </small>
-              </p>
+            <div class="col-8">
+              <div class="card-body">
+                <a href="{{ post.url }}">
+                  <h5 class="card-title" style="font-size: 1rem;">{{ post.title }}</h5>
+                </a>
+                <p class="card-text" style="font-size: 0.9rem;">
+                  {% if post.description %}
+                    {{ post.description }}
+                  {% else %}
+                    {{ post.content | strip_html | truncatewords: 25 }}
+                  {% endif %}
+                </p>
+              </div>
             </div>
           </div>
+          <div class="card-footer text-center">
+            <p class="text-muted">
+              <small>
+                Von <strong>{{ post.author }}</strong> |
+                {% assign include_file = post.include_file %}
+                {% assign file_info = site.data.include_files[include_file] %}
+                {% if file_info and file_info.last_modified %}
+                  {% assign last_modified = file_info.last_modified %}
+                {% elsif post.last_modified_at %}
+                  {% assign last_modified = post.last_modified_at %}
+                {% else %}
+                  {% assign last_modified = nil %}
+                {% endif %}
+
+                Zuletzt aktualisiert:
+                <strong class="last-updated" {% if last_modified %}data-last-modified="{{ last_modified }}"{% endif %}>
+                  {% if last_modified %}
+                    {{ last_modified | date: "%d. %B %Y" }}
+                  {% else %}
+                    Nicht verfügbar
+                  {% endif %}
+                </strong>
+              </small>
+            </p>
+          </div>
         </div>
-      {% endif %}
+      </div>
     {% endfor %}
   </div>
 
-  {% if paginator.next_page %}
-    <div id="pagination-data" data-next-page="{{ paginator.next_page_path }}"></div>
-  {% endif %}
+  <!-- Pagination Controls -->
+  <div class="row">
+    <div class="col-md-12">
+      {% if paginator.total_pages > 1 %}
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+          {% if paginator.previous_page %}
+            <li class="page-item">
+              <a class="page-link" href="{{ paginator.previous_page_path | relative_url }}">&laquo;</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link">&laquo;</span>
+            </li>
+          {% endif %}
+
+          {% for page in (1..paginator.total_pages) %}
+            <li class="page-item {% if page == paginator.page %}active{% endif %}">
+              {% if page == 1 %}
+                <a class="page-link" href="{{ '/' | relative_url }}">{{ page }}</a>
+              {% else %}
+                <a class="page-link" href="{{ site.paginate_path | relative_url | replace: ':num', page }}">{{ page }}</a>
+              {% endif %}
+            </li>
+          {% endfor %}
+
+          {% if paginator.next_page %}
+            <li class="page-item">
+              <a class="page-link" href="{{ paginator.next_page_path | relative_url }}">&raquo;</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link">&raquo;</span>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
+    </div>
+  </div>
 
   <template id="skeleton-template">
     {% for i in (1..3) %}
