@@ -43,7 +43,6 @@ jobs:
       - name: Abhängigkeiten installieren
         run: npm install
 
-      # Install Playwright Browsers
       - name: Installiere Playwright-Browser
         run: npx playwright install
 
@@ -60,55 +59,65 @@ jobs:
           SPIEL_NAME=${{ matrix.game }}
           SPIEL_NAME_KAPITALISIERT=$(echo "$SPIEL_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
-          ABSATZ_DATEI="_includes/${SPIEL_NAME}_post.html"
-
-          # Datei leeren, um Änderungen sicherzustellen
-          > "$ABSATZ_DATEI"
-
-          # Neuen Inhalt schreiben
-          ABSATZ="Willkommen zu den neuesten ${SPIEL_NAME_KAPITALISIERT}-Belohnungen!\n\n
-          Suchst du nach den aktuellsten ${SPIEL_NAME_KAPITALISIERT}-Freispielen, Münzen oder Bonusangeboten? Du bist hier genau richtig! Wir aktualisieren diese Seite täglich mit den neuesten Belohnungslinks, damit du das Beste aus deinem Spielerlebnis herausholen kannst.\n\n
-          **Warum du täglich vorbeischauen solltest:**\n
-          - 🏆 **Täglich neue Links** – Verpasse keine Belohnung mehr.\n
-          - ⏳ **Einfache Einlösung** – Ein Klick und du bekommst deine Belohnung.\n
-          - 🎯 **Sichere & offizielle Quellen** – Keine Hacks oder Cheats, nur legitime Links.\n\n
-          **Hinweis:** Diese Belohnungen stammen aus offiziellen ${SPIEL_NAME_KAPITALISIERT}-Quellen und sind völlig kostenlos."
+          ABSATZ_DATEI="_includes/${SPIEL_NAME}_post.md"
+          ABSATZ="## ${SPIEL_NAME_KAPITALISIERT} Tägliche Belohnungen\n\n
+          Möchtest du dein ${SPIEL_NAME_KAPITALISIERT}-Erlebnis verbessern? Hier findest du die neuesten täglichen kostenlosen Belohnungen, damit du dein Spiel auf das nächste Level bringen kannst!\n\n
+          ### So forderst du deine Belohnungen ein\n
+          1. Wähle einen Belohnungslink aus der obigen Liste.\n
+          2. Klicke auf den Link und melde dich bei deinem ${SPIEL_NAME_KAPITALISIERT}-Konto an.\n
+          3. Die Belohnung wird sofort deinem Konto hinzugefügt!\n\n
+          ### Tipps zur Nutzung von Belohnungen\n
+          - Schaue täglich vorbei, um keine neuen Links zu verpassen.\n
+          - Stelle sicher, dass du eingeloggt bist, bevor du auf die Links klickst.\n
+          - Einige Links können schnell ablaufen, also handle schnell!\n"
           echo -e "$ABSATZ" > "$ABSATZ_DATEI"
-
-          # Erzwinge Änderungsdetektion
-          touch "$ABSATZ_DATEI"
-          git update-index --assume-unchanged "$ABSATZ_DATEI"
 
       - name: Dynamische Footer-Inhalte generieren
         run: |
           SPIEL_NAME=${{ matrix.game }}
           SPIEL_NAME_KAPITALISIERT=$(echo "$SPIEL_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
-          FOOTER_DATEI="_includes/${SPIEL_NAME}_footer.html"
-
-          # Datei leeren, um Änderungen zu erzwingen
-          > "$FOOTER_DATEI"
-
-          FOOTER="### So holst du dir deine ${SPIEL_NAME_KAPITALISIERT}-Belohnungen\n\n
-          Das Einfordern deiner täglichen Belohnungen in ${SPIEL_NAME_KAPITALISIERT} ist schnell und einfach! Folge diesen Schritten:\n
-          1️⃣ **Belohnungslink auswählen** – Klicke auf einen der oben aufgeführten Links.\n
-          2️⃣ **Spiel öffnen** – Der Link leitet dich zur ${SPIEL_NAME_KAPITALISIERT}-App oder Website weiter.\n
-          3️⃣ **Belohnung erhalten** – Logge dich ein und erhalte deine Freispiele oder Münzen.\n\n
-          **Noch mehr Boni?**\n
-          - Tritt der ${SPIEL_NAME_KAPITALISIERT}-Community bei und tausche dich mit anderen Spielern aus.\n
-          - Folge den offiziellen ${SPIEL_NAME_KAPITALISIERT}-Social-Media-Kanälen, um exklusive Events nicht zu verpassen.\n\n
-          Genieße dein Spiel und viel Spaß mit den täglichen ${SPIEL_NAME_KAPITALISIERT}-Belohnungen! 🎉"
+          FOOTER_DATEI="_includes/${SPIEL_NAME}_footer.md"
+          FOOTER="### Warum solltest du unsere Updates verfolgen?\n\n
+          Wir stellen täglich aktualisierte Links aus offiziellen ${SPIEL_NAME_KAPITALISIERT}-Quellen zur Verfügung, damit du keine Belohnung verpasst.\n\n
+          #### Hinweis:\n
+          Diese Seite ist unabhängig und steht in keiner Verbindung zu den Entwicklern von ${SPIEL_NAME_KAPITALISIERT}. Alle Belohnungen stammen aus öffentlichen Quellen und offiziellen Promotionen.\n"
           echo -e "$FOOTER" > "$FOOTER_DATEI"
 
-          # Erzwinge Änderungsdetektion
-          touch "$FOOTER_DATEI"
-          git update-index --assume-unchanged "$FOOTER_DATEI"
+      - name: Letztes Änderungsdatum der Include-Datei aktualisieren
+        run: |
+          export TZ=UTC
+          ZEITSTEMPEL=$(date -u +"%Y-%m-%d %H:%M:%S")
+          INCLUDE_FILES_YML="_data/include_files.yml"
 
-      - name: Änderungen committen und pushen
+          if git diff --quiet _includes/${{ matrix.game }}.html; then
+            echo "_includes/${{ matrix.game }}.html wurde nicht geändert. Aktualisierung des letzten Änderungsdatums übersprungen."
+          else
+            if grep -q "${{ matrix.game }}.html:" "$INCLUDE_FILES_YML"; then
+              sed -i "/${{ matrix.game }}.html:/,/last_modified:/s|last_modified: .*|last_modified: $ZEITSTEMPEL|" "$INCLUDE_FILES_YML"
+            else
+              echo -e "\n${{ matrix.game }}.html:\n  last_modified: $ZEITSTEMPEL" >> "$INCLUDE_FILES_YML"
+            fi
+          fi
+
+      - name: Git konfigurieren
         run: |
           git config --global user.email "prolladmail@gmail.com"
           git config --global user.name "Prollad99"
 
-          git add -A
-          git commit -m "Erzwinge Update für ${SPIEL_NAME_KAPITALISIERT}" || echo "Kein Commit erforderlich"
-          git push --force https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git || true
+      - name: Änderungen committen und pushen
+        env:
+          ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+        run: |
+          git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.md _includes/${{ matrix.game }}_footer.md links-json/${{ matrix.game }}.json _data/include_files.yml
+          git add package.json package-lock.json || true
+          git commit -m "Aktualisiere ${{ matrix.game }}-Belohnungslinks, Inhalte und Änderungsdatum" || true
+          git stash
+          git pull --rebase || true
+          git stash pop || true
+          for i in {1..5}; do
+            git push https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git && break
+            echo "Versuch $i: Push fehlgeschlagen, erneuter Versuch in 5 Sekunden..."
+            sleep 5
+            git pull --rebase || true
+          done
