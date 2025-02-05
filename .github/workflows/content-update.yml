@@ -61,13 +61,11 @@ jobs:
           SPIEL_NAME_KAPITALISIERT=$(echo "$SPIEL_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
           ABSATZ_DATEI="_includes/${SPIEL_NAME}_post.html"
-          ABSATZ="**Willkommen, ${SPIEL_NAME_KAPITALISIERT}-Fans!**  \n
-          Suchst du nach den neuesten Gratis-Belohnungen für ${SPIEL_NAME_KAPITALISIERT}? Dann bist du hier genau richtig! Wir aktualisieren täglich die besten Links für Freispiele, Münzen und andere Boni, damit du dein Spielerlebnis optimal genießen kannst.  \n\n
-          
-          ### Was ist ${SPIEL_NAME_KAPITALISIERT} und warum sind Belohnungen wichtig?  \n
-          ${SPIEL_NAME_KAPITALISIERT} ist ein beliebtes Spiel, das von Millionen gespielt wird. Mit täglichen Belohnungen kannst du länger spielen, schneller leveln und das Beste aus deinem Spielerlebnis herausholen.  \n\n
-          
-          ### 🚀 Tägliche Belohnungslinks für ${SPIEL_NAME_KAPITALISIERT}"
+          ABSATZ="Entdecke tägliche ${SPIEL_NAME_KAPITALISIERT}-Belohnungen!\n\n
+          Bist du ein Fan von ${SPIEL_NAME_KAPITALISIERT} und möchtest dein Spielerlebnis verbessern? Du bist hier genau richtig! Diese Seite ist allen ${SPIEL_NAME_KAPITALISIERT}-Enthusiasten gewidmet, die täglich kostenlose Belohnungen einfordern möchten. Hier findest du die neuesten Links, um Freispiele, Münzen, Chips und andere spannende Boni zu sammeln, damit du das Spiel noch mehr genießen kannst.\n\n
+          ${SPIEL_NAME_KAPITALISIERT} ist ein unterhaltsames Spiel, das von Millionen geliebt wird. Ob du höhere Level erreichen oder einfach nur den Nervenkitzel genießen möchtest – unsere täglichen Belohnungslinks halten dich im Spiel.\n\n
+          Hinweis: ${SPIEL_NAME_KAPITALISIERT} ist eine kostenlose App, die ausschließlich zu Unterhaltungszwecken entwickelt wurde. Bonuscollector.net ist eine unabhängige Plattform und steht in keiner Verbindung zu den Entwicklern oder Eigentümern von ${SPIEL_NAME_KAPITALISIERT}.\n\n
+          Schau täglich vorbei, um sicherzustellen, dass du keine Belohnung verpasst!"
           echo -e "$ABSATZ" > "$ABSATZ_DATEI"
 
       - name: Dynamische Footer-Inhalte generieren
@@ -76,22 +74,18 @@ jobs:
           SPIEL_NAME_KAPITALISIERT=$(echo "$SPIEL_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
           FOOTER_DATEI="_includes/${SPIEL_NAME}_footer.html"
-          FOOTER="*(Diese Liste wird täglich aktualisiert – speichere die Seite und schaue regelmäßig vorbei!)*  \n\n
-          
-          ### 🏆 Profi-Tipps für ${SPIEL_NAME_KAPITALISIERT} Spieler  \n
-          - **Nutze Belohnungen strategisch**: Warte auf knifflige Spielmomente, um Boni einzulösen.  \n
-          - **Verbinde dich mit Freunden**: Viele Spiele bieten Extra-Belohnungen für das Einladen von Freunden.  \n
-          - **Bleibe auf dem Laufenden**: Folge offiziellen ${SPIEL_NAME_KAPITALISIERT}-Social-Media-Seiten für weitere Geheimtipps.  \n\n
-          
-          ### ❓ Häufig gestellte Fragen (FAQ)  \n
-          **Wie oft kann ich die Belohnungslinks nutzen?**  \n
-          👉 Jeder Link ist normalerweise nur einmal gültig. Täglich neue Links nutzen!  \n\n
-          
-          **Warum funktioniert ein Link nicht?**  \n
-          👉 Einige Links haben eine begrenzte Laufzeit. Falls ein Link abgelaufen ist, probiere die neuesten aus.  \n\n
-          
-          ### 📌 Fazit  \n
-          Vergiss nicht, täglich zurückzukommen, um neue Belohnungen zu erhalten! Speichere diese Seite oder teile sie mit deinen Freunden. Viel Spaß beim Spielen von ${SPIEL_NAME_KAPITALISIERT}!"
+          FOOTER="### So holst du dir deine ${SPIEL_NAME_KAPITALISIERT}-Belohnungen\n\n
+          Das Einfordern deiner täglichen Belohnungen in ${SPIEL_NAME_KAPITALISIERT} ist schnell und einfach! Folge einfach diesen Schritten:\n
+          1. Durchsuche die oben bereitgestellten Belohnungslinks und wähle die aus, die du einfordern möchtest.\n
+          2. Klicke auf einen Link, und er leitet dich automatisch zu deiner ${SPIEL_NAME_KAPITALISIERT}-App oder Website weiter.\n
+          3. Melde dich mit deinem Konto an, falls du dazu aufgefordert wirst.\n
+          4. Die Belohnung (z. B. Freispiele, Münzen, Chips oder Boni) wird sofort deinem Konto hinzugefügt.\n\n
+          **Tipps zum Einfordern von Belohnungen:**\n
+          - Stelle sicher, dass du in deinem ${SPIEL_NAME_KAPITALISIERT}-Konto angemeldet bist, bevor du auf die Links klickst.\n
+          - Jeder Belohnungslink kann in der Regel nur einmal eingelöst werden, also schaue täglich für neue Links vorbei.\n
+          - Wenn ein Link nicht funktioniert, ist er möglicherweise abgelaufen. Fordere Belohnungen daher so schnell wie möglich ein.\n\n
+          Viel Spaß mit deinen kostenlosen Belohnungen und genieße das Spielen von ${SPIEL_NAME_KAPITALISIERT}!\n\n
+          Hinweis: Diese Belohnungen werden offiziell von ${SPIEL_NAME_KAPITALISIERT} bereitgestellt und stammen aus öffentlich zugänglichen Quellen. Bonuscollector.net ist nicht verantwortlich für Probleme beim Einlösen der Belohnungen."
           echo -e "$FOOTER" > "$FOOTER_DATEI"
 
       - name: Letztes Änderungsdatum der Include-Datei aktualisieren
