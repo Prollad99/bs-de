@@ -43,6 +43,7 @@ jobs:
       - name: Abhängigkeiten installieren
         run: npm install
 
+      # Install Playwright Browsers
       - name: Installiere Playwright-Browser
         run: npx playwright install
 
@@ -59,17 +60,21 @@ jobs:
           SPIEL_NAME=${{ matrix.game }}
           SPIEL_NAME_KAPITALISIERT=$(echo "$SPIEL_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
-          ABSATZ_DATEI="_includes/${SPIEL_NAME}_post.md"
-          ABSATZ="## ${SPIEL_NAME_KAPITALISIERT} Tägliche Belohnungen\n\n
-          Möchtest du dein ${SPIEL_NAME_KAPITALISIERT}-Erlebnis verbessern? Hier findest du die neuesten täglichen kostenlosen Belohnungen, damit du dein Spiel auf das nächste Level bringen kannst!\n\n
-          ### So forderst du deine Belohnungen ein\n
-          1. Wähle einen Belohnungslink aus der obigen Liste.\n
-          2. Klicke auf den Link und melde dich bei deinem ${SPIEL_NAME_KAPITALISIERT}-Konto an.\n
-          3. Die Belohnung wird sofort deinem Konto hinzugefügt!\n\n
-          ### Tipps zur Nutzung von Belohnungen\n
-          - Schaue täglich vorbei, um keine neuen Links zu verpassen.\n
-          - Stelle sicher, dass du eingeloggt bist, bevor du auf die Links klickst.\n
-          - Einige Links können schnell ablaufen, also handle schnell!\n"
+          ABSATZ_DATEI="_includes/${SPIEL_NAME}_post.html"
+          ABSATZ="<h2>Hole dir täglich kostenlose Belohnungen in ${SPIEL_NAME_KAPITALISIERT}!</h2>\n
+          <p>Möchtest du dein ${SPIEL_NAME_KAPITALISIERT}-Erlebnis verbessern? Entdecke hier die neuesten kostenlosen Belohnungen! Täglich aktualisiert, um dir zu helfen, schneller voranzukommen.</p>\n
+          <h3>So kannst du deine Belohnungen einlösen</h3>\n
+          <ol>\n
+            <li>Durchsuche die oben genannten Belohnungslinks.</li>\n
+            <li>Klicke auf den Link und melde dich bei deinem ${SPIEL_NAME_KAPITALISIERT}-Konto an.</li>\n
+            <li>Genieße deine Belohnungen sofort!</li>\n
+          </ol>\n
+          <h3>Tipps, um das Beste aus deinen Belohnungen herauszuholen</h3>\n
+          <ul>\n
+            <li>Besuche die Seite täglich, um neue Belohnungen zu erhalten.</li>\n
+            <li>Stelle sicher, dass du eingeloggt bist, bevor du auf die Links klickst.</li>\n
+            <li>Handle schnell – einige Links laufen schnell ab!</li>\n
+          </ul>"
           echo -e "$ABSATZ" > "$ABSATZ_DATEI"
 
       - name: Dynamische Footer-Inhalte generieren
@@ -77,11 +82,11 @@ jobs:
           SPIEL_NAME=${{ matrix.game }}
           SPIEL_NAME_KAPITALISIERT=$(echo "$SPIEL_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
-          FOOTER_DATEI="_includes/${SPIEL_NAME}_footer.md"
-          FOOTER="### Warum solltest du unsere Updates verfolgen?\n\n
-          Wir stellen täglich aktualisierte Links aus offiziellen ${SPIEL_NAME_KAPITALISIERT}-Quellen zur Verfügung, damit du keine Belohnung verpasst.\n\n
-          #### Hinweis:\n
-          Diese Seite ist unabhängig und steht in keiner Verbindung zu den Entwicklern von ${SPIEL_NAME_KAPITALISIERT}. Alle Belohnungen stammen aus öffentlichen Quellen und offiziellen Promotionen.\n"
+          FOOTER_DATEI="_includes/${SPIEL_NAME}_footer.html"
+          FOOTER="<h3>Warum du unsere ${SPIEL_NAME_KAPITALISIERT}-Updates folgen solltest</h3>\n
+          <p>Wir bieten täglich die neuesten Belohnungslinks aus offiziellen ${SPIEL_NAME_KAPITALISIERT}-Aktionen. So bleibst du immer auf dem neuesten Stand. Speichere diese Seite für schnellen Zugriff.</p>\n
+          <h4>Hinweis:</h4>\n
+          <p>Diese Seite ist nicht mit den offiziellen Entwicklern von ${SPIEL_NAME_KAPITALISIERT} verbunden. Alle Belohnungen stammen aus öffentlichen Quellen.</p>"
           echo -e "$FOOTER" > "$FOOTER_DATEI"
 
       - name: Letztes Änderungsdatum der Include-Datei aktualisieren
@@ -109,7 +114,7 @@ jobs:
         env:
           ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
         run: |
-          git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.md _includes/${{ matrix.game }}_footer.md links-json/${{ matrix.game }}.json _data/include_files.yml
+          git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.html _includes/${{ matrix.game }}_footer.html links-json/${{ matrix.game }}.json _data/include_files.yml
           git add package.json package-lock.json || true
           git commit -m "Aktualisiere ${{ matrix.game }}-Belohnungslinks, Inhalte und Änderungsdatum" || true
           git stash
