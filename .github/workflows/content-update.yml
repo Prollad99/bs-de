@@ -1,4 +1,4 @@
-# Name: Update Links and Deployment
+Name: Update Links and Deployment
 
 on:
   schedule:
