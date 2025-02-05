@@ -3,6 +3,41 @@ layout: default
 ---
 
 <div class="container">
+  <h1 class="my-4">Willkommen bei BonusCollector.de – Deine ultimative Quelle für kostenlose In-Game-Belohnungen!</h1>
+  
+  <p>Bist du ein begeisterter Gamer und möchtest dein Spielerlebnis verbessern, ohne Geld auszugeben? 
+     Bei <strong>BonusCollector.de</strong> findest du die neuesten Bonus- und Belohnungslinks für zahlreiche beliebte Mobile- und Browserspiele – alles an einem Ort!</p>
+
+  <h2>Warum BonusCollector.de?</h2>
+  <ul>
+    <li><strong>Umfassende Sammlung:</strong> Wir bieten Bonuslinks für eine Vielzahl von Spielen, damit du immer die besten Belohnungen erhältst.</li>
+    <li><strong>Tägliche Updates:</strong> Unser Team aktualisiert die Links regelmäßig, sodass du keine neuen Angebote verpasst.</li>
+    <li><strong>Einfache Nutzung:</strong> Dank unserer benutzerfreundlichen Oberfläche findest du schnell und bequem die besten Belohnungen für deine Lieblingsspiele.</li>
+  </ul>
+
+  <h2>So funktioniert es</h2>
+  <p>Viele Spieleentwickler veröffentlichen regelmäßig Werbelinks und Codes, mit denen Spieler kostenlose In-Game-Items erhalten können. 
+     Doch diese Angebote sind oft verstreut und zeitlich begrenzt. Wir sammeln diese Links, überprüfen ihre Gültigkeit und präsentieren sie dir übersichtlich – damit du Zeit und Mühe sparst!</p>
+
+  <h2>Beliebte Spiele mit Belohnungen</h2>
+  <ul>
+    <li>🎰 <strong>Coin Master</strong></li>
+    <li>🎲 <strong>Monopoly GO</strong></li>
+    <li>🎉 <strong>Bingo Blitz</strong></li>
+    <li>🎡 <strong>Slotomania</strong></li>
+    <li>🃏 <strong>WSOP Poker</strong></li>
+    <li>...und viele mehr!</li>
+  </ul>
+
+  <h2>Bleib auf dem Laufenden</h2>
+  <p>Speichere <strong>BonusCollector.de</strong> als Lesezeichen und besuche uns regelmäßig, um die neuesten kostenlosen Belohnungen zu sichern. 
+     Teile unsere Seite mit deinen Freunden, damit auch sie von den besten Angeboten profitieren können!</p>
+
+  <p><small><strong>Hinweis:</strong> BonusCollector.de ist eine unabhängige Plattform und steht in keiner Verbindung mit den jeweiligen Spieleentwicklern. 
+     Alle Marken und registrierten Marken gehören ihren jeweiligen Eigentümern.</small></p>
+
+  <hr>
+
   <h1 class="my-4">Spieleliste</h1>
 
   <div class="row">
@@ -34,36 +69,35 @@ layout: default
           </div>
           <div class="card-footer text-center">
             <p class="text-muted">
-  <small>
-    Von <strong>{{ post.author }}</strong> |
-    {% assign include_file = post.include_file %}
-    {% assign file_info = site.data.include_files[include_file] %}
-    {% if file_info %}
-      {% assign last_modified = file_info.last_modified %}
-      {% if last_modified %}
-        Zuletzt aktualisiert:
-        <strong class="last-updated" data-last-modified="{{ last_modified }}">
-          {% assign day = last_modified | date: "%d" %}
-          {% assign month = last_modified | date: "%B" %}
-          {% assign year = last_modified | date: "%Y" %}
-          {{ day }}. {{ site.data.months.months[month] }} {{ year }}
-        </strong>
-      {% else %}
-        Zuletzt aktualisiert: <strong>Nicht verfügbar</strong>
-      {% endif %}
-    {% else %}
-      Zuletzt aktualisiert:
-      <strong>
-        {% assign day = post.last_modified_at | date: "%d" %}
-        {% assign month = post.last_modified_at | date: "%B" %}
-        {% assign year = post.last_modified_at | date: "%Y" %}
-        {{ day }}. {{ site.data.months.months[month] }} {{ year }}
-      </strong>
-    {% endif %}
-    <!-- Verstecktes Eingabefeld für include_file -->
-    <input type="hidden" name="include_file" value="{{ post.include_file }}">
-  </small>
-</p>
+              <small>
+                Von <strong>{{ post.author }}</strong> |
+                {% assign include_file = post.include_file %}
+                {% assign file_info = site.data.include_files[include_file] %}
+                {% if file_info %}
+                  {% assign last_modified = file_info.last_modified %}
+                  {% if last_modified %}
+                    Zuletzt aktualisiert:
+                    <strong class="last-updated" data-last-modified="{{ last_modified }}">
+                      {% assign day = last_modified | date: "%d" %}
+                      {% assign month = last_modified | date: "%B" %}
+                      {% assign year = last_modified | date: "%Y" %}
+                      {{ day }}. {{ site.data.months.months[month] }} {{ year }}
+                    </strong>
+                  {% else %}
+                    Zuletzt aktualisiert: <strong>Nicht verfügbar</strong>
+                  {% endif %}
+                {% else %}
+                  Zuletzt aktualisiert:
+                  <strong>
+                    {% assign day = post.last_modified_at | date: "%d" %}
+                    {% assign month = post.last_modified_at | date: "%B" %}
+                    {% assign year = post.last_modified_at | date: "%Y" %}
+                    {{ day }}. {{ site.data.months.months[month] }} {{ year }}
+                  </strong>
+                {% endif %}
+                <input type="hidden" name="include_file" value="{{ post.include_file }}">
+              </small>
+            </p>
           </div>
         </div>
       </div>
