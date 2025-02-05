@@ -43,7 +43,6 @@ jobs:
       - name: Abhängigkeiten installieren
         run: npm install
 
-      # Install Playwright Browsers
       - name: Installiere Playwright-Browser
         run: npx playwright install
 
@@ -61,20 +60,12 @@ jobs:
           SPIEL_NAME_KAPITALISIERT=$(echo "$SPIEL_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
           ABSATZ_DATEI="_includes/${SPIEL_NAME}_post.html"
-          ABSATZ="<h2>Hole dir täglich kostenlose Belohnungen in ${SPIEL_NAME_KAPITALISIERT}!</h2>\n
-          <p>Möchtest du dein ${SPIEL_NAME_KAPITALISIERT}-Erlebnis verbessern? Entdecke hier die neuesten kostenlosen Belohnungen! Täglich aktualisiert, um dir zu helfen, schneller voranzukommen.</p>\n
-          <h3>So kannst du deine Belohnungen einlösen</h3>\n
-          <ol>\n
-            <li>Durchsuche die oben genannten Belohnungslinks.</li>\n
-            <li>Klicke auf den Link und melde dich bei deinem ${SPIEL_NAME_KAPITALISIERT}-Konto an.</li>\n
-            <li>Genieße deine Belohnungen sofort!</li>\n
-          </ol>\n
-          <h3>Tipps, um das Beste aus deinen Belohnungen herauszuholen</h3>\n
-          <ul>\n
-            <li>Besuche die Seite täglich, um neue Belohnungen zu erhalten.</li>\n
-            <li>Stelle sicher, dass du eingeloggt bist, bevor du auf die Links klickst.</li>\n
-            <li>Handle schnell – einige Links laufen schnell ab!</li>\n
-          </ul>"
+          ABSATZ="Sind Sie ein ${SPIEL_NAME_KAPITALISIERT} Fan? Holen Sie sich täglich kostenlose Münzen, Spins, Chips und Boni mit diesen aktualisierten Reward-Links. Wir aktualisieren diese Seite täglich mit neuen Reward-Links, damit Sie nie eine Gelegenheit verpassen, Ihr Spiel zu verbessern.\n\n
+          ## Wie Sie Ihre Belohnungen einfordern können\n\n
+          - Wählen Sie einen Prämienlink aus der Liste aus.\n
+          - Tippen Sie auf den Link und melden Sie sich bei Ihrem ${SPIEL_NAME_KAPITALISIERT} Konto an.\n
+          - Ihre Belohnungen werden sofort gutgeschrieben!\n\n
+          ## Tägliche Belohnungslinks für ${SPIEL_NAME_KAPITALISIERT}"
           echo -e "$ABSATZ" > "$ABSATZ_DATEI"
 
       - name: Dynamische Footer-Inhalte generieren
@@ -83,10 +74,9 @@ jobs:
           SPIEL_NAME_KAPITALISIERT=$(echo "$SPIEL_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
           FOOTER_DATEI="_includes/${SPIEL_NAME}_footer.html"
-          FOOTER="<h3>Warum du unsere ${SPIEL_NAME_KAPITALISIERT}-Updates folgen solltest</h3>\n
-          <p>Wir bieten täglich die neuesten Belohnungslinks aus offiziellen ${SPIEL_NAME_KAPITALISIERT}-Aktionen. So bleibst du immer auf dem neuesten Stand. Speichere diese Seite für schnellen Zugriff.</p>\n
-          <h4>Hinweis:</h4>\n
-          <p>Diese Seite ist nicht mit den offiziellen Entwicklern von ${SPIEL_NAME_KAPITALISIERT} verbunden. Alle Belohnungen stammen aus öffentlichen Quellen.</p>"
+          FOOTER="## Warum sollten Sie unsere Reward Updates verfolgen?\n\n
+          Wir aktualisieren die Links ständig, um sicherzustellen, dass Sie die neuesten Belohnungen erhalten. Alle Belohnungen stammen aus offiziellen ${SPIEL_NAME_KAPITALISIERT} Aktionen, so dass Sie sie einfach und sicher einfordern können.\n\n
+          Hinweis: Diese Links können ablaufen, also fordern Sie Ihre Belohnungen schnell ein. Wir sind nicht mit den Entwicklern von ${SPIEL_NAME_KAPITALISIERT} verbunden; diese Seite ist eine Ressource für Spieler."
           echo -e "$FOOTER" > "$FOOTER_DATEI"
 
       - name: Letztes Änderungsdatum der Include-Datei aktualisieren
