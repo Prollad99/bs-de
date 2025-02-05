@@ -116,7 +116,15 @@ jobs:
           git config --global user.email "prolladmail@gmail.com"
           git config --global user.name "Prollad99"
 
+          # Fetch the latest changes from the remote repository before proceeding
+          git fetch origin
+
+          # Rebase or merge changes if needed
+          git rebase origin/main || git merge origin/main
+
+          # Add the changes and commit
           git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.html _includes/${{ matrix.game }}_footer.html links-json/${{ matrix.game }}.json _data/include_files.yml
-git commit -m "Update content for ${{ matrix.game }}" || true
-git pull --rebase origin main || true
-git push --force https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git
+          git commit -m "Aktualisiere Inhalte für ${{ matrix.game }}" || true
+
+          # Push the changes back to the repository
+          git push https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git
