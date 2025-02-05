@@ -2,88 +2,71 @@
 layout: default
 ---
 
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>BonusCollector.de - Kostenlose In-Game-Belohnungen</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Custom Styles -->
-    <style>
-        body { font-family: Arial, sans-serif; }
-        .hero-section { text-align: center; padding: 40px 20px; }
-        .hero-section h1 { font-size: 2rem; font-weight: bold; }
-        .hero-section p { font-size: 1.1rem; color: #555; }
-        .game-card img { max-width: 65px; max-height: 65px; }
-        .game-card .btn { width: 100%; }
-        .game-card-footer { font-size: 0.85rem; color: #6c757d; }
-        .section-title { font-weight: bold; text-align: center; margin-top: 40px; font-size: 1.5rem; }
-    </style>
-</head>
-<body>
+<div class="container">
+  <h1 class="my-4">Spieleliste</h1>
 
-<div class="container mt-4">
-    <!-- Hero Section -->
-    <div class="hero-section">
-        <h1>BonusCollector.de – Deine ultimative Quelle für kostenlose In-Game-Belohnungen!</h1>
-        <p>
-            Bist du ein begeisterter Gamer und möchtest dein Spielerlebnis verbessern, ohne Geld auszugeben? 
-            Bei <strong>BonusCollector.de</strong> findest du die neuesten Bonus- und Belohnungslinks für zahlreiche 
-            beliebte Mobile- und Browserspiele – alles an einem Ort!
-        </p>
-    </div>
-
-    <!-- Game List Section -->
-    <h2 class="section-title">Spieleliste</h2>
-    
-    <div class="row">
-        {% assign sorted_posts = site.posts | sort: 'title' %}
-        {% for post in sorted_posts %}
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card game-card shadow-sm border rounded-3">
-                    <div class="row g-0 align-items-center">
-                        <div class="col-4 text-center bg-light p-3 d-flex flex-column align-items-center justify-content-center">
-                            {% if post.image %}
-                                <img src="{{ post.image }}" class="img-fluid rounded" alt="{{ post.title }}">
-                            {% endif %}
-                            <a href="{{ post.url }}" class="btn btn-primary btn-sm mt-2">Jetzt beanspruchen</a>
-                        </div>
-                        <div class="col-8">
-                            <div class="card-body p-3">
-                                <a href="{{ post.url }}" class="text-decoration-none text-dark">
-                                    <h5 class="card-title fw-bold fs-6">{{ post.title }}</h5>
-                                </a>
-                                <p class="card-text small text-muted">
-                                    {% if post.description %}
-                                        {{ post.description }}
-                                    {% else %}
-                                        {{ post.content | strip_html | truncatewords: 15 }}
-                                    {% endif %}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-footer bg-white border-top text-center p-2 game-card-footer">
-                        <span>Von <strong>BonusCollector</strong> | </span>
-                        {% assign last_modified = post.last_modified_at %}
-                        {% if last_modified %}
-                            <span>Zuletzt aktualisiert: <strong>{{ last_modified | date: "%d.%m.%Y" }}</strong></span>
-                        {% else %}
-                            <span>Zuletzt aktualisiert: <strong>Unbekannt</strong></span>
-                        {% endif %}
-                    </div>
-                </div>
+  <div class="row">
+    {% assign sorted_posts = site.posts | sort: 'title' %}
+    {% for post in sorted_posts %}
+      <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+          <div class="row no-gutters">
+            <div class="col-4 d-flex flex-column align-items-center justify-content-center">
+              {% if post.image %}
+                <img src="{{ post.image }}" class="card-img" alt="{{ post.title }}" style="max-width: 80px; max-height: 80px; margin: 10px;">
+              {% endif %}
+              <a href="{{ post.url }}" class="btn btn-primary btn-sm mt-2 mb-2">Jetzt beanspruchen</a>
             </div>
-        {% endfor %}
-    </div>
+            <div class="col-8">
+              <div class="card-body">
+                <a href="{{ post.url }}">
+                  <h5 class="card-title" style="font-size: 1rem;">{{ post.title }}</h5>
+                </a>
+                <p class="card-text" style="font-size: 0.9rem;">
+                  {% if post.description %}
+                    {{ post.description }}
+                  {% else %}
+                    {{ post.content | strip_html | truncatewords: 25 }}
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer text-center">
+            <p class="text-muted">
+  <small>
+    Von <strong>{{ post.author }}</strong> |
+    {% assign include_file = post.include_file %}
+    {% assign file_info = site.data.include_files[include_file] %}
+    {% if file_info %}
+      {% assign last_modified = file_info.last_modified %}
+      {% if last_modified %}
+        Zuletzt aktualisiert:
+        <strong class="last-updated" data-last-modified="{{ last_modified }}">
+          {% assign day = last_modified | date: "%d" %}
+          {% assign month = last_modified | date: "%B" %}
+          {% assign year = last_modified | date: "%Y" %}
+          {{ day }}. {{ site.data.months.months[month] }} {{ year }}
+        </strong>
+      {% else %}
+        Zuletzt aktualisiert: <strong>Nicht verfügbar</strong>
+      {% endif %}
+    {% else %}
+      Zuletzt aktualisiert:
+      <strong>
+        {% assign day = post.last_modified_at | date: "%d" %}
+        {% assign month = post.last_modified_at | date: "%B" %}
+        {% assign year = post.last_modified_at | date: "%Y" %}
+        {{ day }}. {{ site.data.months.months[month] }} {{ year }}
+      </strong>
+    {% endif %}
+    <!-- Verstecktes Eingabefeld für include_file -->
+    <input type="hidden" name="include_file" value="{{ post.include_file }}">
+  </small>
+</p>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
 </div>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-</html>
