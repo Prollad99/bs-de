@@ -1,14 +1,14 @@
-Name: Update Links and Deployment
+name: Aktualisiere Links und Bereitstellung
 
 on:
   schedule:
-    - cron: '*/30 * * * *'  # Runs every 30 minutes
+    - cron: '*/30 * * * *' # Läuft alle 30 Minuten
   push:
     branches:
       - main
 
 jobs:
-  update-links:
+  links-aktualisieren:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -29,10 +29,10 @@ jobs:
           - gametwist
 
     steps:
-      - name: Checkout Repository
+      - name: Repository auschecken
         uses: actions/checkout@v2
 
-      - name: Cache Node Modules
+      - name: Node-Module zwischenspeichern
         uses: actions/cache@v2
         with:
           path: ~/.npm
@@ -40,98 +40,88 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Install Dependencies
+      - name: Abhängigkeiten installieren
         run: npm install
 
-      - name: Install Playwright Browsers
+      # Install Playwright Browsers
+      - name: Installiere Playwright-Browser
         run: npx playwright install
 
-      - name: Fetch and Update Links
+      - name: Links abrufen und aktualisieren
         run: |
           node index-js/${{ matrix.game }}.js
-          echo "Content of links-json/${{ matrix.game }}.json:"
+          echo "Inhalt von links-json/${{ matrix.game }}.json:"
           cat links-json/${{ matrix.game }}.json
-          echo "Content of _includes/${{ matrix.game }}.html:"
+          echo "Inhalt von _includes/${{ matrix.game }}.html:"
           cat _includes/${{ matrix.game }}.html
 
-      - name: Generate Dynamic Post Content
+      - name: Dynamische Beitragsinhalte generieren
         run: |
-          GAME_NAME=${{ matrix.game }}
-          GAME_NAME_CAPITALIZED=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
+          SPIEL_NAME=${{ matrix.game }}
+          SPIEL_NAME_KAPITALISIERT=$(echo "$SPIEL_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
-          POST_FILE="_includes/${GAME_NAME}_post.html"
-          POST_CONTENT="Willkommen auf der täglichen ${GAME_NAME_CAPITALIZED}-Belohnungsseite!\n\n
-          Wenn Sie ein engagierter Fan von ${GAME_NAME_CAPITALIZED} sind, haben wir etwas Besonderes für Sie! Hier finden Sie aktualisierte Links zu kostenlosen Drehungen, Münzen, Chips und anderen Boni, die Ihr Spielerlebnis verbessern.\n\n
-          **Was macht ${GAME_NAME_CAPITALIZED} so besonders?**\n
-          ${GAME_NAME_CAPITALIZED} hat die Herzen von Millionen Spielern auf der ganzen Welt erobert. Mit seinem fesselnden Gameplay, herausfordernden Wettbewerben und spannenden Events ist es ein Muss für alle, die Spaß, Strategie und Belohnungen lieben.\n\n
-          **Tägliche Belohnungen:**\n
-          - Frische Belohnungslinks, die regelmäßig aktualisiert werden.\n
-          - Verpassen Sie keinen Bonus – setzen Sie ein Lesezeichen für diese Seite und schauen Sie täglich vorbei.\n
-          - Sichern Sie sich Drehungen, Münzen und exklusive Boni, bevor sie ablaufen!\n\n
-          **Warum unsere Plattform nutzen?**\n
-          - Einfaches, benutzerfreundliches Erlebnis.\n
-          - Überprüfte und aktive Belohnungslinks.\n
-          - Schneller Zugriff ohne komplizierte Schritte.\n\n
-          *Hinweis: ${GAME_NAME_CAPITALIZED} ist eine kostenlose App, die zu Unterhaltungszwecken entwickelt wurde. Wir stehen in keiner Verbindung zu den Entwicklern oder Eigentümern des Spiels.*"
-          echo -e "$POST_CONTENT" > "$POST_FILE"
+          ABSATZ_DATEI="_includes/${SPIEL_NAME}_post.html"
+          ABSATZ="Entdecke tägliche ${SPIEL_NAME_KAPITALISIERT}-Belohnungen!\n\n
+          Bist du ein Fan von ${SPIEL_NAME_KAPITALISIERT} und möchtest dein Spielerlebnis verbessern? Du bist hier genau richtig! Diese Seite ist allen ${SPIEL_NAME_KAPITALISIERT}-Enthusiasten gewidmet, die täglich kostenlose Belohnungen einfordern möchten. Hier findest du die neuesten Links, um Freispiele, Münzen, Chips und andere spannende Boni zu sammeln, damit du das Spiel noch mehr genießen kannst.\n\n
+          ${SPIEL_NAME_KAPITALISIERT} ist ein unterhaltsames Spiel, das von Millionen geliebt wird. Ob du höhere Level erreichen oder einfach nur den Nervenkitzel genießen möchtest – unsere täglichen Belohnungslinks halten dich im Spiel.\n\n
+          Hinweis: ${SPIEL_NAME_KAPITALISIERT} ist eine kostenlose App, die ausschließlich zu Unterhaltungszwecken entwickelt wurde. Bonuscollector.net ist eine unabhängige Plattform und steht in keiner Verbindung zu den Entwicklern oder Eigentümern von ${SPIEL_NAME_KAPITALISIERT}.\n\n
+          Schau täglich vorbei, um sicherzustellen, dass du keine Belohnung verpasst!"
+          echo -e "$ABSATZ" > "$ABSATZ_DATEI"
 
-      - name: Generate Dynamic Footer Content
+      - name: Dynamische Footer-Inhalte generieren
         run: |
-          GAME_NAME=${{ matrix.game }}
-          GAME_NAME_CAPITALIZED=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
+          SPIEL_NAME=${{ matrix.game }}
+          SPIEL_NAME_KAPITALISIERT=$(echo "$SPIEL_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
-          FOOTER_FILE="_includes/${GAME_NAME}_footer.html"
-          FOOTER_CONTENT="### So maximieren Sie Ihre ${GAME_NAME_CAPITALIZED}-Belohnungen\n\n
-          Folgen Sie diesen einfachen Schritten, um Ihre täglichen Boni zu beanspruchen:\n
-          1. Durchsuchen Sie die oben aufgeführten verifizierten Belohnungslinks.\n
-          2. Klicken Sie auf einen Link, um zum Spiel oder zur offiziellen Seite weitergeleitet zu werden.\n
-          3. Stellen Sie sicher, dass Sie in Ihr ${GAME_NAME_CAPITALIZED}-Konto eingeloggt sind.\n
-          4. Genießen Sie Ihre Belohnungen sofort nach dem Einlösen.\n\n
-          **Fehlerbehebung:**\n
-          - Wenn ein Belohnungslink nicht funktioniert, ist er möglicherweise bereits abgelaufen.\n
-          - Stellen Sie sicher, dass Ihr Spiel auf die neueste Version aktualisiert ist.\n
-          - Löschen Sie Ihren Cache und versuchen Sie es erneut, falls Probleme auftreten.\n\n
-          **Sicherheitstipps:**\n
-          - Teilen Sie Ihre Spielanmeldedaten niemals mit anderen.\n
-          - Klicken Sie nur auf vertrauenswürdige Links aus überprüften Quellen.\n\n
-          *Hinweis: Die Belohnungslinks können schnell ablaufen, besuchen Sie daher täglich die Seite für die neuesten Updates.*\n
-          Viel Spaß beim Spielen!"
-          echo -e "$FOOTER_CONTENT" > "$FOOTER_FILE"
+          FOOTER_DATEI="_includes/${SPIEL_NAME}_footer.html"
+          FOOTER="### So holst du dir deine ${SPIEL_NAME_KAPITALISIERT}-Belohnungen\n\n
+          Das Einfordern deiner täglichen Belohnungen in ${SPIEL_NAME_KAPITALISIERT} ist schnell und einfach! Folge einfach diesen Schritten:\n
+          1. Durchsuche die oben bereitgestellten Belohnungslinks und wähle die aus, die du einfordern möchtest.\n
+          2. Klicke auf einen Link, und er leitet dich automatisch zu deiner ${SPIEL_NAME_KAPITALISIERT}-App oder Website weiter.\n
+          3. Melde dich mit deinem Konto an, falls du dazu aufgefordert wirst.\n
+          4. Die Belohnung (z. B. Freispiele, Münzen, Chips oder Boni) wird sofort deinem Konto hinzugefügt.\n\n
+          **Tipps zum Einfordern von Belohnungen:**\n
+          - Stelle sicher, dass du in deinem ${SPIEL_NAME_KAPITALISIERT}-Konto angemeldet bist, bevor du auf die Links klickst.\n
+          - Jeder Belohnungslink kann in der Regel nur einmal eingelöst werden, also schaue täglich für neue Links vorbei.\n
+          - Wenn ein Link nicht funktioniert, ist er möglicherweise abgelaufen. Fordere Belohnungen daher so schnell wie möglich ein.\n\n
+          Viel Spaß mit deinen kostenlosen Belohnungen und genieße das Spielen von ${SPIEL_NAME_KAPITALISIERT}!\n\n
+          Hinweis: Diese Belohnungen werden offiziell von ${SPIEL_NAME_KAPITALISIERT} bereitgestellt und stammen aus öffentlich zugänglichen Quellen. Bonuscollector.net ist nicht verantwortlich für Probleme beim Einlösen der Belohnungen."
+          echo -e "$FOOTER" > "$FOOTER_DATEI"
 
-      - name: Update Last Modified Timestamp
+      - name: Letztes Änderungsdatum der Include-Datei aktualisieren
         run: |
           export TZ=UTC
-          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S")
+          ZEITSTEMPEL=$(date -u +"%Y-%m-%d %H:%M:%S")
           INCLUDE_FILES_YML="_data/include_files.yml"
 
           if git diff --quiet _includes/${{ matrix.game }}.html; then
-            echo "_includes/${{ matrix.game }}.html has not changed. Skipping timestamp update."
+            echo "_includes/${{ matrix.game }}.html wurde nicht geändert. Aktualisierung des letzten Änderungsdatums übersprungen."
           else
             if grep -q "${{ matrix.game }}.html:" "$INCLUDE_FILES_YML"; then
-              sed -i "/${{ matrix.game }}.html:/,/last_modified:/s|last_modified: .*|last_modified: $TIMESTAMP|" "$INCLUDE_FILES_YML"
+              sed -i "/${{ matrix.game }}.html:/,/last_modified:/s|last_modified: .*|last_modified: $ZEITSTEMPEL|" "$INCLUDE_FILES_YML"
             else
-              echo -e "\n${{ matrix.game }}.html:\n  last_modified: $TIMESTAMP" >> "$INCLUDE_FILES_YML"
+              echo -e "\n${{ matrix.game }}.html:\n  last_modified: $ZEITSTEMPEL" >> "$INCLUDE_FILES_YML"
             fi
           fi
 
-      - name: Configure Git
+      - name: Git konfigurieren
         run: |
           git config --global user.email "prolladmail@gmail.com"
           git config --global user.name "Prollad99"
 
-      - name: Commit and Push Changes
+      - name: Änderungen committen und pushen
         env:
           ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
         run: |
           git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.html _includes/${{ matrix.game }}_footer.html links-json/${{ matrix.game }}.json _data/include_files.yml
           git add package.json package-lock.json || true
-          git commit -m "Update ${{ matrix.game }} reward links, content, and modification timestamp" || true
+          git commit -m "Aktualisiere ${{ matrix.game }}-Belohnungslinks, Inhalte und Änderungsdatum" || true
           git stash
           git pull --rebase || true
           git stash pop || true
           for i in {1..5}; do
             git push https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git && break
-            echo "Attempt $i: Push failed, retrying in 5 seconds..."
+            echo "Versuch $i: Push fehlgeschlagen, erneuter Versuch in 5 Sekunden..."
             sleep 5
             git pull --rebase || true
           done
