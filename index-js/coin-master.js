@@ -75,7 +75,7 @@ async function main() {
     combinedLinks.forEach(link => {
       const formattedDate = formatDateCustom(link.date); // Datum im Format MM-DD-YYYY formatieren
       htmlContent += `  <li class="list-group-item d-flex justify-content-between align-items-center">\n`;
-      htmlContent += `    <span>Coin Master Spin Link ${formattedDate}</span>\n`; // Benutzerdefinierter Text mit formatiertem Datum
+      htmlContent += `    <span>Free Spins ${formattedDate}</span>\n`; // Benutzerdefinierter Text mit formatiertem Datum
       htmlContent += `    <a href="${link.href}" class="btn btn-primary btn-sm">Sammeln</a>\n`;
       htmlContent += `  </li>\n`;
     });
