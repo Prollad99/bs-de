@@ -54,73 +54,102 @@ jobs:
           echo "Contents of _includes/${{ matrix.game }}.html:"
           cat _includes/${{ matrix.game }}.html
 
-      - name: Generate dynamic post content
+      - name: Generate dynamic content
         run: |
+          declare -A GAME_TYPES
+          GAME_TYPES=(
+            ["bingo-bash"]="Free Chips"
+            ["bingo-blitz"]="Free Credits"
+            ["coin-master"]="Free Spins"
+            ["crazy-coin"]="Free Spins"
+            ["dice-dreams"]="Free Rolls"
+            ["gametwist"]="Free Coins"
+            ["house-of-fun"]="Free Coins"
+            ["huuuge-casino"]="Free Chips"
+            ["match-masters"]="Free Gifts"
+            ["monopoly-go"]="Würfel"
+            ["slotomania"]="Free Coins"
+            ["slotpark"]="Bonus Code"
+            ["solitaire-grand-harvest"]="Free Coins"
+            ["wsop"]="Free Chips"
+          )
+
           GAME_NAME=${{ matrix.game }}
           GAME_NAME_CAPITALIZED=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
+          GAME_TYPE=${GAME_TYPES[$GAME_NAME]}
 
           POST_FILE="_includes/${GAME_NAME}_post.html"
-          POST_CONTENT="Are you a dedicated **${GAME_NAME_CAPITALIZED}** player? Looking for the easiest way to collect free coins, spins, and other bonuses? You're in the right place! We update this page daily with new reward links so you don’t miss any chance to level up faster and fully enjoy the game.\n\n
-          ## **What are reward links?**\n
-          Reward links are official promotions from **${GAME_NAME_CAPITALIZED}** developers that provide players with free in-game items like spins, coins, and exclusive bonuses. They are a great way to enhance your gameplay without spending money.\n\n
-          Every day, we provide the latest and most reliable reward links, so you can redeem your rewards effortlessly and continue your journey without interruptions.\n\n
-          ---\n\n
-          ## **How to redeem your free rewards**\n
-          Redeeming your daily rewards is simple and requires just a few steps:\n
-          1. **Choose a reward link from the list below.**\n
-          2. **Tap on the link and log into your ${GAME_NAME_CAPITALIZED} account.**\n
-          3. **The reward will be instantly credited to your account!**\n\n
-          Check back on this page regularly, as links can expire quickly. Don’t miss out!\n\n
-          ---\n\n
-          ## **Today's ${GAME_NAME_CAPITALIZED} reward links**"
-          echo -e "$POST_CONTENT" > "$POST_FILE"
-
-      - name: Generate dynamic footer content
-        run: |
-          GAME_NAME=${{ matrix.game }}
-          GAME_NAME_CAPITALIZED=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
-
           FOOTER_FILE="_includes/${GAME_NAME}_footer.html"
-          FOOTER_CONTENT="---\n\n
-          ## **Why you should follow our daily reward updates**\n
-          We help players like you get the most out of their gaming experience. Here’s why bookmarking our page is worth it:\n
-          - **Daily updates:** Find the latest reward links here every day.\n
-          - **Safe and reliable:** All rewards come from official **${GAME_NAME_CAPITALIZED}** promotions.\n
-          - **Completely free:** No hidden costs or tricks – just free rewards!\n\n
-          ---\n\n
-          ## **Pro tips for using free rewards**\n
-          Make the most of your rewards with these helpful tips:\n
-          - **Use free spins strategically:** Save your spins for special events to maximize your chances of winning.\n
-          - **Plan your coin spending:** Invest your coins wisely to level up faster and unlock premium features.\n
-          - **Log in daily:** Many rewards are time-limited, so check in regularly to avoid missing out.\n\n
-          ---\n\n
-          ## **Frequently Asked Questions (FAQs)**\n\n
-          ### **1. Are these reward links safe?**\n
-          Yes! All our links come from official **${GAME_NAME_CAPITALIZED}** promotions, ensuring they are safe and reliable.\n\n
-          ### **2. How often are the reward links updated?**\n
-          We update our page daily to provide the latest active links. Bookmark it and visit every day!\n\n
-          ### **3. What if a link doesn’t work?**\n
-          Some links expire quickly or have a limited number of redemptions. If a link doesn’t work, check back later for new ones.\n\n
-          ---\n\n
-          ## **Disclaimer**\n
-          We are not affiliated with the developers of **${GAME_NAME_CAPITALIZED}**. All content is for informational purposes only to help players easily claim free rewards."
+
+          POST_CONTENT="Are you a dedicated **${GAME_NAME_CAPITALIZED}** player? Want to collect **${GAME_TYPE}** without spending real money? You’re in the right place!  
+
+          We update this page **every day** with fresh **${GAME_TYPE}** links so you can boost your gameplay, level up faster, and unlock exciting rewards—all for free.  
+
+          ---  
+
+          ## **What Are ${GAME_TYPE} Links?**  
+
+          **${GAME_TYPE}** links are official rewards from **${GAME_NAME_CAPITALIZED}** developers, offering free **${GAME_TYPE}** and other in-game bonuses like spins, rolls, credits, and special gifts.  
+
+          Instead of searching for them yourself, we do the work for you! We gather and update the latest working links daily, so you can claim your free rewards hassle-free.  
+
+          ---  
+
+          ## **How to Claim Your Free ${GAME_TYPE}**  
+
+          Getting your free **${GAME_TYPE}** is quick and easy:  
+
+          1. **Choose a link from the list below.**  
+          2. **Click the link and sign in to your ${GAME_NAME_CAPITALIZED} account.**  
+          3. **Enjoy your free ${GAME_TYPE}—instantly added to your game!**  
+
+          > 🔔 **Pro Tip:** These links expire fast, so check back daily to grab yours before they’re gone!  
+
+          ---  
+
+          ## **Today’s Free ${GAME_TYPE} for ${GAME_NAME_CAPITALIZED}**"
+
+          FOOTER_CONTENT="---  
+
+          ## **Why Bookmark This Page?**  
+
+          We make it easy to stay ahead in **${GAME_NAME_CAPITALIZED}** with daily updates and verified links. Here’s why you should visit us daily:  
+
+          ✅ **Daily Updates:** We post the latest free **${GAME_TYPE}** links every day.  
+          ✅ **100% Safe & Verified:** All links come from official **${GAME_NAME_CAPITALIZED}** sources.  
+          ✅ **Completely Free:** No sign-ups, no hidden fees—just free in-game rewards!  
+
+          ---  
+
+          ## **Maximize Your Free ${GAME_TYPE} with These Pro Tips**  
+
+          Want to get the most out of your free rewards? Follow these expert strategies:  
+
+          - **Use Spins & Rolls Wisely:** Save them for high-reward events.  
+          - **Manage Coins & Credits Smartly:** Spend strategically to progress faster.  
+          - **Log in Daily:** Many links have a short lifespan—claim them ASAP!  
+
+          ---  
+
+          ## **FAQs – Your Questions Answered**  
+
+          ### **1. Are these ${GAME_TYPE} links safe to use?**  
+          Yes! We only share links directly from official **${GAME_NAME_CAPITALIZED}** promotions, so they’re completely safe and legitimate.  
+
+          ### **2. How often do you update the links?**  
+          We update this page **daily** with new working links, so be sure to check back every day.  
+
+          ### **3. What if a link doesn’t work?**  
+          Some links have a limited number of redemptions or expire quickly. If one isn’t working, don’t worry—new ones will be available soon!  
+
+          ---  
+
+          ## **Disclaimer**  
+
+          We are **not affiliated** with **${GAME_NAME_CAPITALIZED}** or its developers. This page is solely for informational purposes to help players claim free **${GAME_TYPE}** and enjoy the game to the fullest."
+
+          echo -e "$POST_CONTENT" > "$POST_FILE"
           echo -e "$FOOTER_CONTENT" > "$FOOTER_FILE"
-
-      - name: Update last modified date of include file
-        run: |
-          export TZ=UTC
-          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S")
-          INCLUDE_FILES_YML="_data/include_files.yml"
-
-          if git diff --quiet _includes/${{ matrix.game }}.html; then
-            echo "_includes/${{ matrix.game }}.html was not changed. Skipping last modified date update."
-          else
-            if grep -q "${{ matrix.game }}.html:" "$INCLUDE_FILES_YML"; then
-              sed -i "/${{ matrix.game }}.html:/,/last_modified:/s|last_modified: .*|last_modified: $TIMESTAMP|" "$INCLUDE_FILES_YML"
-            else
-              echo -e "\n${{ matrix.game }}.html:\n  last_modified: $TIMESTAMP" >> "$INCLUDE_FILES_YML"
-            fi
-          fi
 
       - name: Configure Git
         run: |
@@ -131,15 +160,6 @@ jobs:
         env:
           ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
         run: |
-          git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.html _includes/${{ matrix.game }}_footer.html links-json/${{ matrix.game }}.json _data/include_files.yml
-          git add package.json package-lock.json || true
+          git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.html _includes/${{ matrix.game }}_footer.html links-json/${{ matrix.game }}.json
           git commit -m "Update ${{ matrix.game }} reward links, content, and last modified date" || true
-          git stash
-          git pull --rebase || true
-          git stash pop || true
-          for i in {1..5}; do
-            git push https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git && break
-            echo "Attempt $i: Push failed, retrying in 5 seconds..."
-            sleep 5
-            git pull --rebase || true
-          done
+          git push https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git || true
