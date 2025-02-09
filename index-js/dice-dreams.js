@@ -75,7 +75,7 @@ async function main() {
     combinedLinks.forEach(link => {
       const formattedDate = formatDateCustom(link.date); // Format date as MM-DD-YYYY
       htmlContent += `  <li class="list-group-item d-flex justify-content-between align-items-center">\n`;
-      htmlContent += `    <span>Dice Dreams Free Rolls ${formattedDate}</span>\n`; // Custom text with formatted date
+      htmlContent += `    <span>Free Rolls ${formattedDate}</span>\n`; // Custom text with formatted date
       htmlContent += `    <a href="${link.href}" class="btn btn-primary btn-sm">Sammeln</a>\n`;
       htmlContent += `  </li>\n`;
     });
