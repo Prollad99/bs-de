@@ -58,20 +58,20 @@ jobs:
         run: |
           declare -A GAME_TYPES
           GAME_TYPES=(
-            ["bingo-bash"]="Free Chips"
-            ["bingo-blitz"]="Free Credits"
-            ["coin-master"]="Free Spins"
-            ["crazy-coin"]="Free Spins"
-            ["dice-dreams"]="Free Rolls"
-            ["gametwist"]="Free Coins"
-            ["house-of-fun"]="Free Coins"
-            ["huuuge-casino"]="Free Chips"
-            ["match-masters"]="Free Gifts"
+            ["bingo-bash"]="Gratis Chips"
+            ["bingo-blitz"]="Gratis Credits"
+            ["coin-master"]="Gratis Spins"
+            ["crazy-coin"]="Gratis Spins"
+            ["dice-dreams"]="Gratis Würfe"
+            ["gametwist"]="Gratis Münzen"
+            ["house-of-fun"]="Gratis Münzen"
+            ["huuuge-casino"]="Gratis Chips"
+            ["match-masters"]="Gratis Geschenke"
             ["monopoly-go"]="Würfel"
-            ["slotomania"]="Free Coins"
-            ["slotpark"]="Bonus Code"
-            ["solitaire-grand-harvest"]="Free Coins"
-            ["wsop"]="Free Chips"
+            ["slotomania"]="Gratis Münzen"
+            ["slotpark"]="Bonuscode"
+            ["solitaire-grand-harvest"]="Gratis Münzen"
+            ["wsop"]="Gratis Chips"
           )
 
           GAME_NAME=${{ matrix.game }}
@@ -81,72 +81,72 @@ jobs:
           POST_FILE="_includes/${GAME_NAME}_post.html"
           FOOTER_FILE="_includes/${GAME_NAME}_footer.html"
 
-          POST_CONTENT="Are you a dedicated **${GAME_NAME_CAPITALIZED}** player? Want to collect **${GAME_TYPE}** without spending real money? You’re in the right place!  
+          POST_CONTENT="Bist du ein leidenschaftlicher **${GAME_NAME_CAPITALIZED}**-Spieler? Möchtest du **${GAME_TYPE}** sammeln, ohne echtes Geld auszugeben? Dann bist du hier genau richtig!  
 
-          We update this page **every day** with fresh **${GAME_TYPE}** links so you can boost your gameplay, level up faster, and unlock exciting rewards—all for free.  
-
-          ---  
-
-          ## **What Are ${GAME_TYPE} Links?**  
-
-          **${GAME_TYPE}** links are official rewards from **${GAME_NAME_CAPITALIZED}** developers, offering free **${GAME_TYPE}** and other in-game bonuses like spins, rolls, credits, and special gifts.  
-
-          Instead of searching for them yourself, we do the work for you! We gather and update the latest working links daily, so you can claim your free rewards hassle-free.  
+          Wir aktualisieren diese Seite **täglich** mit neuen **${GAME_TYPE}**-Links, damit du dein Gameplay verbessern, schneller aufsteigen und spannende Belohnungen freischalten kannst – völlig kostenlos.  
 
           ---  
 
-          ## **How to Claim Your Free ${GAME_TYPE}**  
+          ## **Was sind ${GAME_TYPE}-Links?**  
 
-          Getting your free **${GAME_TYPE}** is quick and easy:  
+          **${GAME_TYPE}**-Links sind offizielle Belohnungen der **${GAME_NAME_CAPITALIZED}**-Entwickler. Sie bieten kostenlose **${GAME_TYPE}** und weitere In-Game-Boni wie Spins, Würfe, Credits und spezielle Geschenke.  
 
-          1. **Choose a link from the list below.**  
-          2. **Click the link and sign in to your ${GAME_NAME_CAPITALIZED} account.**  
-          3. **Enjoy your free ${GAME_TYPE}—instantly added to your game!**  
-
-          > 🔔 **Pro Tip:** These links expire fast, so check back daily to grab yours before they’re gone!  
+          Statt selbst danach zu suchen, übernehmen wir die Arbeit für dich! Wir sammeln und aktualisieren täglich die neuesten funktionierenden Links, damit du deine Gratis-Belohnungen mühelos einlösen kannst.  
 
           ---  
 
-          ## **Today’s Free ${GAME_TYPE} for ${GAME_NAME_CAPITALIZED}**"
+          ## **So löst du deine kostenlosen ${GAME_TYPE} ein**  
+
+          Deine **${GAME_TYPE}** zu erhalten ist schnell und einfach:  
+
+          1. **Wähle einen Link aus der Liste unten.**  
+          2. **Klicke auf den Link und melde dich in deinem ${GAME_NAME_CAPITALIZED}-Konto an.**  
+          3. **Genieße deine kostenlosen ${GAME_TYPE} – sofort in deinem Spiel verfügbar!**  
+
+          > 🔔 **Tipp:** Diese Links laufen schnell ab – schau täglich vorbei, um dir deine Belohnungen zu sichern!  
+
+          ---  
+
+          ## **Heutige Gratis-${GAME_TYPE} für ${GAME_NAME_CAPITALIZED}**"
 
           FOOTER_CONTENT="---  
 
-          ## **Why Bookmark This Page?**  
+          ## **Warum solltest du diese Seite speichern?**  
 
-          We make it easy to stay ahead in **${GAME_NAME_CAPITALIZED}** with daily updates and verified links. Here’s why you should visit us daily:  
+          Wir machen es dir leicht, in **${GAME_NAME_CAPITALIZED}** vorne mit dabei zu sein – mit täglichen Updates und geprüften Links. Hier sind die Gründe, warum du uns täglich besuchen solltest:  
 
-          ✅ **Daily Updates:** We post the latest free **${GAME_TYPE}** links every day.  
-          ✅ **100% Safe & Verified:** All links come from official **${GAME_NAME_CAPITALIZED}** sources.  
-          ✅ **Completely Free:** No sign-ups, no hidden fees—just free in-game rewards!  
-
-          ---  
-
-          ## **Maximize Your Free ${GAME_TYPE} with These Pro Tips**  
-
-          Want to get the most out of your free rewards? Follow these expert strategies:  
-
-          - **Use Spins & Rolls Wisely:** Save them for high-reward events.  
-          - **Manage Coins & Credits Smartly:** Spend strategically to progress faster.  
-          - **Log in Daily:** Many links have a short lifespan—claim them ASAP!  
+          ✅ **Tägliche Updates:** Wir posten jeden Tag die neuesten kostenlosen **${GAME_TYPE}**-Links.  
+          ✅ **100 % sicher & geprüft:** Alle Links stammen aus offiziellen **${GAME_NAME_CAPITALIZED}**-Quellen.  
+          ✅ **Komplett kostenlos:** Keine Anmeldung, keine versteckten Gebühren – nur kostenlose In-Game-Belohnungen!  
 
           ---  
 
-          ## **FAQs – Your Questions Answered**  
+          ## **Maximiere deine Gratis-${GAME_TYPE} mit diesen Profi-Tipps**  
 
-          ### **1. Are these ${GAME_TYPE} links safe to use?**  
-          Yes! We only share links directly from official **${GAME_NAME_CAPITALIZED}** promotions, so they’re completely safe and legitimate.  
+          Möchtest du das Beste aus deinen kostenlosen Belohnungen herausholen? Befolge diese Expertenstrategien:  
 
-          ### **2. How often do you update the links?**  
-          We update this page **daily** with new working links, so be sure to check back every day.  
-
-          ### **3. What if a link doesn’t work?**  
-          Some links have a limited number of redemptions or expire quickly. If one isn’t working, don’t worry—new ones will be available soon!  
+          - **Spins & Würfe clever einsetzen:** Spare sie für Events mit hohen Belohnungen auf.  
+          - **Münzen & Credits geschickt verwalten:** Investiere sie strategisch, um schneller voranzukommen.  
+          - **Täglich einloggen:** Viele Links sind nur kurz gültig – sichere sie dir so schnell wie möglich!  
 
           ---  
 
-          ## **Disclaimer**  
+          ## **Häufig gestellte Fragen (FAQs)**  
 
-          We are **not affiliated** with **${GAME_NAME_CAPITALIZED}** or its developers. This page is solely for informational purposes to help players claim free **${GAME_TYPE}** and enjoy the game to the fullest."
+          ### **1. Sind diese ${GAME_TYPE}-Links sicher?**  
+          Ja! Wir teilen ausschließlich Links, die direkt aus offiziellen **${GAME_NAME_CAPITALIZED}**-Aktionen stammen – sie sind völlig sicher und legitim.  
+
+          ### **2. Wie oft werden die Links aktualisiert?**  
+          Wir aktualisieren diese Seite **täglich** mit neuen funktionierenden Links – schau also jeden Tag vorbei!  
+
+          ### **3. Was, wenn ein Link nicht funktioniert?**  
+          Einige Links haben eine begrenzte Anzahl an Einlösungen oder laufen schnell ab. Falls einer nicht funktioniert, keine Sorge – neue werden bald verfügbar sein!  
+
+          ---  
+
+          ## **Haftungsausschluss**  
+
+          Wir sind **nicht mit** **${GAME_NAME_CAPITALIZED}** oder seinen Entwicklern **verbunden**. Diese Seite dient ausschließlich zu Informationszwecken, um Spielern zu helfen, kostenlose **${GAME_TYPE}** zu erhalten und das Spiel in vollen Zügen zu genießen."
 
           echo -e "$POST_CONTENT" > "$POST_FILE"
           echo -e "$FOOTER_CONTENT" > "$FOOTER_FILE"
@@ -160,6 +160,14 @@ jobs:
         env:
           ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
         run: |
-          git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.html _includes/${{ matrix.game }}_footer.html links-json/${{ matrix.game }}.json
+          git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.html _includes/${{ matrix.game }}_footer.html links-json/${{ matrix.game }}.json _data/include_files.yml
           git commit -m "Update ${{ matrix.game }} reward links, content, and last modified date" || true
-          git push https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git || true
+          git stash
+          git pull --rebase || true
+          git stash pop || true
+          for i in {1..5}; do
+            git push https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git && break
+            echo "Attempt $i: Push failed, retrying in 5 seconds..."
+            sleep 5
+            git pull --rebase || true
+          done
