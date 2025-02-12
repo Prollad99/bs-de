@@ -1,5 +1,33 @@
 [
   {
+    "href": "https://api.playtika.com/redirector/?coupon_token=1_3_1739283758593_w5oge9nz",
+    "date": "2025-02-12"
+  },
+  {
+    "href": "https://api.playtika.com/redirector/?coupon_token=1_3_1739302200033_29pp58w9",
+    "date": "2025-02-12"
+  },
+  {
+    "href": "https://api.playtika.com/redirector/?coupon_token=1_3_1739289600283_5l22g4e4",
+    "date": "2025-02-12"
+  },
+  {
+    "href": "https://api.playtika.com/redirector/?coupon_token=1_3_1739283653453_4w68dooy",
+    "date": "2025-02-12"
+  },
+  {
+    "href": "https://api.playtika.com/redirector/?coupon_token=1_3_1739274677041_owrj8d3o",
+    "date": "2025-02-12"
+  },
+  {
+    "href": "https://api.playtika.com/redirector/?coupon_token=1_3_1739274509892_owrjy564",
+    "date": "2025-02-12"
+  },
+  {
+    "href": "https://api.playtika.com/redirector/?coupon_token=1_3_1739228400039_0k9r5433",
+    "date": "2025-02-12"
+  },
+  {
     "href": "https://api.playtika.com/redirector/?coupon_token=1_3_1739202474245_rdjxmd8w",
     "date": "2025-02-11"
   },
@@ -370,33 +398,5 @@
   {
     "href": "https://api.playtika.com/redirector/?coupon_token=1_3_1737574200128_nl8pp8mx",
     "date": "2025-01-23"
-  },
-  {
-    "href": "https://api.playtika.com/redirector/?coupon_token=1_3_1737473144088_4wk3yy07",
-    "date": "2025-01-22"
-  },
-  {
-    "href": "https://api.playtika.com/redirector/?coupon_token=1_3_1737473034791_8gl98xle",
-    "date": "2025-01-22"
-  },
-  {
-    "href": "https://api.playtika.com/redirector/?coupon_token=1_3_1737487800122_o5ry64p8",
-    "date": "2025-01-22"
-  },
-  {
-    "href": "https://api.playtika.com/redirector/?coupon_token=1_3_1737327600128_nlw980ky",
-    "date": "2025-01-22"
-  },
-  {
-    "href": "https://api.playtika.com/redirector/?coupon_token=1_3_1737414000127_w7zpnjn2",
-    "date": "2025-01-22"
-  },
-  {
-    "href": "https://api.playtika.com/redirector/?coupon_token=1_3_1737241200121_072rny7l",
-    "date": "2025-01-22"
-  },
-  {
-    "href": "https://api.playtika.com/redirector/?coupon_token=1_3_1737366907245_07r09gwl",
-    "date": "2025-01-21"
   }
 ]
