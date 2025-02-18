@@ -75,7 +75,6 @@ jobs:
 
             # Generate HTML post content
             POST_CONTENT=$(printf '<div class="game-content">
-              <h1>%s Spieler gesucht!</h1>
               <p>Möchtest du <strong>%s</strong> sammeln, ohne echtes Geld auszugeben? Dann bist du hier genau richtig!</p>
               
               <div class="update-info">
