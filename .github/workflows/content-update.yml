@@ -46,13 +46,15 @@ jobs:
           git config --global pull.rebase true
 
           for GAME in $GAMES; do
-            echo "ℹ️ Processing $GAME..."
+            echo "🔄 Processing $GAME..."
             
+            # Run game script
             if ! node "index-js/$GAME.js"; then
               echo "❌ Error processing $GAME script"
               exit 1
             fi
 
+            # Game type mapping
             declare -A GAME_TYPES=(
               ["bingo-bash"]="Gratis Chips"
               ["bingo-blitz"]="Gratis Credits"
@@ -70,151 +72,147 @@ jobs:
               ["wsop"]="Gratis Chips"
             )
 
-            GAME_NAME_CAPITALIZED=$(echo "$GAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
+            # Format names
+            GAME_NAME=$(echo "$GAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
             GAME_TYPE=${GAME_TYPES[$GAME]}
 
-            # Generate HTML post content
-            POST_CONTENT=$(printf '<div class="game-content">
-              <p>Möchtest du <strong>%s</strong> sammeln, ohne echtes Geld auszugeben? Dann bist du hier genau richtig!</p>
-              
-              <div class="update-info">
-                <p>Wir aktualisieren diese Seite <strong>täglich</strong> mit neuen %s-Links:</p>
-                <ul>
-                  <li>Verbessere dein Gameplay</li>
-                  <li>Steige schneller auf</li>
-                  <li>Freischalte spannende Belohnungen</li>
-                </ul>
+            # Generate SEO-optimized post content
+            POST_CONTENT=$(cat <<HTML
+<div class="container mt-4">
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
+      <h2 class="h4 mb-0">${GAME_NAME} ${GAME_TYPE} – Tägliche Gratis Links</h2>
+    </div>
+    <div class="card-body">
+      <div class="alert alert-info d-flex align-items-center">
+        <i class="bi bi-arrow-clockwise me-2"></i>
+        Letzte Aktualisierung: $(date +"%d.%m.%Y %H:%M Uhr")
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h3 class="h5 card-title mb-3"><i class="bi bi-gift me-2"></i>So erhalten Sie ${GAME_TYPE}:</h3>
+              <ol class="list-group list-group-numbered">
+                <li class="list-group-item d-flex align-items-start">
+                  <span class="me-auto">Kostenlosen Link auswählen</span>
+                </li>
+                <li class="list-group-item d-flex align-items-start">
+                  <span class="me-auto">In ${GAME_NAME} einlösen</span>
+                </li>
+                <li class="list-group-item d-flex align-items-start">
+                  <span class="me-auto">${GAME_TYPE} sofort erhalten</span>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h3 class="h5 card-title mb-3"><i class="bi bi-star me-2"></i>Vorteile:</h3>
+              <div class="list-group">
+                <div class="list-group-item">
+                  <i class="bi bi-check2-circle text-success me-2"></i>
+                  Täglich neue Links
+                </div>
+                <div class="list-group-item">
+                  <i class="bi bi-shield-check text-success me-2"></i>
+                  100% sichere Quellen
+                </div>
+                <div class="list-group-item">
+                  <i class="bi bi-phone text-success me-2"></i>
+                  Mobile & Desktop optimiert
+                </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-              <hr>
+      <div class="mt-4">
+        <h3 class="h5 mb-3"><i class="bi bi-link-45deg me-2"></i>Aktuelle ${GAME_TYPE} Links:</h3>
+        <!-- Links will be inserted here -->
+      </div>
+    </div>
+  </div>
+</div>
+HTML
+            )
 
-              <section class="content-section">
-                <h2>Was sind %s-Links?</h2>
-                <p>Diese offiziellen Belohnungen der %s-Entwickler bieten:</p>
-                <ul class="benefits-list">
-                  <li>Kostenlose %s</li>
-                  <li>Spins/Würfe/Credits</li>
-                  <li>Spezielle Geschenke</li>
-                </ul>
-                <p class="highlight">Wir übernehmen die Link-Suche für dich!</p>
-              </section>
+            # Generate SEO footer
+            FOOTER_CONTENT=$(cat <<HTML
+<div class="container mt-4">
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="card border-0">
+        <div class="card-body">
+          <h3 class="h5"><i class="bi bi-lightbulb me-2"></i>${GAME_NAME} Tipps</h3>
+          <ul class="list-unstyled">
+            <li class="mb-2"><i class="bi bi-chevron-right me-2"></i>${GAME_TYPE} für Events sparen</li>
+            <li class="mb-2"><i class="bi bi-chevron-right me-2"></i>Tägliche Login-Belohnungen</li>
+            <li><i class="bi bi-chevron-right me-2"></i>Strategische Spieloptimierung</li>
+          </ul>
+        </div>
+      </div>
+    </div>
 
-              <hr>
-
-              <section class="tutorial-section">
-                <h2>So löst du deine %s ein</h2>
-                <ol class="steps">
-                  <li>Wähle einen Link aus unserer Liste</li>
-                  <li>Klicke und melde dich in deinem %s-Konto an</li>
-                  <li>Erhalte sofort deine Belohnung!</li>
-                </ol>
-                <div class="tip-box">
-                  <p>🔔 Tipp: Links laufen schnell ab - täglich vorbeischauen!</p>
+    <div class="col-md-6">
+      <div class="card border-0">
+        <div class="card-body">
+          <h3 class="h5"><i class="bi bi-question-circle me-2"></i>Häufige Fragen</h3>
+          <div class="accordion" id="faqAccordion">
+            <div class="accordion-item">
+              <h4 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                  Link funktioniert nicht?
+                </button>
+              </h4>
+              <div id="collapseOne" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                  Neue Links werden täglich um 08:00 MEZ aktualisiert
                 </div>
-              </section>
-
-              <hr>
-
-              <section class="todays-links">
-                <h2>Heutige Gratis-%s</h2>
-              </section>
-            </div>' "$GAME_NAME_CAPITALIZED" "$GAME_TYPE" "$GAME_TYPE" "$GAME_TYPE" \
-              "$GAME_NAME_CAPITALIZED" "$GAME_TYPE" "$GAME_TYPE" "$GAME_NAME_CAPITALIZED" "$GAME_TYPE")
-
-            # Generate HTML footer content
-            FOOTER_CONTENT=$(printf '<div class="footer-content">
-              <hr>
-              
-              <section class="why-save">
-                <h2>Warum diese Seite speichern?</h2>
-                <div class="benefits">
-                  <div class="benefit-item">
-                    <h3>✅ Tägliche Updates</h3>
-                    <p>Immer aktuelle %s-Links</p>
-                  </div>
-                  <div class="benefit-item">
-                    <h3>✅ 100%% Sicher</h3>
-                    <p>Geprüfte Links von %s</p>
-                  </div>
-                  <div class="benefit-item">
-                    <h3>✅ Komplett kostenlos</h3>
-                    <p>Keine Anmeldung, keine Gebühren</p>
-                  </div>
-                </div>
-              </section>
-
-              <hr>
-
-              <section class="pro-tips">
-                <h2>Profi-Tipps für maximale %s</h2>
-                <div class="tip-grid">
-                  <div class="tip">
-                    <h4>Clever einsetzen</h4>
-                    <p>Spare Spins für Events mit hohen Belohnungen</p>
-                  </div>
-                  <div class="tip">
-                    <h4>Strategisch verwalten</h4>
-                    <p>Investiere Münzen gezielt für schnellen Fortschritt</p>
-                  </div>
-                  <div class="tip">
-                    <h4>Täglich einloggen</h4>
-                    <p>Sichere dir zeitlich begrenzte Links</p>
-                  </div>
-                </div>
-              </section>
-
-              <hr>
-
-              <section class="faq">
-                <h2>Häufige Fragen</h2>
-                <div class="faq-item">
-                  <h3>Sind die Links sicher?</h3>
-                  <p>Ja! Alle Links stammen aus offiziellen %s-Quellen.</p>
-                </div>
-                <div class="faq-item">
-                  <h3>Update-Häufigkeit?</h3>
-                  <p>Tägliche Aktualisierungen garantierte frische Links.</p>
-                </div>
-                <div class="faq-item">
-                  <h3>Link funktioniert nicht?</h3>
-                  <p>Neue Links kommen bald - einfach später nochmal versuchen!</p>
-                </div>
-              </section>
-
-              <hr>
-
-              <div class="disclaimer">
-                <p>Haftungsausschluss: Nicht verbunden mit %s oder dessen Entwicklern.</p>
               </div>
-            </div>' "$GAME_TYPE" "$GAME_NAME_CAPITALIZED" "$GAME_TYPE" \
-              "$GAME_NAME_CAPITALIZED" "$GAME_NAME_CAPITALIZED")
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-            # Write HTML files
-            echo "$POST_CONTENT" | sed 's/^              //' > "_includes/${GAME}_post.html"
-            echo "$FOOTER_CONTENT" | sed 's/^              //' > "_includes/${GAME}_footer.html"
+  <div class="mt-4 text-center text-muted small">
+    <p class="mb-1">Unabhängiges Fan-Portal - Nicht verbunden mit ${GAME_NAME}</p>
+    <p class="mb-0">© $(date +"%Y") ${GAME_NAME} ${GAME_TYPE} | Alle Rechte vorbehalten</p>
+  </div>
+</div>
+HTML
+            )
 
-            git add "index-js/$GAME.js" \
-                   "_includes/$GAME.html" \
-                   "_includes/${GAME}_post.html" \
-                   "_includes/${GAME}_footer.html" \
-                   "links-json/$GAME.json"
+            # Save HTML files
+            echo "$POST_CONTENT" > "_includes/${GAME}_post.html"
+            echo "$FOOTER_CONTENT" > "_includes/${GAME}_footer.html"
+
+            git add "_includes/${GAME}_post.html" "_includes/${GAME}_footer.html"
           done
 
-          git commit -m "🤖 HTML content update: $(date +'%Y-%m-%d %H:%M')" || echo "⏩ No changes"
+          # Commit and push changes
+          git commit -m "🚀 SEO Boost: Updated game content - $(date +'%d.%m.%Y %H:%M')" || echo "⏩ No changes to commit"
           
-          MAX_RETRIES=5
-          for ((i=1; i<=$MAX_RETRIES; i++)); do
+          # Push with retry logic
+          for i in {1..5}; do
             git pull --rebase
             if git push "https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git" HEAD:main; then
-              echo "✅ Push successful"
+              echo "✅ Successfully pushed changes"
               break
             else
-              echo "🔄 Attempt $i/$MAX_RETRIES failed, retrying..."
+              echo "🔄 Retry push attempt $i/5..."
               sleep 5
             fi
           done
 
-          if [ $i -gt $MAX_RETRIES ]; then
+          if [ $? -ne 0 ]; then
             echo "❌ All push attempts failed"
             exit 1
           fi
