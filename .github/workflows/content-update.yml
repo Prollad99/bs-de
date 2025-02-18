@@ -30,10 +30,10 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Cache Node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -43,18 +43,19 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install Playwright browser
-        run: npx playwright install
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
 
       - name: Fetch and update links
         run: |
-          node index-js/${{ matrix.game }}.js
+          node index-js/${{ matrix.game }}.js || echo "Script failed but continuing"
           echo "Contents of links-json/${{ matrix.game }}.json:"
           cat links-json/${{ matrix.game }}.json
           echo "Contents of _includes/${{ matrix.game }}.html:"
           cat _includes/${{ matrix.game }}.html
 
       - name: Generate dynamic content
+        shell: bash
         run: |
           declare -A GAME_TYPES
           GAME_TYPES=(
@@ -81,6 +82,7 @@ jobs:
           POST_FILE="_includes/${GAME_NAME}_post.html"
           FOOTER_FILE="_includes/${GAME_NAME}_footer.html"
 
+          # Create post content
           POST_CONTENT="Bist du ein leidenschaftlicher **${GAME_NAME_CAPITALIZED}**-Spieler? Möchtest du **${GAME_TYPE}** sammeln, ohne echtes Geld auszugeben? Dann bist du hier genau richtig!  
 
           Wir aktualisieren diese Seite **täglich** mit neuen **${GAME_TYPE}**-Links, damit du dein Gameplay verbessern, schneller aufsteigen und spannende Belohnungen freischalten kannst – völlig kostenlos.  
@@ -109,6 +111,7 @@ jobs:
 
           ## **Heutige Gratis-${GAME_TYPE} für ${GAME_NAME_CAPITALIZED}**"
 
+          # Create footer content
           FOOTER_CONTENT="---  
 
           ## **Warum solltest du diese Seite speichern?**  
@@ -148,8 +151,9 @@ jobs:
 
           Wir sind **nicht mit** **${GAME_NAME_CAPITALIZED}** oder seinen Entwicklern **verbunden**. Diese Seite dient ausschließlich zu Informationszwecken, um Spielern zu helfen, kostenlose **${GAME_TYPE}** zu erhalten und das Spiel in vollen Zügen zu genießen."
 
-          echo -e "$POST_CONTENT" > "$POST_FILE"
-          echo -e "$FOOTER_CONTENT" > "$FOOTER_FILE"
+          # Write content to files
+          echo "$POST_CONTENT" > "$POST_FILE"
+          echo "$FOOTER_CONTENT" > "$FOOTER_FILE"
 
       - name: Configure Git
         run: |
@@ -160,14 +164,11 @@ jobs:
         env:
           ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
         run: |
-          git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.html _includes/${{ matrix.game }}_footer.html links-json/${{ matrix.game }}.json _data/include_files.yml
-          git commit -m "Update ${{ matrix.game }} reward links, content, and last modified date" || true
-          git stash
-          git pull --rebase || true
-          git stash pop || true
+          git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.html _includes/${{ matrix.game }}_footer.html links-json/${{ matrix.game }}.json
+          git commit -m "Update ${{ matrix.game }} reward links, content, and last modified date" || echo "No changes to commit"
           for i in {1..5}; do
+            git pull --rebase
             git push https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git && break
             echo "Attempt $i: Push failed, retrying in 5 seconds..."
             sleep 5
-            git pull --rebase || true
           done
