@@ -1,15 +1,14 @@
-name: Update Links and Deployment
+name: Auto-Update Game Links
 
 on:
   schedule:
-    - cron: '*/30 * * * *'
-  push:
-    branches:
-      - main
+    - cron: '*/30 * * * *'  # Every 30 minutes
+  workflow_dispatch:
 
 jobs:
-  update-and-deploy:
+  update-links:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -20,199 +19,154 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
-
-      - name: Cache dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.npm
-            ~/.cache/playwright
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          cache: 'npm'
 
       - name: Install dependencies
         run: |
           npm ci
-          sudo apt-get update
-          sudo apt-get install -y libgbm-dev
           npx playwright install --with-deps
 
-      - name: Process game links
+      - name: Create directories
+        run: |
+          mkdir -p _includes links-json
+
+      - name: Process games
         shell: bash
         env:
           GAMES: "coin-master monopoly-go bingo-blitz dice-dreams match-masters solitaire-grand-harvest slotpark house-of-fun slotomania bingo-bash huuuge-casino wsop crazy-coin gametwist"
         run: |
-          git config --global user.email "prolladmail@gmail.com"
-          git config --global user.name "Prollad99"
+          # Configure Git
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
           git config --global pull.rebase true
+
+          # Game type mappings
+          declare -A GAME_TYPES=(
+            ["bingo-bash"]="Gratis Chips"
+            ["bingo-blitz"]="Gratis Credits"
+            ["coin-master"]="Gratis Spins"
+            ["crazy-coin"]="Gratis Spins"
+            ["dice-dreams"]="Gratis Würfe"
+            ["gametwist"]="Gratis Münzen"
+            ["house-of-fun"]="Gratis Münzen"
+            ["huuuge-casino"]="Gratis Chips"
+            ["match-masters"]="Gratis Geschenke"
+            ["monopoly-go"]="Würfel"
+            ["slotomania"]="Gratis Münzen"
+            ["slotpark"]="Bonuscode"
+            ["solitaire-grand-harvest"]="Gratis Münzen"
+            ["wsop"]="Gratis Chips"
+          )
 
           for GAME in $GAMES; do
             echo "🔄 Processing $GAME..."
             
             # Run game script
             if ! node "index-js/$GAME.js"; then
-              echo "❌ Error processing $GAME script"
-              exit 1
+              echo "⚠️ Skipping $GAME due to error"
+              continue
             fi
 
-            # Game type mapping
-            declare -A GAME_TYPES=(
-              ["bingo-bash"]="Gratis Chips"
-              ["bingo-blitz"]="Gratis Credits"
-              ["coin-master"]="Gratis Spins"
-              ["crazy-coin"]="Gratis Spins"
-              ["dice-dreams"]="Gratis Würfe"
-              ["gametwist"]="Gratis Münzen"
-              ["house-of-fun"]="Gratis Münzen"
-              ["huuuge-casino"]="Gratis Chips"
-              ["match-masters"]="Gratis Geschenke"
-              ["monopoly-go"]="Würfel"
-              ["slotomania"]="Gratis Münzen"
-              ["slotpark"]="Bonuscode"
-              ["solitaire-grand-harvest"]="Gratis Münzen"
-              ["wsop"]="Gratis Chips"
-            )
-
-            # Format names
+            # Generate names
             GAME_NAME=$(echo "$GAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
             GAME_TYPE=${GAME_TYPES[$GAME]}
 
-            # Generate SEO-optimized post content
-            POST_CONTENT=$(cat <<HTML
+            # Generate post HTML
+            cat <<HTML > "_includes/${GAME}_post.html"
 <div class="container mt-4">
-  <div class="card shadow-sm mb-4">
+  <div class="game-card card shadow-sm mb-4">
     <div class="card-header bg-primary text-white">
-      <h2 class="h4 mb-0">${GAME_NAME} ${GAME_TYPE} – Tägliche Gratis Links</h2>
+      <h2 class="h4 mb-0">$GAME_NAME $GAME_TYPE</h2>
     </div>
     <div class="card-body">
-      <div class="alert alert-info d-flex align-items-center">
-        <i class="bi bi-arrow-clockwise me-2"></i>
-        Letzte Aktualisierung: $(date +"%d.%m.%Y %H:%M Uhr")
+      <div class="alert alert-info">
+        <i class="bi bi-clock-history me-2"></i>
+        Letzte Aktualisierung: $(date +"%d.%m.%Y %H:%M")
       </div>
 
-      <div class="row g-4">
-        <div class="col-lg-6">
+      <div class="row g-3">
+        <div class="col-md-6">
           <div class="card h-100">
             <div class="card-body">
-              <h3 class="h5 card-title mb-3"><i class="bi bi-gift me-2"></i>So erhalten Sie ${GAME_TYPE}:</h3>
+              <h3 class="h5"><i class="bi bi-gift me-2"></i>Einlösung</h3>
               <ol class="list-group list-group-numbered">
-                <li class="list-group-item d-flex align-items-start">
-                  <span class="me-auto">Kostenlosen Link auswählen</span>
-                </li>
-                <li class="list-group-item d-flex align-items-start">
-                  <span class="me-auto">In ${GAME_NAME} einlösen</span>
-                </li>
-                <li class="list-group-item d-flex align-items-start">
-                  <span class="me-auto">${GAME_TYPE} sofort erhalten</span>
-                </li>
+                <li class="list-group-item">Link auswählen</li>
+                <li class="list-group-item">In $GAME_NAME einlösen</li>
+                <li class="list-group-item">$GAME_TYPE erhalten</li>
               </ol>
             </div>
           </div>
         </div>
 
-        <div class="col-lg-6">
+        <div class="col-md-6">
           <div class="card h-100">
             <div class="card-body">
-              <h3 class="h5 card-title mb-3"><i class="bi bi-star me-2"></i>Vorteile:</h3>
-              <div class="list-group">
-                <div class="list-group-item">
+              <h3 class="h5"><i class="bi bi-star me-2"></i>Vorteile</h3>
+              <ul class="list-group">
+                <li class="list-group-item">
                   <i class="bi bi-check2-circle text-success me-2"></i>
-                  Täglich neue Links
-                </div>
-                <div class="list-group-item">
+                  Tägliche Updates
+                </li>
+                <li class="list-group-item">
                   <i class="bi bi-shield-check text-success me-2"></i>
-                  100% sichere Quellen
-                </div>
-                <div class="list-group-item">
+                  100% Sicher
+                </li>
+                <li class="list-group-item">
                   <i class="bi bi-phone text-success me-2"></i>
-                  Mobile & Desktop optimiert
-                </div>
-              </div>
+                  Mobile Optimiert
+                </li>
+              </ul>
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="mt-4">
-        <h3 class="h5 mb-3"><i class="bi bi-link-45deg me-2"></i>Aktuelle ${GAME_TYPE} Links:</h3>
-        <!-- Links will be inserted here -->
       </div>
     </div>
   </div>
 </div>
 HTML
-            )
 
-            # Generate SEO footer
-            FOOTER_CONTENT=$(cat <<HTML
+            # Generate footer HTML
+            cat <<HTML > "_includes/${GAME}_footer.html"
 <div class="container mt-4">
-  <div class="row g-4">
-    <div class="col-md-6">
-      <div class="card border-0">
-        <div class="card-body">
-          <h3 class="h5"><i class="bi bi-lightbulb me-2"></i>${GAME_NAME} Tipps</h3>
-          <ul class="list-unstyled">
-            <li class="mb-2"><i class="bi bi-chevron-right me-2"></i>${GAME_TYPE} für Events sparen</li>
-            <li class="mb-2"><i class="bi bi-chevron-right me-2"></i>Tägliche Login-Belohnungen</li>
-            <li><i class="bi bi-chevron-right me-2"></i>Strategische Spieloptimierung</li>
-          </ul>
+  <div class="card border-0">
+    <div class="card-body small">
+      <div class="row">
+        <div class="col-md-6">
+          <h3 class="h6"><i class="bi bi-info-circle me-2"></i>Über $GAME_NAME</h3>
+          <p>Unoffizielle Quelle für tägliche $GAME_TYPE.</p>
+        </div>
+        <div class="col-md-6">
+          <h3 class="h6"><i class="bi bi-exclamation-triangle me-2"></i>Hinweis</h3>
+          <p>Nicht verbunden mit $GAME_NAME.</p>
         </div>
       </div>
-    </div>
-
-    <div class="col-md-6">
-      <div class="card border-0">
-        <div class="card-body">
-          <h3 class="h5"><i class="bi bi-question-circle me-2"></i>Häufige Fragen</h3>
-          <div class="accordion" id="faqAccordion">
-            <div class="accordion-item">
-              <h4 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
-                  Link funktioniert nicht?
-                </button>
-              </h4>
-              <div id="collapseOne" class="accordion-collapse collapse">
-                <div class="accordion-body">
-                  Neue Links werden täglich um 08:00 MEZ aktualisiert
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="text-center mt-3">
+        <p class="mb-0 text-muted">&copy; $(date +"%Y") $GAME_NAME Links</p>
       </div>
     </div>
-  </div>
-
-  <div class="mt-4 text-center text-muted small">
-    <p class="mb-1">Unabhängiges Fan-Portal - Nicht verbunden mit ${GAME_NAME}</p>
-    <p class="mb-0">© $(date +"%Y") ${GAME_NAME} ${GAME_TYPE} | Alle Rechte vorbehalten</p>
   </div>
 </div>
 HTML
-            )
-
-            # Save HTML files
-            echo "$POST_CONTENT" > "_includes/${GAME}_post.html"
-            echo "$FOOTER_CONTENT" > "_includes/${GAME}_footer.html"
 
             git add "_includes/${GAME}_post.html" "_includes/${GAME}_footer.html"
           done
 
-          # Commit and push changes
-          git commit -m "🚀 SEO Boost: Updated game content - $(date +'%d.%m.%Y %H:%M')" || echo "⏩ No changes to commit"
-          
-          # Push with retry logic
+          # Commit changes
+          git commit -m "📌 Auto-Update: $(date +'%d.%m.%Y %H:%M')" || echo "ℹ️ No changes"
+
+          # Push changes with retries
           for i in {1..5}; do
             git pull --rebase
-            if git push "https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git" HEAD:main; then
-              echo "✅ Successfully pushed changes"
+            if git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:main; then
+              echo "✅ Push successful"
               break
             else
-              echo "🔄 Retry push attempt $i/5..."
+              echo "🔄 Retry $i/5..."
               sleep 5
             fi
           done
 
-          if [ $? -ne 0 ]; then
-            echo "❌ All push attempts failed"
-            exit 1
-          fi
+      - name: Verify output
+        run: |
+          echo "Generated Files:"
+          ls -la _includes/*.html
