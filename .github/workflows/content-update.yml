@@ -1,53 +1,63 @@
-name: Auto-Update Game Links
+name: Update Links and Deployment
 
 on:
   schedule:
-    - cron: '*/30 * * * *'  # Every 30 minutes
-  workflow_dispatch:
+    - cron: '*/30 * * * *' # Runs every 30 minutes
+  push:
+    branches:
+      - main
 
 jobs:
   update-links:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - name: Checkout repository (SSH)
-        uses: actions/checkout@v4
-        with:
-          ssh-key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-          fetch-depth: 0
+    strategy:
+      matrix:
+        game:
+          - coin-master
+          - monopoly-go
+          - bingo-blitz
+          - dice-dreams
+          - match-masters
+          - solitaire-grand-harvest
+          - slotpark
+          - house-of-fun
+          - slotomania
+          - bingo-bash
+          - huuuge-casino
+          - wsop
+          - crazy-coin
+          - gametwist
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Cache Node modules
+        uses: actions/cache@v2
         with:
-          node-version: '20.x'
-          cache: 'npm'
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
       - name: Install dependencies
+        run: npm install
+
+      - name: Install Playwright browser
+        run: npx playwright install
+
+      - name: Fetch and update links
         run: |
-          npm ci
-          npx playwright install --with-deps
+          node index-js/${{ matrix.game }}.js
+          echo "Contents of links-json/${{ matrix.game }}.json:"
+          cat links-json/${{ matrix.game }}.json
+          echo "Contents of _includes/${{ matrix.game }}.html:"
+          cat _includes/${{ matrix.game }}.html
 
-      - name: Create directories
+      - name: Generate dynamic content
         run: |
-          mkdir -p _includes links-json
-
-      - name: Process games
-        shell: bash
-        env:
-          GAMES: "coin-master monopoly-go bingo-blitz dice-dreams match-masters solitaire-grand-harvest slotpark house-of-fun slotomania bingo-bash huuuge-casino wsop crazy-coin gametwist"
-        run: |
-          # Configure SSH
-          mkdir -p ~/.ssh
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/known_hosts
-
-          # Configure Git
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git config --global pull.rebase true
-
-          # Game type mappings
-          declare -A GAME_TYPES=(
+          declare -A GAME_TYPES
+          GAME_TYPES=(
             ["bingo-bash"]="Gratis Chips"
             ["bingo-blitz"]="Gratis Credits"
             ["coin-master"]="Gratis Spins"
@@ -64,115 +74,100 @@ jobs:
             ["wsop"]="Gratis Chips"
           )
 
-          for GAME in $GAMES; do
-            echo "🔄 Processing $GAME..."
-            
-            # Run game script
-            if ! node "index-js/$GAME.js"; then
-              echo "⚠️ Skipping $GAME due to error"
-              continue
-            fi
+          GAME_NAME=${{ matrix.game }}
+          GAME_NAME_CAPITALIZED=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
+          GAME_TYPE=${GAME_TYPES[$GAME_NAME]}
 
-            # Generate names
-            GAME_NAME=$(echo "$GAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
-            GAME_TYPE=${GAME_TYPES[$GAME]}
+          POST_FILE="_includes/${GAME_NAME}_post.html"
+          FOOTER_FILE="_includes/${GAME_NAME}_footer.html"
 
-            # Generate post HTML
-            cat <<HTML > "_includes/${GAME}_post.html"
-<div class="container mt-4">
-  <div class="game-card card shadow-sm mb-4">
-    <div class="card-header bg-primary text-white">
-      <h2 class="h4 mb-0">$GAME_NAME $GAME_TYPE</h2>
-    </div>
-    <div class="card-body">
-      <div class="alert alert-info">
-        <i class="bi bi-clock-history me-2"></i>
-        Letzte Aktualisierung: $(date +"%d.%m.%Y %H:%M")
-      </div>
+          POST_CONTENT="Bist du ein leidenschaftlicher **${GAME_NAME_CAPITALIZED}**-Spieler? Möchtest du **${GAME_TYPE}** sammeln, ohne echtes Geld auszugeben? Dann bist du hier genau richtig!  
 
-      <div class="row g-3">
-        <div class="col-md-6">
-          <div class="card h-100">
-            <div class="card-body">
-              <h3 class="h5"><i class="bi bi-gift me-2"></i>Einlösung</h3>
-              <ol class="list-group list-group-numbered">
-                <li class="list-group-item">Link auswählen</li>
-                <li class="list-group-item">In $GAME_NAME einlösen</li>
-                <li class="list-group-item">$GAME_TYPE erhalten</li>
-              </ol>
-            </div>
-          </div>
-        </div>
+          Wir aktualisieren diese Seite **täglich** mit neuen **${GAME_TYPE}**-Links, damit du dein Gameplay verbessern, schneller aufsteigen und spannende Belohnungen freischalten kannst – völlig kostenlos.  
 
-        <div class="col-md-6">
-          <div class="card h-100">
-            <div class="card-body">
-              <h3 class="h5"><i class="bi bi-star me-2"></i>Vorteile</h3>
-              <ul class="list-group">
-                <li class="list-group-item">
-                  <i class="bi bi-check2-circle text-success me-2"></i>
-                  Tägliche Updates
-                </li>
-                <li class="list-group-item">
-                  <i class="bi bi-shield-check text-success me-2"></i>
-                  100% Sicher
-                </li>
-                <li class="list-group-item">
-                  <i class="bi bi-phone text-success me-2"></i>
-                  Mobile Optimiert
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-HTML
+          ---  
 
-            # Generate footer HTML
-            cat <<HTML > "_includes/${GAME}_footer.html"
-<div class="container mt-4">
-  <div class="card border-0">
-    <div class="card-body small">
-      <div class="row">
-        <div class="col-md-6">
-          <h3 class="h6"><i class="bi bi-info-circle me-2"></i>Über $GAME_NAME</h3>
-          <p>Unoffizielle Quelle für tägliche $GAME_TYPE.</p>
-        </div>
-        <div class="col-md-6">
-          <h3 class="h6"><i class="bi bi-exclamation-triangle me-2"></i>Hinweis</h3>
-          <p>Nicht verbunden mit $GAME_NAME.</p>
-        </div>
-      </div>
-      <div class="text-center mt-3">
-        <p class="mb-0 text-muted">&copy; $(date +"%Y") $GAME_NAME Links</p>
-      </div>
-    </div>
-  </div>
-</div>
-HTML
+          ## **Was sind ${GAME_TYPE}-Links?**  
 
-            git add "_includes/${GAME}_post.html" "_includes/${GAME}_footer.html"
-          done
+          **${GAME_TYPE}**-Links sind offizielle Belohnungen der **${GAME_NAME_CAPITALIZED}**-Entwickler. Sie bieten kostenlose **${GAME_TYPE}** und weitere In-Game-Boni wie Spins, Würfe, Credits und spezielle Geschenke.  
 
-          # Commit changes
-          git commit -m "📌 Auto-Update: $(date +'%d.%m.%Y %H:%M')" || echo "ℹ️ No changes"
+          Statt selbst danach zu suchen, übernehmen wir die Arbeit für dich! Wir sammeln und aktualisieren täglich die neuesten funktionierenden Links, damit du deine Gratis-Belohnungen mühelos einlösen kannst.  
 
-          # Push changes with retries
-          for i in {1..5}; do
-            git pull --rebase
-            if git push origin HEAD:main; then
-              echo "✅ Push successful"
-              break
-            else
-              echo "🔄 Retry $i/5..."
-              sleep 5
-            fi
-          done
+          ---  
 
-      - name: Verify output
+          ## **So löst du deine kostenlosen ${GAME_TYPE} ein**  
+
+          Deine **${GAME_TYPE}** zu erhalten ist schnell und einfach:  
+
+          1. **Wähle einen Link aus der Liste unten.**  
+          2. **Klicke auf den Link und melde dich in deinem ${GAME_NAME_CAPITALIZED}-Konto an.**  
+          3. **Genieße deine kostenlosen ${GAME_TYPE} – sofort in deinem Spiel verfügbar!**  
+
+          > 🔔 **Tipp:** Diese Links laufen schnell ab – schau täglich vorbei, um dir deine Belohnungen zu sichern!  
+
+          ---  
+
+          ## **Heutige Gratis-${GAME_TYPE} für ${GAME_NAME_CAPITALIZED}**"
+
+          FOOTER_CONTENT="---  
+
+          ## **Warum solltest du diese Seite speichern?**  
+
+          Wir machen es dir leicht, in **${GAME_NAME_CAPITALIZED}** vorne mit dabei zu sein – mit täglichen Updates und geprüften Links. Hier sind die Gründe, warum du uns täglich besuchen solltest:  
+
+          ✅ **Tägliche Updates:** Wir posten jeden Tag die neuesten kostenlosen **${GAME_TYPE}**-Links.  
+          ✅ **100 % sicher & geprüft:** Alle Links stammen aus offiziellen **${GAME_NAME_CAPITALIZED}**-Quellen.  
+          ✅ **Komplett kostenlos:** Keine Anmeldung, keine versteckten Gebühren – nur kostenlose In-Game-Belohnungen!  
+
+          ---  
+
+          ## **Maximiere deine Gratis-${GAME_TYPE} mit diesen Profi-Tipps**  
+
+          Möchtest du das Beste aus deinen kostenlosen Belohnungen herausholen? Befolge diese Expertenstrategien:  
+
+          - **Spins & Würfe clever einsetzen:** Spare sie für Events mit hohen Belohnungen auf.  
+          - **Münzen & Credits geschickt verwalten:** Investiere sie strategisch, um schneller voranzukommen.  
+          - **Täglich einloggen:** Viele Links sind nur kurz gültig – sichere sie dir so schnell wie möglich!  
+
+          ---  
+
+          ## **Häufig gestellte Fragen (FAQs)**  
+
+          ### **1. Sind diese ${GAME_TYPE}-Links sicher?**  
+          Ja! Wir teilen ausschließlich Links, die direkt aus offiziellen **${GAME_NAME_CAPITALIZED}**-Aktionen stammen – sie sind völlig sicher und legitim.  
+
+          ### **2. Wie oft werden die Links aktualisiert?**  
+          Wir aktualisieren diese Seite **täglich** mit neuen funktionierenden Links – schau also jeden Tag vorbei!  
+
+          ### **3. Was, wenn ein Link nicht funktioniert?**  
+          Einige Links haben eine begrenzte Anzahl an Einlösungen oder laufen schnell ab. Falls einer nicht funktioniert, keine Sorge – neue werden bald verfügbar sein!  
+
+          ---  
+
+          ## **Haftungsausschluss**  
+
+          Wir sind **nicht mit** **${GAME_NAME_CAPITALIZED}** oder seinen Entwicklern **verbunden**. Diese Seite dient ausschließlich zu Informationszwecken, um Spielern zu helfen, kostenlose **${GAME_TYPE}** zu erhalten und das Spiel in vollen Zügen zu genießen."
+
+          echo -e "$POST_CONTENT" > "$POST_FILE"
+          echo -e "$FOOTER_CONTENT" > "$FOOTER_FILE"
+
+      - name: Configure Git
         run: |
-          echo "Generated Files:"
-          ls -la _includes/*.html
+          git config --global user.email "prolladmail@gmail.com"
+          git config --global user.name "Prollad99"
+
+      - name: Commit and push changes
+        env:
+          ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+        run: |
+          git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.html _includes/${{ matrix.game }}_footer.html links-json/${{ matrix.game }}.json _data/include_files.yml
+          git commit -m "Update ${{ matrix.game }} reward links, content, and last modified date" || true
+          git stash
+          git pull --rebase || true
+          git stash pop || true
+          for i in {1..5}; do
+            git push https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git && break
+            echo "Attempt $i: Push failed, retrying in 5 seconds..."
+            sleep 5
+            git pull --rebase || true
+          done
