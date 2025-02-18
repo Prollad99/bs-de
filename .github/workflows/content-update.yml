@@ -10,9 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Checkout repository
+      - name: Checkout repository (SSH)
         uses: actions/checkout@v4
         with:
+          ssh-key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
           fetch-depth: 0
 
       - name: Setup Node.js
@@ -35,6 +36,11 @@ jobs:
         env:
           GAMES: "coin-master monopoly-go bingo-blitz dice-dreams match-masters solitaire-grand-harvest slotpark house-of-fun slotomania bingo-bash huuuge-casino wsop crazy-coin gametwist"
         run: |
+          # Configure SSH
+          mkdir -p ~/.ssh
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
           # Configure Git
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
@@ -157,7 +163,7 @@ HTML
           # Push changes with retries
           for i in {1..5}; do
             git pull --rebase
-            if git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:main; then
+            if git push origin HEAD:main; then
               echo "✅ Push successful"
               break
             else
