@@ -8,166 +8,174 @@ on:
       - main
 
 jobs:
-  update-links:
+  update-and-deploy:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        game:
-          - coin-master
-          - monopoly-go
-          - bingo-blitz
-          - dice-dreams
-          - match-masters
-          - solitaire-grand-harvest
-          - slotpark
-          - house-of-fun
-          - slotomania
-          - bingo-bash
-          - huuuge-casino
-          - wsop
-          - crazy-coin
-          - gametwist
-
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v2
-
-      - name: Cache Node modules
-        uses: actions/cache@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          path: ~/.npm
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            ~/.cache/playwright
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
 
       - name: Install dependencies
-        run: npm install
-
-      - name: Install Playwright browser
-        run: npx playwright install
-
-      - name: Fetch and update links
         run: |
-          node index-js/${{ matrix.game }}.js
-          echo "Contents of links-json/${{ matrix.game }}.json:"
-          cat links-json/${{ matrix.game }}.json
-          echo "Contents of _includes/${{ matrix.game }}.html:"
-          cat _includes/${{ matrix.game }}.html
+          npm ci
+          sudo apt-get update
+          sudo apt-get install -y libgbm-dev
+          npx playwright install --with-deps
 
-      - name: Generate dynamic content
+      - name: Process game links
+        shell: bash
+        env:
+          GAMES: "coin-master monopoly-go bingo-blitz dice-dreams match-masters solitaire-grand-harvest slotpark house-of-fun slotomania bingo-bash huuuge-casino wsop crazy-coin gametwist"
         run: |
-          declare -A GAME_TYPES
-          GAME_TYPES=(
-            ["bingo-bash"]="Gratis Chips"
-            ["bingo-blitz"]="Gratis Credits"
-            ["coin-master"]="Gratis Spins"
-            ["crazy-coin"]="Gratis Spins"
-            ["dice-dreams"]="Gratis Würfe"
-            ["gametwist"]="Gratis Münzen"
-            ["house-of-fun"]="Gratis Münzen"
-            ["huuuge-casino"]="Gratis Chips"
-            ["match-masters"]="Gratis Geschenke"
-            ["monopoly-go"]="Würfel"
-            ["slotomania"]="Gratis Münzen"
-            ["slotpark"]="Bonuscode"
-            ["solitaire-grand-harvest"]="Gratis Münzen"
-            ["wsop"]="Gratis Chips"
-          )
-
-          GAME_NAME=${{ matrix.game }}
-          GAME_NAME_CAPITALIZED=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
-          GAME_TYPE=${GAME_TYPES[$GAME_NAME]}
-
-          POST_FILE="_includes/${GAME_NAME}_post.html"
-          FOOTER_FILE="_includes/${GAME_NAME}_footer.html"
-
-          POST_CONTENT="Bist du ein leidenschaftlicher **${GAME_NAME_CAPITALIZED}**-Spieler? Möchtest du **${GAME_TYPE}** sammeln, ohne echtes Geld auszugeben? Dann bist du hier genau richtig!  
-
-          Wir aktualisieren diese Seite **täglich** mit neuen **${GAME_TYPE}**-Links, damit du dein Gameplay verbessern, schneller aufsteigen und spannende Belohnungen freischalten kannst – völlig kostenlos.  
-
-          ---  
-
-          ## **Was sind ${GAME_TYPE}-Links?**  
-
-          **${GAME_TYPE}**-Links sind offizielle Belohnungen der **${GAME_NAME_CAPITALIZED}**-Entwickler. Sie bieten kostenlose **${GAME_TYPE}** und weitere In-Game-Boni wie Spins, Würfe, Credits und spezielle Geschenke.  
-
-          Statt selbst danach zu suchen, übernehmen wir die Arbeit für dich! Wir sammeln und aktualisieren täglich die neuesten funktionierenden Links, damit du deine Gratis-Belohnungen mühelos einlösen kannst.  
-
-          ---  
-
-          ## **So löst du deine kostenlosen ${GAME_TYPE} ein**  
-
-          Deine **${GAME_TYPE}** zu erhalten ist schnell und einfach:  
-
-          1. **Wähle einen Link aus der Liste unten.**  
-          2. **Klicke auf den Link und melde dich in deinem ${GAME_NAME_CAPITALIZED}-Konto an.**  
-          3. **Genieße deine kostenlosen ${GAME_TYPE} – sofort in deinem Spiel verfügbar!**  
-
-          > 🔔 **Tipp:** Diese Links laufen schnell ab – schau täglich vorbei, um dir deine Belohnungen zu sichern!  
-
-          ---  
-
-          ## **Heutige Gratis-${GAME_TYPE} für ${GAME_NAME_CAPITALIZED}**"
-
-          FOOTER_CONTENT="---  
-
-          ## **Warum solltest du diese Seite speichern?**  
-
-          Wir machen es dir leicht, in **${GAME_NAME_CAPITALIZED}** vorne mit dabei zu sein – mit täglichen Updates und geprüften Links. Hier sind die Gründe, warum du uns täglich besuchen solltest:  
-
-          ✅ **Tägliche Updates:** Wir posten jeden Tag die neuesten kostenlosen **${GAME_TYPE}**-Links.  
-          ✅ **100 % sicher & geprüft:** Alle Links stammen aus offiziellen **${GAME_NAME_CAPITALIZED}**-Quellen.  
-          ✅ **Komplett kostenlos:** Keine Anmeldung, keine versteckten Gebühren – nur kostenlose In-Game-Belohnungen!  
-
-          ---  
-
-          ## **Maximiere deine Gratis-${GAME_TYPE} mit diesen Profi-Tipps**  
-
-          Möchtest du das Beste aus deinen kostenlosen Belohnungen herausholen? Befolge diese Expertenstrategien:  
-
-          - **Spins & Würfe clever einsetzen:** Spare sie für Events mit hohen Belohnungen auf.  
-          - **Münzen & Credits geschickt verwalten:** Investiere sie strategisch, um schneller voranzukommen.  
-          - **Täglich einloggen:** Viele Links sind nur kurz gültig – sichere sie dir so schnell wie möglich!  
-
-          ---  
-
-          ## **Häufig gestellte Fragen (FAQs)**  
-
-          ### **1. Sind diese ${GAME_TYPE}-Links sicher?**  
-          Ja! Wir teilen ausschließlich Links, die direkt aus offiziellen **${GAME_NAME_CAPITALIZED}**-Aktionen stammen – sie sind völlig sicher und legitim.  
-
-          ### **2. Wie oft werden die Links aktualisiert?**  
-          Wir aktualisieren diese Seite **täglich** mit neuen funktionierenden Links – schau also jeden Tag vorbei!  
-
-          ### **3. Was, wenn ein Link nicht funktioniert?**  
-          Einige Links haben eine begrenzte Anzahl an Einlösungen oder laufen schnell ab. Falls einer nicht funktioniert, keine Sorge – neue werden bald verfügbar sein!  
-
-          ---  
-
-          ## **Haftungsausschluss**  
-
-          Wir sind **nicht mit** **${GAME_NAME_CAPITALIZED}** oder seinen Entwicklern **verbunden**. Diese Seite dient ausschließlich zu Informationszwecken, um Spielern zu helfen, kostenlose **${GAME_TYPE}** zu erhalten und das Spiel in vollen Zügen zu genießen."
-
-          echo -e "$POST_CONTENT" > "$POST_FILE"
-          echo -e "$FOOTER_CONTENT" > "$FOOTER_FILE"
-
-      - name: Configure Git
-        run: |
+          # Initialize git configuration
           git config --global user.email "prolladmail@gmail.com"
           git config --global user.name "Prollad99"
+          git config --global pull.rebase true
 
-      - name: Commit and push changes
-        env:
-          ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-        run: |
-          git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.html _includes/${{ matrix.game }}_footer.html links-json/${{ matrix.game }}.json _data/include_files.yml
-          git commit -m "Update ${{ matrix.game }} reward links, content, and last modified date" || true
-          git stash
-          git pull --rebase || true
-          git stash pop || true
-          for i in {1..5}; do
-            git push https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git && break
-            echo "Attempt $i: Push failed, retrying in 5 seconds..."
-            sleep 5
-            git pull --rebase || true
+          # Process each game sequentially
+          for GAME in $GAMES; do
+            echo "ℹ️ Processing $GAME..."
+            
+            # Run game-specific script
+            if ! node "index-js/$GAME.js"; then
+              echo "❌ Error processing $GAME script"
+              exit 1
+            fi
+
+            # Generate content files
+            declare -A GAME_TYPES=(
+              ["bingo-bash"]="Gratis Chips"
+              ["bingo-blitz"]="Gratis Credits"
+              ["coin-master"]="Gratis Spins"
+              ["crazy-coin"]="Gratis Spins"
+              ["dice-dreams"]="Gratis Würfe"
+              ["gametwist"]="Gratis Münzen"
+              ["house-of-fun"]="Gratis Münzen"
+              ["huuuge-casino"]="Gratis Chips"
+              ["match-masters"]="Gratis Geschenke"
+              ["monopoly-go"]="Würfel"
+              ["slotomania"]="Gratis Münzen"
+              ["slotpark"]="Bonuscode"
+              ["solitaire-grand-harvest"]="Gratis Münzen"
+              ["wsop"]="Gratis Chips"
+            )
+
+            # Format game name
+            GAME_NAME_CAPITALIZED=$(echo "$GAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
+            GAME_TYPE=${GAME_TYPES[$GAME]}
+
+            # Generate post content
+            POST_CONTENT="Bist du ein leidenschaftlicher **${GAME_NAME_CAPITALIZED}**-Spieler? Möchtest du **${GAME_TYPE}** sammeln, ohne echtes Geld auszugeben? Dann bist du hier genau richtig!  
+
+            Wir aktualisieren diese Seite **täglich** mit neuen **${GAME_TYPE}**-Links, damit du dein Gameplay verbessern, schneller aufsteigen und spannende Belohnungen freischalten kannst – völlig kostenlos.  
+
+            ---  
+
+            ## **Was sind ${GAME_TYPE}-Links?**  
+
+            **${GAME_TYPE}**-Links sind offizielle Belohnungen der **${GAME_NAME_CAPITALIZED}**-Entwickler. Sie bieten kostenlose **${GAME_TYPE}** und weitere In-Game-Boni wie Spins, Würfe, Credits und spezielle Geschenke.  
+
+            Statt selbst danach zu suchen, übernehmen wir die Arbeit für dich! Wir sammeln und aktualisieren täglich die neuesten funktionierenden Links, damit du deine Gratis-Belohnungen mühelos einlösen kannst.  
+
+            ---  
+
+            ## **So löst du deine kostenlosen ${GAME_TYPE} ein**  
+
+            Deine **${GAME_TYPE}** zu erhalten ist schnell und einfach:  
+
+            1. **Wähle einen Link aus der Liste unten.**  
+            2. **Klicke auf den Link und melde dich in deinem ${GAME_NAME_CAPITALIZED}-Konto an.**  
+            3. **Genieße deine kostenlosen ${GAME_TYPE} – sofort in deinem Spiel verfügbar!**  
+
+            > 🔔 **Tipp:** Diese Links laufen schnell ab – schau täglich vorbei, um dir deine Belohnungen zu sichern!  
+
+            ---  
+
+            ## **Heutige Gratis-${GAME_TYPE} für ${GAME_NAME_CAPITALIZED}**"
+
+            # Generate footer content
+            FOOTER_CONTENT="---  
+
+            ## **Warum solltest du diese Seite speichern?**  
+
+            Wir machen es dir leicht, in **${GAME_NAME_CAPITALIZED}** vorne mit dabei zu sein – mit täglichen Updates und geprüften Links. Hier sind die Gründe, warum du uns täglich besuchen solltest:  
+
+            ✅ **Tägliche Updates:** Wir posten jeden Tag die neuesten kostenlosen **${GAME_TYPE}**-Links.  
+            ✅ **100 % sicher & geprüft:** Alle Links stammen aus offiziellen **${GAME_NAME_CAPITALIZED}**-Quellen.  
+            ✅ **Komplett kostenlos:** Keine Anmeldung, keine versteckten Gebühren – nur kostenlose In-Game-Belohnungen!  
+
+            ---  
+
+            ## **Maximiere deine Gratis-${GAME_TYPE} mit diesen Profi-Tipps**  
+
+            Möchtest du das Beste aus deinen kostenlosen Belohnungen herausholen? Befolge diese Expertenstrategien:  
+
+            - **Spins & Würfe clever einsetzen:** Spare sie für Events mit hohen Belohnungen auf.  
+            - **Münzen & Credits geschickt verwalten:** Investiere sie strategisch, um schneller voranzukommen.  
+            - **Täglich einloggen:** Viele Links sind nur kurz gültig – sichere sie dir so schnell wie möglich!  
+
+            ---  
+
+            ## **Häufig gestellte Fragen (FAQs)**  
+
+            ### **1. Sind diese ${GAME_TYPE}-Links sicher?**  
+            Ja! Wir teilen ausschließlich Links, die direkt aus offiziellen **${GAME_NAME_CAPITALIZED}**-Aktionen stammen – sie sind völlig sicher und legitim.  
+
+            ### **2. Wie oft werden die Links aktualisiert?**  
+            Wir aktualisieren diese Seite **täglich** mit neuen funktionierenden Links – schau also jeden Tag vorbei!  
+
+            ### **3. Was, wenn ein Link nicht funktioniert?**  
+            Einige Links haben eine begrenzte Anzahl an Einlösungen oder laufen schnell ab. Falls einer nicht funktioniert, keine Sorge – neue werden bald verfügbar sein!  
+
+            ---  
+
+            ## **Haftungsausschluss**  
+
+            Wir sind **nicht mit** **${GAME_NAME_CAPITALIZED}** oder seinen Entwicklern **verbunden**. Diese Seite dient ausschließlich zu Informationszwecken, um Spielern zu helfen, kostenlose **${GAME_TYPE}** zu erhalten und das Spiel in vollen Zügen zu genießen."
+
+            # Write content to files
+            echo "$POST_CONTENT" > "_includes/${GAME}_post.html"
+            echo "$FOOTER_CONTENT" > "_includes/${GAME}_footer.html"
+
+            # Add changed files to git
+            git add "index-js/$GAME.js" \
+                   "_includes/$GAME.html" \
+                   "_includes/${GAME}_post.html" \
+                   "_includes/${GAME}_footer.html" \
+                   "links-json/$GAME.json"
           done
+
+          # Commit changes
+          git commit -m "🤖 Auto-update: $(date +'%Y-%m-%d %H:%M')" || echo "⏩ No changes to commit"
+
+          # Push changes with retry logic
+          MAX_RETRIES=5
+          for ((i=1; i<=$MAX_RETRIES; i++)); do
+            git pull --rebase
+            if git push "https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git" HEAD:main; then
+              echo "✅ Push successful"
+              break
+            else
+              echo "🔄 Attempt $i/$MAX_RETRIES failed, retrying in 5 seconds..."
+              sleep 5
+            fi
+          done
+
+          if [ $i -gt $MAX_RETRIES ]; then
+            echo "❌ All push attempts failed"
+            exit 1
+          fi
