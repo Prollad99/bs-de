@@ -2,7 +2,7 @@ name: Update Links and Deployment
 
 on:
   schedule:
-    - cron: '*/30 * * * *' # Runs every 30 minutes
+    - cron: '*/30 * * * *'
   push:
     branches:
       - main
@@ -41,22 +41,18 @@ jobs:
         env:
           GAMES: "coin-master monopoly-go bingo-blitz dice-dreams match-masters solitaire-grand-harvest slotpark house-of-fun slotomania bingo-bash huuuge-casino wsop crazy-coin gametwist"
         run: |
-          # Initialize git configuration
           git config --global user.email "prolladmail@gmail.com"
           git config --global user.name "Prollad99"
           git config --global pull.rebase true
 
-          # Process each game sequentially
           for GAME in $GAMES; do
             echo "ℹ️ Processing $GAME..."
             
-            # Run game-specific script
             if ! node "index-js/$GAME.js"; then
               echo "❌ Error processing $GAME script"
               exit 1
             fi
 
-            # Generate content files
             declare -A GAME_TYPES=(
               ["bingo-bash"]="Gratis Chips"
               ["bingo-blitz"]="Gratis Credits"
@@ -74,84 +70,130 @@ jobs:
               ["wsop"]="Gratis Chips"
             )
 
-            # Format game name
             GAME_NAME_CAPITALIZED=$(echo "$GAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
             GAME_TYPE=${GAME_TYPES[$GAME]}
 
-            # Generate post content
-            POST_CONTENT="Bist du ein leidenschaftlicher **${GAME_NAME_CAPITALIZED}**-Spieler? Möchtest du **${GAME_TYPE}** sammeln, ohne echtes Geld auszugeben? Dann bist du hier genau richtig!  
+            # Generate HTML post content
+            POST_CONTENT=$(printf '<div class="game-content">
+              <h1>%s Spieler gesucht!</h1>
+              <p>Möchtest du <strong>%s</strong> sammeln, ohne echtes Geld auszugeben? Dann bist du hier genau richtig!</p>
+              
+              <div class="update-info">
+                <p>Wir aktualisieren diese Seite <strong>täglich</strong> mit neuen %s-Links:</p>
+                <ul>
+                  <li>Verbessere dein Gameplay</li>
+                  <li>Steige schneller auf</li>
+                  <li>Freischalte spannende Belohnungen</li>
+                </ul>
+              </div>
 
-            Wir aktualisieren diese Seite **täglich** mit neuen **${GAME_TYPE}**-Links, damit du dein Gameplay verbessern, schneller aufsteigen und spannende Belohnungen freischalten kannst – völlig kostenlos.  
+              <hr>
 
-            ---  
+              <section class="content-section">
+                <h2>Was sind %s-Links?</h2>
+                <p>Diese offiziellen Belohnungen der %s-Entwickler bieten:</p>
+                <ul class="benefits-list">
+                  <li>Kostenlose %s</li>
+                  <li>Spins/Würfe/Credits</li>
+                  <li>Spezielle Geschenke</li>
+                </ul>
+                <p class="highlight">Wir übernehmen die Link-Suche für dich!</p>
+              </section>
 
-            ## **Was sind ${GAME_TYPE}-Links?**  
+              <hr>
 
-            **${GAME_TYPE}**-Links sind offizielle Belohnungen der **${GAME_NAME_CAPITALIZED}**-Entwickler. Sie bieten kostenlose **${GAME_TYPE}** und weitere In-Game-Boni wie Spins, Würfe, Credits und spezielle Geschenke.  
+              <section class="tutorial-section">
+                <h2>So löst du deine %s ein</h2>
+                <ol class="steps">
+                  <li>Wähle einen Link aus unserer Liste</li>
+                  <li>Klicke und melde dich in deinem %s-Konto an</li>
+                  <li>Erhalte sofort deine Belohnung!</li>
+                </ol>
+                <div class="tip-box">
+                  <p>🔔 Tipp: Links laufen schnell ab - täglich vorbeischauen!</p>
+                </div>
+              </section>
 
-            Statt selbst danach zu suchen, übernehmen wir die Arbeit für dich! Wir sammeln und aktualisieren täglich die neuesten funktionierenden Links, damit du deine Gratis-Belohnungen mühelos einlösen kannst.  
+              <hr>
 
-            ---  
+              <section class="todays-links">
+                <h2>Heutige Gratis-%s</h2>
+              </section>
+            </div>' "$GAME_NAME_CAPITALIZED" "$GAME_TYPE" "$GAME_TYPE" "$GAME_TYPE" \
+              "$GAME_NAME_CAPITALIZED" "$GAME_TYPE" "$GAME_TYPE" "$GAME_NAME_CAPITALIZED" "$GAME_TYPE")
 
-            ## **So löst du deine kostenlosen ${GAME_TYPE} ein**  
+            # Generate HTML footer content
+            FOOTER_CONTENT=$(printf '<div class="footer-content">
+              <hr>
+              
+              <section class="why-save">
+                <h2>Warum diese Seite speichern?</h2>
+                <div class="benefits">
+                  <div class="benefit-item">
+                    <h3>✅ Tägliche Updates</h3>
+                    <p>Immer aktuelle %s-Links</p>
+                  </div>
+                  <div class="benefit-item">
+                    <h3>✅ 100%% Sicher</h3>
+                    <p>Geprüfte Links von %s</p>
+                  </div>
+                  <div class="benefit-item">
+                    <h3>✅ Komplett kostenlos</h3>
+                    <p>Keine Anmeldung, keine Gebühren</p>
+                  </div>
+                </div>
+              </section>
 
-            Deine **${GAME_TYPE}** zu erhalten ist schnell und einfach:  
+              <hr>
 
-            1. **Wähle einen Link aus der Liste unten.**  
-            2. **Klicke auf den Link und melde dich in deinem ${GAME_NAME_CAPITALIZED}-Konto an.**  
-            3. **Genieße deine kostenlosen ${GAME_TYPE} – sofort in deinem Spiel verfügbar!**  
+              <section class="pro-tips">
+                <h2>Profi-Tipps für maximale %s</h2>
+                <div class="tip-grid">
+                  <div class="tip">
+                    <h4>Clever einsetzen</h4>
+                    <p>Spare Spins für Events mit hohen Belohnungen</p>
+                  </div>
+                  <div class="tip">
+                    <h4>Strategisch verwalten</h4>
+                    <p>Investiere Münzen gezielt für schnellen Fortschritt</p>
+                  </div>
+                  <div class="tip">
+                    <h4>Täglich einloggen</h4>
+                    <p>Sichere dir zeitlich begrenzte Links</p>
+                  </div>
+                </div>
+              </section>
 
-            > 🔔 **Tipp:** Diese Links laufen schnell ab – schau täglich vorbei, um dir deine Belohnungen zu sichern!  
+              <hr>
 
-            ---  
+              <section class="faq">
+                <h2>Häufige Fragen</h2>
+                <div class="faq-item">
+                  <h3>Sind die Links sicher?</h3>
+                  <p>Ja! Alle Links stammen aus offiziellen %s-Quellen.</p>
+                </div>
+                <div class="faq-item">
+                  <h3>Update-Häufigkeit?</h3>
+                  <p>Tägliche Aktualisierungen garantierte frische Links.</p>
+                </div>
+                <div class="faq-item">
+                  <h3>Link funktioniert nicht?</h3>
+                  <p>Neue Links kommen bald - einfach später nochmal versuchen!</p>
+                </div>
+              </section>
 
-            ## **Heutige Gratis-${GAME_TYPE} für ${GAME_NAME_CAPITALIZED}**"
+              <hr>
 
-            # Generate footer content
-            FOOTER_CONTENT="---  
+              <div class="disclaimer">
+                <p>Haftungsausschluss: Nicht verbunden mit %s oder dessen Entwicklern.</p>
+              </div>
+            </div>' "$GAME_TYPE" "$GAME_NAME_CAPITALIZED" "$GAME_TYPE" \
+              "$GAME_NAME_CAPITALIZED" "$GAME_NAME_CAPITALIZED")
 
-            ## **Warum solltest du diese Seite speichern?**  
+            # Write HTML files
+            echo "$POST_CONTENT" | sed 's/^              //' > "_includes/${GAME}_post.html"
+            echo "$FOOTER_CONTENT" | sed 's/^              //' > "_includes/${GAME}_footer.html"
 
-            Wir machen es dir leicht, in **${GAME_NAME_CAPITALIZED}** vorne mit dabei zu sein – mit täglichen Updates und geprüften Links. Hier sind die Gründe, warum du uns täglich besuchen solltest:  
-
-            ✅ **Tägliche Updates:** Wir posten jeden Tag die neuesten kostenlosen **${GAME_TYPE}**-Links.  
-            ✅ **100 % sicher & geprüft:** Alle Links stammen aus offiziellen **${GAME_NAME_CAPITALIZED}**-Quellen.  
-            ✅ **Komplett kostenlos:** Keine Anmeldung, keine versteckten Gebühren – nur kostenlose In-Game-Belohnungen!  
-
-            ---  
-
-            ## **Maximiere deine Gratis-${GAME_TYPE} mit diesen Profi-Tipps**  
-
-            Möchtest du das Beste aus deinen kostenlosen Belohnungen herausholen? Befolge diese Expertenstrategien:  
-
-            - **Spins & Würfe clever einsetzen:** Spare sie für Events mit hohen Belohnungen auf.  
-            - **Münzen & Credits geschickt verwalten:** Investiere sie strategisch, um schneller voranzukommen.  
-            - **Täglich einloggen:** Viele Links sind nur kurz gültig – sichere sie dir so schnell wie möglich!  
-
-            ---  
-
-            ## **Häufig gestellte Fragen (FAQs)**  
-
-            ### **1. Sind diese ${GAME_TYPE}-Links sicher?**  
-            Ja! Wir teilen ausschließlich Links, die direkt aus offiziellen **${GAME_NAME_CAPITALIZED}**-Aktionen stammen – sie sind völlig sicher und legitim.  
-
-            ### **2. Wie oft werden die Links aktualisiert?**  
-            Wir aktualisieren diese Seite **täglich** mit neuen funktionierenden Links – schau also jeden Tag vorbei!  
-
-            ### **3. Was, wenn ein Link nicht funktioniert?**  
-            Einige Links haben eine begrenzte Anzahl an Einlösungen oder laufen schnell ab. Falls einer nicht funktioniert, keine Sorge – neue werden bald verfügbar sein!  
-
-            ---  
-
-            ## **Haftungsausschluss**  
-
-            Wir sind **nicht mit** **${GAME_NAME_CAPITALIZED}** oder seinen Entwicklern **verbunden**. Diese Seite dient ausschließlich zu Informationszwecken, um Spielern zu helfen, kostenlose **${GAME_TYPE}** zu erhalten und das Spiel in vollen Zügen zu genießen."
-
-            # Write content to files
-            echo "$POST_CONTENT" > "_includes/${GAME}_post.html"
-            echo "$FOOTER_CONTENT" > "_includes/${GAME}_footer.html"
-
-            # Add changed files to git
             git add "index-js/$GAME.js" \
                    "_includes/$GAME.html" \
                    "_includes/${GAME}_post.html" \
@@ -159,10 +201,8 @@ jobs:
                    "links-json/$GAME.json"
           done
 
-          # Commit changes
-          git commit -m "🤖 Auto-update: $(date +'%Y-%m-%d %H:%M')" || echo "⏩ No changes to commit"
-
-          # Push changes with retry logic
+          git commit -m "🤖 HTML content update: $(date +'%Y-%m-%d %H:%M')" || echo "⏩ No changes"
+          
           MAX_RETRIES=5
           for ((i=1; i<=$MAX_RETRIES; i++)); do
             git pull --rebase
@@ -170,7 +210,7 @@ jobs:
               echo "✅ Push successful"
               break
             else
-              echo "🔄 Attempt $i/$MAX_RETRIES failed, retrying in 5 seconds..."
+              echo "🔄 Attempt $i/$MAX_RETRIES failed, retrying..."
               sleep 5
             fi
           done
