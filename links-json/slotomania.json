@@ -1,5 +1,17 @@
 [
   {
+    "href": "https://api.playtika.com/redirector/?coupon_token=1_3_1741462200035_82enljop",
+    "date": "2025-03-09"
+  },
+  {
+    "href": "https://api.playtika.com/redirector/?coupon_token=1_3_1741474800051_w4p5pxmk",
+    "date": "2025-03-09"
+  },
+  {
+    "href": "https://api.playtika.com/redirector/?coupon_token=1_3_1741425499750_px99gewy",
+    "date": "2025-03-09"
+  },
+  {
     "href": "https://api.playtika.com/redirector/?coupon_token=1_3_1740582599673_04ly57rm",
     "date": "2025-03-08"
   },
@@ -385,18 +397,6 @@
   },
   {
     "href": "https://api.playtika.com/redirector/?coupon_token=1_3_1739699851448_2p036m68",
-    "date": "2025-02-17"
-  },
-  {
-    "href": "https://api.playtika.com/redirector/?coupon_token=1_3_1739734200046_ow94nkj7",
-    "date": "2025-02-17"
-  },
-  {
-    "href": "https://api.playtika.com/redirector/?coupon_token=1_3_1739715000279_o54w5lp5",
-    "date": "2025-02-17"
-  },
-  {
-    "href": "https://api.playtika.com/redirector/?coupon_token=1_3_1739660400034_nl9g78k6",
     "date": "2025-02-17"
   }
 ]
