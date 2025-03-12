@@ -6,7 +6,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch: {}  # FIXED
+  workflow_dispatch:
 
 jobs:
   update-links:
@@ -35,6 +35,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false # Ensures we use the deploy key
 
       - name: Cache Node modules
         uses: actions/cache@v3
@@ -65,6 +66,66 @@ jobs:
             echo "⚠️ Error: index-js/${{ matrix.game }}.js not found"
           fi
 
+      - name: Generate dynamic content
+        shell: bash
+        run: |
+          declare -A GAME_TYPES
+          GAME_TYPES=(
+            ["bingo-bash"]="Gratis Chips"
+            ["bingo-blitz"]="Gratis Credits"
+            ["coin-master"]="Gratis Spins"
+            ["crazy-coin"]="Gratis Spins"
+            ["dice-dreams"]="Gratis Würfe"
+            ["gametwist"]="Gratis Münzen"
+            ["house-of-fun"]="Gratis Münzen"
+            ["huuuge-casino"]="Gratis Chips"
+            ["match-masters"]="Gratis Geschenke"
+            ["monopoly-go"]="Würfel"
+            ["slotomania"]="Gratis Münzen"
+            ["slotpark"]="Bonuscode"
+            ["solitaire-grand-harvest"]="Gratis Münzen"
+            ["wsop"]="Gratis Chips"
+          )
+
+          GAME_NAME="${{ matrix.game }}"
+          GAME_NAME_CAPITALIZED=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
+          GAME_TYPE="${GAME_TYPES[$GAME_NAME]}"
+          CURRENT_DATE=$(date '+%d.%m.%Y %H:%M')
+
+          POST_FILE="_includes/${GAME_NAME}_post.html"
+          FOOTER_FILE="_includes/${GAME_NAME}_footer.html"
+
+          POST_CONTENT="Bist du ein leidenschaftlicher **${GAME_NAME_CAPITALIZED}**-Spieler? Hier findest du alle 30 Minuten neue **${GAME_TYPE}**-Links, um kostenlose Belohnungen zu sammeln – 100% sicher und gratis!  
+
+Klicke einfach auf die Links unten, melde dich in deinem **${GAME_NAME_CAPITALIZED}**-Konto an und sichere dir deine **${GAME_TYPE}** – sie sind sofort im Spiel verfügbar. Schau regelmäßig vorbei, da die Links schnell ablaufen!"
+
+          FOOTER_CONTENT="---
+
+## **Was sind ${GAME_TYPE}-Links?**  
+
+**${GAME_TYPE}**-Links sind offizielle Belohnungen von den **${GAME_NAME_CAPITALIZED}**-Entwicklern. Sie bieten kostenlose **${GAME_TYPE}** wie Spins, Würfe, Credits oder spezielle Geschenke. Wir sammeln und prüfen diese Links alle 30 Minuten, damit du sie mühelos einlösen kannst.  
+
+---
+
+## **Warum diese Seite dein ${GAME_NAME_CAPITALIZED}-Begleiter ist**  
+
+Wir helfen dir, in **${GAME_NAME_CAPITALIZED}** vorne zu bleiben:  
+
+✅ **Updates alle 30 Minuten:** Neue **${GAME_TYPE}**-Links so schnell wie möglich (Stand: ${CURRENT_DATE}).  
+✅ **100 % sicher:** Links direkt aus offiziellen **${GAME_NAME_CAPITALIZED}**-Quellen.  
+✅ **Kostenlos:** Keine Gebühren, keine Anmeldung – nur Belohnungen!  
+
+---
+
+## **Haftungsausschluss**  
+
+Wir sind **nicht mit ${GAME_NAME_CAPITALIZED}** oder seinen Entwicklern verbunden. Diese Seite hilft Spielern, kostenlose **${GAME_TYPE}** zu finden und das Spiel zu genießen.
+"
+
+          echo "$POST_CONTENT" > "$POST_FILE"
+          echo "$FOOTER_CONTENT" > "$FOOTER_FILE"
+          echo "Generated content for ${GAME_NAME}"
+
       - name: Configure Git
         run: |
           git config --global user.email "prolladmail@gmail.com"
@@ -79,25 +140,10 @@ jobs:
             echo "No changes to commit for ${GAME_NAME}"
           else
             git commit -m "Update ${GAME_NAME} links and content - $(date '+%Y-%m-%d %H:%M')"
+            git remote set-url origin git@github.com:Prollad99/bs-de.git
             for i in {1..5}; do
-              git push --force https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git && break
+              ssh-agent bash -c "ssh-add <(echo \"${ACTIONS_DEPLOY_KEY}\") && git pull --rebase && git push origin main" && break
               echo "Attempt $i: Push failed, retrying in 5 seconds..."
               sleep 5
             done || echo "❌ All push attempts failed for ${GAME_NAME}"
           fi
-
-      - name: Install Jekyll
-        run: gem install jekyll bundler  # FIXED
-
-      - name: Build Jekyll site
-        run: |
-          bundle install
-          bundle exec jekyll build
-
-      - name: Deploy to GitHub Pages
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          personal_access_token: ${{ secrets.ACTIONS_DEPLOY_KEY }}  # FIXED
-          publish_dir: ./_site
-          commit_message: "Deploy updated site with ${GAME_NAME} content"
