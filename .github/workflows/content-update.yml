@@ -59,10 +59,12 @@ jobs:
       - name: Fetch and update links
         run: |
           echo "Processing ${{ matrix.game }}..."
-          node index-js/${{ matrix.game }}.js || echo "⚠️ Warning: Script for ${{ matrix.game }} failed, proceeding anyway"
-          echo "Links JSON content:"
+          if [ -f "index-js/${{ matrix.game }}.js" ]; then
+            node index-js/${{ matrix.game }}.js || echo "⚠️ Warning: Script for ${{ matrix.game }} failed, proceeding anyway"
+          else
+            echo "⚠️ Error: index-js/${{ matrix.game }}.js not found"
+          fi
           cat links-json/${{ matrix.game }}.json || echo "No links JSON found"
-          echo "HTML include content:"
           cat _includes/${{ matrix.game }}.html || echo "No HTML include found"
 
       - name: Generate dynamic content
@@ -86,9 +88,9 @@ jobs:
             ["wsop"]="Gratis Chips"
           )
 
-          GAME_NAME=${{ matrix.game }}
+          GAME_NAME="${{ matrix.game }}"
           GAME_NAME_CAPITALIZED=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
-          GAME_TYPE=${GAME_TYPES[$GAME_NAME]}
+          GAME_TYPE="${GAME_TYPES[$GAME_NAME]}"
           CURRENT_DATE=$(date '+%d.%m.%Y %H:%M')
 
           POST_FILE="_includes/${GAME_NAME}_post.html"
@@ -159,18 +161,14 @@ Wir sind **nicht mit ${GAME_NAME_CAPITALIZED}** oder seinen Entwicklern verbunde
         run: |
           git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.html _includes/${{ matrix.game }}_footer.html links-json/${{ matrix.game }}.json
           if git diff --staged --quiet; then
-            echo "No changes to commit for ${{ matrix.game }}"
+            echo "No changes to commit for ${GAME_NAME}"
           else
-            git commit -m "Update ${{ matrix.game }} links and content - $(date '+%Y-%m-%d %H:%M')"
+            git commit -m "Update ${GAME_NAME} links and content - $(date '+%Y-%m-%d %H:%M')"
             for i in {1..5}; do
-              git pull --rebase
-              if git push https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git; then
-                echo "Successfully pushed changes for ${{ matrix.game }}"
-                break
-              fi
+              git pull --rebase && git push https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git && break
               echo "Attempt $i: Push failed, retrying in 5 seconds..."
               sleep 5
-            done || echo "❌ All push attempts failed for ${{ matrix.game }}"
+            done || echo "❌ All push attempts failed for ${GAME_NAME}"
           fi
 
       - name: Build Jekyll site
@@ -185,4 +183,4 @@ Wir sind **nicht mit ${GAME_NAME_CAPITALIZED}** oder seinen Entwicklern verbunde
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./_site
-          commit_message: "Deploy updated site with ${{ matrix.game }} content"
+          commit_message: "Deploy updated site with ${GAME_NAME} content"
