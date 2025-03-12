@@ -96,10 +96,12 @@ jobs:
           POST_FILE="_includes/${GAME_NAME}_post.html"
           FOOTER_FILE="_includes/${GAME_NAME}_footer.html"
 
+          # Short POST_CONTENT (2 paragraphs)
           POST_CONTENT="Bist du ein leidenschaftlicher **${GAME_NAME_CAPITALIZED}**-Spieler? Hier findest du alle 30 Minuten neue **${GAME_TYPE}**-Links, um kostenlose Belohnungen zu sammeln – 100% sicher und gratis!  
 
 Klicke einfach auf die Links unten, melde dich in deinem **${GAME_NAME_CAPITALIZED}**-Konto an und sichere dir deine **${GAME_TYPE}** – sie sind sofort im Spiel verfügbar. Schau regelmäßig vorbei, da die Links schnell ablaufen!"
 
+          # Detailed FOOTER_CONTENT with fixed syntax
           FOOTER_CONTENT="---
 
 ## **Was sind ${GAME_TYPE}-Links?**  
@@ -130,14 +132,14 @@ Maximiere deine Gratis-Belohnungen mit diesen Tricks:
 
 ## **Häufige Fragen zu ${GAME_TYPE}**  
 
-### **Sind die Links sicher?**  
-Ja, alle Links kommen direkt von **${GAME_NAME_CAPITALIZED}** und sind absolut sicher.  
+### **Sind diese ${GAME_TYPE}-Links sicher?**  
+Ja! Wir teilen ausschließlich Links, die direkt aus offiziellen **${GAME_NAME_CAPITALIZED}**-Aktionen stammen – sie sind völlig sicher und legitim.  
 
-### **Wie oft gibt’s neue Links?**  
+### **Wie oft werden die Links aktualisiert?**  
 Alle 30 Minuten! Besuche uns regelmäßig für frische **${GAME_TYPE}**.  
 
-### **Link funktioniert nicht?**  
-Manche Links sind limitiert oder ablaufend – neue kommen bald!  
+### **Was wenn ein Link nicht funktioniert?**  
+Einige Links haben eine begrenzte Anzahl an Einlösungen oder laufen schnell ab. Falls einer nicht funktioniert, keine Sorge – neue werden bald verfügbar sein!  
 
 ---
 
