@@ -96,60 +96,64 @@ jobs:
           POST_FILE="_includes/${GAME_NAME}_post.html"
           FOOTER_FILE="_includes/${GAME_NAME}_footer.html"
 
-          # Short POST_CONTENT (2 paragraphs)
-          POST_CONTENT="Bist du ein leidenschaftlicher **${GAME_NAME_CAPITALIZED}**-Spieler? Hier findest du alle 30 Minuten neue **${GAME_TYPE}**-Links, um kostenlose Belohnungen zu sammeln – 100% sicher und gratis!  
+          # Use heredoc to avoid YAML parsing issues
+          cat << EOF > "$POST_FILE"
+Bist du ein leidenschaftlicher **${GAME_NAME_CAPITALIZED}**-Spieler? Hier findest du alle 30 Minuten neue **${GAME_TYPE}**-Links, um kostenlose Belohnungen zu sammeln – 100% sicher und gratis!
 
-Klicke einfach auf die Links unten, melde dich in deinem **${GAME_NAME_CAPITALIZED}**-Konto an und sichere dir deine **${GAME_TYPE}** – sie sind sofort im Spiel verfügbar. Schau regelmäßig vorbei, da die Links schnell ablaufen!"
+Klicke einfach auf die Links unten, melde dich in deinem **${GAME_NAME_CAPITALIZED}**-Konto an und sichere dir deine **${GAME_TYPE}** – sie sind sofort im Spiel verfügbar. Schau regelmäßig vorbei, da die Links schnell ablaufen!
+EOF
 
-          # Detailed FOOTER_CONTENT with fixed syntax
-          FOOTER_CONTENT="---
+          # Use heredoc for FOOTER_CONTENT
+          cat << EOF > "$FOOTER_FILE"
+---
 
-## **Was sind ${GAME_TYPE}-Links?**  
+## Was sind ${GAME_TYPE}-Links?
 
-**${GAME_TYPE}**-Links sind offizielle Belohnungen von den **${GAME_NAME_CAPITALIZED}**-Entwicklern. Sie bieten kostenlose **${GAME_TYPE}** wie Spins, Würfe, Credits oder spezielle Geschenke. Wir sammeln und prüfen diese Links alle 30 Minuten, damit du sie mühelos einlösen kannst.  
+**${GAME_TYPE}**-Links sind offizielle Belohnungen von den **${GAME_NAME_CAPITALIZED}**-Entwicklern. Sie bieten kostenlose **${GAME_TYPE}** wie Spins, Würfe, Credits oder spezielle Geschenke. Wir sammeln und prüfen diese Links alle 30 Minuten, damit du sie mühelos einlösen kannst.
 
 ---
 
-## **Warum diese Seite dein ${GAME_NAME_CAPITALIZED}-Begleiter ist**  
+## Warum diese Seite dein ${GAME_NAME_CAPITALIZED}-Begleiter ist
 
-Wir helfen dir, in **${GAME_NAME_CAPITALIZED}** vorne zu bleiben:  
+Wir helfen dir, in **${GAME_NAME_CAPITALIZED}** vorne zu bleiben:
 
-✅ **Updates alle 30 Minuten:** Neue **${GAME_TYPE}**-Links so schnell wie möglich (Stand: ${CURRENT_DATE}).  
-✅ **100 % sicher:** Links direkt aus offiziellen **${GAME_NAME_CAPITALIZED}**-Quellen.  
-✅ **Kostenlos:** Keine Gebühren, keine Anmeldung – nur Belohnungen!  
-
----
-
-## **Profi-Tipps für mehr ${GAME_TYPE}**  
-
-Maximiere deine Gratis-Belohnungen mit diesen Tricks:  
-
-- **Spins & Würfe sparen:** Nutze sie bei Events mit hohen Gewinnen.  
-- **Münzen strategisch einsetzen:** Investiere klug, um schneller voranzukommen.  
-- **Regelmäßig checken:** Links sind kurzlebig – sei schnell!  
+- **Updates alle 30 Minuten:** Neue **${GAME_TYPE}**-Links so schnell wie möglich (Stand: ${CURRENT_DATE}).
+- **100 % sicher:** Links direkt aus offiziellen **${GAME_NAME_CAPITALIZED}**-Quellen.
+- **Kostenlos:** Keine Gebühren, keine Anmeldung – nur Belohnungen!
 
 ---
 
-## **Häufige Fragen zu ${GAME_TYPE}**  
+## Profi-Tipps für mehr ${GAME_TYPE}
 
-### **Sind diese ${GAME_TYPE}-Links sicher?**  
-Ja! Wir teilen ausschließlich Links, die direkt aus offiziellen **${GAME_NAME_CAPITALIZED}**-Aktionen stammen – sie sind völlig sicher und legitim.  
+Maximiere deine Gratis-Belohnungen mit diesen Tricks:
 
-### **Wie oft werden die Links aktualisiert?**  
-Alle 30 Minuten! Besuche uns regelmäßig für frische **${GAME_TYPE}**.  
-
-### **Was wenn ein Link nicht funktioniert?**  
-Einige Links haben eine begrenzte Anzahl an Einlösungen oder laufen schnell ab. Falls einer nicht funktioniert, keine Sorge – neue werden bald verfügbar sein!  
+- **Spins & Würfe sparen:** Nutze sie bei Events mit hohen Gewinnen.
+- **Münzen strategisch einsetzen:** Investiere klug, um schneller voranzukommen.
+- **Regelmäßig checken:** Links sind kurzlebig – sei schnell!
 
 ---
 
-## **Haftungsausschluss**  
+## Häufige Fragen zu ${GAME_TYPE}
+
+### Sind diese ${GAME_TYPE}-Links sicher?
+
+Ja! Wir teilen ausschließlich Links, die direkt aus offiziellen **${GAME_NAME_CAPITALIZED}**-Aktionen stammen – sie sind völlig sicher und legitim.
+
+### Wie oft werden die Links aktualisiert?
+
+Alle 30 Minuten! Besuche uns regelmäßig für frische **${GAME_TYPE}**.
+
+### Was wenn ein Link nicht funktioniert?
+
+Einige Links haben eine begrenzte Anzahl an Einlösungen oder laufen schnell ab. Falls einer nicht funktioniert, keine Sorge – neue werden bald verfügbar sein!
+
+---
+
+## Haftungsausschluss
 
 Wir sind **nicht mit ${GAME_NAME_CAPITALIZED}** oder seinen Entwicklern verbunden. Diese Seite hilft Spielern, kostenlose **${GAME_TYPE}** zu finden und das Spiel zu genießen.
-"
+EOF
 
-          echo "$POST_CONTENT" > "$POST_FILE"
-          echo "$FOOTER_CONTENT" > "$FOOTER_FILE"
           echo "Generated content for ${GAME_NAME}"
 
       - name: Configure Git
