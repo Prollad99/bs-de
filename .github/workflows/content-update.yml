@@ -2,7 +2,7 @@ name: Update Links and Deployment
 
 on:
   schedule:
-    - cron: '*/30 * * * *' # Runs every 30 minutes
+    - cron: "*/30 * * * *" # Runs every 30 minutes
   push:
     branches:
       - main
@@ -89,17 +89,15 @@ jobs:
           GAME_NAME=${{ matrix.game }}
           GAME_NAME_CAPITALIZED=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
           GAME_TYPE=${GAME_TYPES[$GAME_NAME]}
-          CURRENT_DATE=$(date '+%d.%m.%Y %H:%M') # Includes time for 30-min updates
+          CURRENT_DATE=$(date '+%d.%m.%Y %H:%M')
 
           POST_FILE="_includes/${GAME_NAME}_post.html"
           FOOTER_FILE="_includes/${GAME_NAME}_footer.html"
 
-          # Short POST_CONTENT (2 paragraphs)
           POST_CONTENT="Bist du ein leidenschaftlicher **${GAME_NAME_CAPITALIZED}**-Spieler? Hier findest du alle 30 Minuten neue **${GAME_TYPE}**-Links, um kostenlose Belohnungen zu sammeln – 100% sicher und gratis!  
 
 Klicke einfach auf die Links unten, melde dich in deinem **${GAME_NAME_CAPITALIZED}**-Konto an und sichere dir deine **${GAME_TYPE}** – sie sind sofort im Spiel verfügbar. Schau regelmäßig vorbei, da die Links schnell ablaufen!"
 
-          # Detailed FOOTER_CONTENT
           FOOTER_CONTENT="---
 
 ## **Was sind ${GAME_TYPE}-Links?**  
@@ -146,7 +144,6 @@ Manche Links sind limitiert oder ablaufend – neue kommen bald!
 Wir sind **nicht mit ${GAME_NAME_CAPITALIZED}** oder seinen Entwicklern verbunden. Diese Seite hilft Spielern, kostenlose **${GAME_TYPE}** zu finden und das Spiel zu genießen.
 "
 
-          # Write content to files
           echo "$POST_CONTENT" > "$POST_FILE"
           echo "$FOOTER_CONTENT" > "$FOOTER_FILE"
           echo "Generated content for ${GAME_NAME}"
