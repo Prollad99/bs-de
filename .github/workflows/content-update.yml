@@ -2,11 +2,10 @@ name: Update Links and Deployment
 
 on:
   schedule:
-    - cron: "*/30 * * * *" # Runs every 30 minutes
+    - cron: '*/30 * * * *' # Runs every 30 minutes
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   update-links:
@@ -28,44 +27,32 @@ jobs:
           - wsop
           - crazy-coin
           - gametwist
-      fail-fast: false
 
     steps:
-      - name: Checkout repository
+      - name: Check out repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Cache Node modules
         uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
-
-      - name: Cache Playwright browsers
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-playwright-
+          restore-keys: |
+            ${{ runner.os }}-node-
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
       - name: Fetch and update links
         run: |
-          echo "Processing ${{ matrix.game }}..."
-          if [ -f "index-js/${{ matrix.game }}.js" ]; then
-            node index-js/${{ matrix.game }}.js || echo "⚠️ Warning: Script for ${{ matrix.game }} failed, proceeding anyway"
-          else
-            echo "⚠️ Error: index-js/${{ matrix.game }}.js not found"
-          fi
-          cat links-json/${{ matrix.game }}.json || echo "No links JSON found"
-          cat _includes/${{ matrix.game }}.html || echo "No HTML include found"
+          node index-js/${{ matrix.game }}.js || echo "Script failed but continuing"
+          echo "Contents of links-json/${{ matrix.game }}.json:"
+          cat links-json/${{ matrix.game }}.json
+          echo "Contents of _includes/${{ matrix.game }}.html:"
+          cat _includes/${{ matrix.game }}.html
 
       - name: Generate dynamic content
         shell: bash
@@ -88,37 +75,36 @@ jobs:
             ["wsop"]="Gratis Chips"
           )
 
-          GAME_NAME="${{ matrix.game }}"
+          GAME_NAME=${{ matrix.game }}
           GAME_NAME_CAPITALIZED=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
-          GAME_TYPE="${GAME_TYPES[$GAME_NAME]}"
-          CURRENT_DATE=$(date '+%d.%m.%Y %H:%M')
+          GAME_TYPE=${GAME_TYPES[$GAME_NAME]}
 
           POST_FILE="_includes/${GAME_NAME}_post.html"
           FOOTER_FILE="_includes/${GAME_NAME}_footer.html"
 
-          # Short POST_CONTENT
-          POST_CONTENT="Bist du ein leidenschaftlicher **${GAME_NAME_CAPITALIZED}**-Spieler? Hier findest du alle 30 Minuten neue **${GAME_TYPE}**-Links, um kostenlose Belohnungen zu sammeln – 100% sicher und gratis!  
+          # Create post content
+          POST_CONTENT="Bist du ein leidenschaftlicher **${GAME_NAME_CAPITALIZED}**-Spieler? Hier findest du täglich neue **${GAME_TYPE}**-Links, um kostenlose Belohnungen zu sammeln – 100% sicher und gratis!  
 
-Klicke einfach auf die Links unten, melde dich in deinem **${GAME_NAME_CAPITALIZED}**-Konto an und sichere dir deine **${GAME_TYPE}** – sie sind sofort im Spiel verfügbar. Schau regelmäßig vorbei, da die Links schnell ablaufen!"
+Klicke einfach auf die Links unten, melde dich in deinem **${GAME_NAME_CAPITALIZED}**-Konto an und sichere dir deine **${GAME_TYPE}** – sie sind sofort im Spiel verfügbar. Schau täglich vorbei, da die Links schnell ablaufen!"
 
-          # FOOTER_CONTENT
-          FOOTER_CONTENT="---  
+          # Create footer content
+          FOOTER_CONTENT="---
 
 ## **Was sind ${GAME_TYPE}-Links?**  
 
-**${GAME_TYPE}**-Links sind offizielle Belohnungen von den **${GAME_NAME_CAPITALIZED}**-Entwicklern. Sie bieten kostenlose **${GAME_TYPE}** wie Spins, Würfe, Credits oder spezielle Geschenke. Wir sammeln und prüfen diese Links alle 30 Minuten, damit du sie mühelos einlösen kannst.  
+**${GAME_TYPE}**-Links sind offizielle Belohnungen von den **${GAME_NAME_CAPITALIZED}**-Entwicklern. Sie bieten kostenlose **${GAME_TYPE}** wie Spins, Würfe, Credits oder spezielle Geschenke. Wir sammeln und prüfen diese Links täglich, damit du sie mühelos einlösen kannst.  
 
----  
+---
 
 ## **Warum diese Seite dein ${GAME_NAME_CAPITALIZED}-Begleiter ist**  
 
 Wir helfen dir, in **${GAME_NAME_CAPITALIZED}** vorne zu bleiben:  
 
-✅ **Updates alle 30 Minuten:** Neue **${GAME_TYPE}**-Links so schnell wie möglich (Stand: ${CURRENT_DATE}).  
+✅ **Tägliche Updates:** Neue **${GAME_TYPE}**-Links jeden Tag (Stand: ${CURRENT_DATE}).  
 ✅ **100 % sicher:** Links direkt aus offiziellen **${GAME_NAME_CAPITALIZED}**-Quellen.  
 ✅ **Kostenlos:** Keine Gebühren, keine Anmeldung – nur Belohnungen!  
 
----  
+---
 
 ## **Profi-Tipps für mehr ${GAME_TYPE}**  
 
@@ -126,31 +112,31 @@ Maximiere deine Gratis-Belohnungen mit diesen Tricks:
 
 - **Spins & Würfe sparen:** Nutze sie bei Events mit hohen Gewinnen.  
 - **Münzen strategisch einsetzen:** Investiere klug, um schneller voranzukommen.  
-- **Regelmäßig checken:** Links sind kurzlebig – sei schnell!  
+- **Täglich checken:** Links sind kurzlebig – sei schnell!  
 
----  
+---
 
 ## **Häufige Fragen zu ${GAME_TYPE}**  
 
-### **Sind diese ${GAME_TYPE}-Links sicher?**  
-Ja! Wir teilen ausschließlich Links, die direkt aus offiziellen **${GAME_NAME_CAPITALIZED}**-Aktionen stammen – sie sind völlig sicher und legitim.  
+### **Sind die Links sicher?**  
+Ja, alle Links kommen direkt von **${GAME_NAME_CAPITALIZED}** und sind absolut sicher.  
 
-### **Wie oft werden die Links aktualisiert?**  
-Alle 30 Minuten! Besuche uns regelmäßig für frische **${GAME_TYPE}**.  
+### **Wie oft gibt’s neue Links?**  
+Täglich! Besuche uns regelmäßig für frische **${GAME_TYPE}**.  
 
-### **Was wenn ein Link nicht funktioniert?**  
-Einige Links haben eine begrenzte Anzahl an Einlösungen oder laufen schnell ab. Falls einer nicht funktioniert, keine Sorge – neue werden bald verfügbar sein!  
+### **Link funktioniert nicht?**  
+Manche Links sind limitiert oder ablaufend – neue kommen bald!  
 
----  
+---
 
 ## **Haftungsausschluss**  
 
 Wir sind **nicht mit ${GAME_NAME_CAPITALIZED}** oder seinen Entwicklern verbunden. Diese Seite hilft Spielern, kostenlose **${GAME_TYPE}** zu finden und das Spiel zu genießen.
 "
 
+          # Write content to files
           echo "$POST_CONTENT" > "$POST_FILE"
           echo "$FOOTER_CONTENT" > "$FOOTER_FILE"
-          echo "Generated content for ${GAME_NAME}"
 
       - name: Configure Git
         run: |
@@ -161,41 +147,11 @@ Wir sind **nicht mit ${GAME_NAME_CAPITALIZED}** oder seinen Entwicklern verbunde
         env:
           ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
         run: |
-          # Add only existing files
-          for file in _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.html _includes/${{ matrix.game }}_footer.html links-json/${{ matrix.game }}.json; do
-            if [ -f "$file" ]; then
-              git add "$file"
-            fi
+          git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.html _includes/${{ matrix.game }}_footer.html links-json/${{ matrix.game }}.json
+          git commit -m "Update ${{ matrix.game }} reward links, content, and last modified date" || echo "No changes to commit"
+          for i in {1..5}; do
+            git pull --rebase
+            git push https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git && break
+            echo "Attempt $i: Push failed, retrying in 5 seconds..."
+            sleep 5
           done
-
-          if git diff --staged --quiet; then
-            echo "No changes to commit for ${{ matrix.game }}"
-          else
-            git commit -m "Update ${{ matrix.game }} links and content - $(date '+%Y-%m-%d %H:%M')"
-            for i in {1..5}; do
-              git pull --rebase && git push https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git && break
-              echo "Attempt $i: Push failed, retrying in 5 seconds..."
-              sleep 5
-            done || echo "❌ All push attempts failed for ${{ matrix.game }}"
-          fi
-
-      - name: Build Jekyll site
-        run: |
-          gem install bundler
-          bundle install
-          bundle exec jekyll build
-
-  deploy:
-    needs: update-links
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./_site
-          commit_message: "Deploy updated site"
