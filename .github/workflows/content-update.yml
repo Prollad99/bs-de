@@ -35,24 +35,31 @@ jobs:
       - name: Cache Node modules
         uses: actions/cache@v3
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
       - name: Fetch and update links
         run: |
-          node index-js/${{ matrix.game }}.js || echo "Script failed but continuing"
+          node index-js/${{ matrix.game }}.js > logs/${{ matrix.game }}.log 2>&1 || echo "Script failed but continuing"
           echo "Contents of links-json/${{ matrix.game }}.json:"
           cat links-json/${{ matrix.game }}.json
           echo "Contents of _includes/${{ matrix.game }}.html:"
           cat _includes/${{ matrix.game }}.html
+
+      - name: Verify JSON integrity
+        run: |
+          if ! jq empty links-json/${{ matrix.game }}.json; then
+            echo "Invalid JSON detected in links-json/${{ matrix.game }}.json"
+            exit 1
+          fi
 
       - name: Generate dynamic content
         shell: bash
@@ -78,61 +85,61 @@ jobs:
           GAME_NAME=${{ matrix.game }}
           GAME_NAME_CAPITALIZED=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
           GAME_TYPE=${GAME_TYPES[$GAME_NAME]}
+          CURRENT_DATE=$(date +'%d.%m.%Y')
 
           POST_FILE="_includes/${GAME_NAME}_post.html"
           FOOTER_FILE="_includes/${GAME_NAME}_footer.html"
 
-          # Create post content
+          # New Post Content
           POST_CONTENT="Bist du ein leidenschaftlicher **${GAME_NAME_CAPITALIZED}**-Spieler? Hier findest du täglich neue **${GAME_TYPE}**-Links, um kostenlose Belohnungen zu sammeln – 100% sicher und gratis!  
 
-Klicke einfach auf die Links unten, melde dich in deinem **${GAME_NAME_CAPITALIZED}**-Konto an und sichere dir deine **${GAME_TYPE}** – sie sind sofort im Spiel verfügbar. Schau täglich vorbei, da die Links schnell ablaufen!"
+          Klicke einfach auf die Links unten, melde dich in deinem **${GAME_NAME_CAPITALIZED}**-Konto an und sichere dir deine **${GAME_TYPE}** – sie sind sofort im Spiel verfügbar. Schau täglich vorbei, da die Links schnell ablaufen!"
 
-          # Create footer content
+          # New Footer Content
           FOOTER_CONTENT="---
 
-## **Was sind ${GAME_TYPE}-Links?**  
+          ## **Was sind ${GAME_TYPE}-Links?**  
 
-**${GAME_TYPE}**-Links sind offizielle Belohnungen von den **${GAME_NAME_CAPITALIZED}**-Entwicklern. Sie bieten kostenlose **${GAME_TYPE}** wie Spins, Würfe, Credits oder spezielle Geschenke. Wir sammeln und prüfen diese Links täglich, damit du sie mühelos einlösen kannst.  
+          **${GAME_TYPE}**-Links sind offizielle Belohnungen von den **${GAME_NAME_CAPITALIZED}**-Entwicklern. Sie bieten kostenlose **${GAME_TYPE}** wie Spins, Würfe, Credits oder spezielle Geschenke. Wir sammeln und prüfen diese Links täglich, damit du sie mühelos einlösen kannst.  
 
----
+          ---
 
-## **Warum diese Seite dein ${GAME_NAME_CAPITALIZED}-Begleiter ist**  
+          ## **Warum diese Seite dein ${GAME_NAME_CAPITALIZED}-Begleiter ist**  
 
-Wir helfen dir, in **${GAME_NAME_CAPITALIZED}** vorne zu bleiben:  
+          Wir helfen dir, in **${GAME_NAME_CAPITALIZED}** vorne zu bleiben:  
 
-✅ **Tägliche Updates:** Neue **${GAME_TYPE}**-Links jeden Tag (Stand: ${CURRENT_DATE}).  
-✅ **100 % sicher:** Links direkt aus offiziellen **${GAME_NAME_CAPITALIZED}**-Quellen.  
-✅ **Kostenlos:** Keine Gebühren, keine Anmeldung – nur Belohnungen!  
+          ✅ **Tägliche Updates:** Neue **${GAME_TYPE}**-Links jeden Tag (Stand: ${CURRENT_DATE}).  
+          ✅ **100 % sicher:** Links direkt aus offiziellen **${GAME_NAME_CAPITALIZED}**-Quellen.  
+          ✅ **Kostenlos:** Keine Gebühren, keine Anmeldung – nur Belohnungen!  
 
----
+          ---
 
-## **Profi-Tipps für mehr ${GAME_TYPE}**  
+          ## **Profi-Tipps für mehr ${GAME_TYPE}**  
 
-Maximiere deine Gratis-Belohnungen mit diesen Tricks:  
+          Maximiere deine Gratis-Belohnungen mit diesen Tricks:  
 
-- **Spins & Würfe sparen:** Nutze sie bei Events mit hohen Gewinnen.  
-- **Münzen strategisch einsetzen:** Investiere klug, um schneller voranzukommen.  
-- **Täglich checken:** Links sind kurzlebig – sei schnell!  
+          - **Spins & Würfe sparen:** Nutze sie bei Events mit hohen Gewinnen.  
+          - **Münzen strategisch einsetzen:** Investiere klug, um schneller voranzukommen.  
+          - **Täglich checken:** Links sind kurzlebig – sei schnell!  
 
----
+          ---
 
-## **Häufige Fragen zu ${GAME_TYPE}**  
+          ## **Häufige Fragen zu ${GAME_TYPE}**  
 
-### **Sind die Links sicher?**  
-Ja, alle Links kommen direkt von **${GAME_NAME_CAPITALIZED}** und sind absolut sicher.  
+          ### **Sind die Links sicher?**  
+          Ja, alle Links kommen direkt von **${GAME_NAME_CAPITALIZED}** und sind absolut sicher.  
 
-### **Wie oft gibt’s neue Links?**  
-Täglich! Besuche uns regelmäßig für frische **${GAME_TYPE}**.  
+          ### **Wie oft gibt’s neue Links?**  
+          Täglich! Besuche uns regelmäßig für frische **${GAME_TYPE}**.  
 
-### **Link funktioniert nicht?**  
-Manche Links sind limitiert oder ablaufend – neue kommen bald!  
+          ### **Link funktioniert nicht?**  
+          Manche Links sind limitiert oder ablaufend – neue kommen bald!  
 
----
+          ---
 
-## **Haftungsausschluss**  
+          ## **Haftungsausschluss**  
 
-Wir sind **nicht mit ${GAME_NAME_CAPITALIZED}** oder seinen Entwicklern verbunden. Diese Seite hilft Spielern, kostenlose **${GAME_TYPE}** zu finden und das Spiel zu genießen.
-"
+          Wir sind **nicht mit ${GAME_NAME_CAPITALIZED}** oder seinen Entwicklern verbunden. Diese Seite hilft Spielern, kostenlose **${GAME_TYPE}** zu finden und das Spiel zu genießen."
 
           # Write content to files
           echo "$POST_CONTENT" > "$POST_FILE"
