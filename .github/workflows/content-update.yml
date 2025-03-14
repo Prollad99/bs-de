@@ -41,7 +41,8 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
+          restore-keys: |
+            ${{ runner.os }}-node-
 
       - name: Install dependencies
         run: npm ci
@@ -51,9 +52,8 @@ jobs:
 
       - name: Fetch and update links
         run: |
-          echo "Processing ${{ matrix.game }}..."
           mkdir -p logs # Ensure logs directory exists
-          node index-js/${{ matrix.game }}.js > logs/${{ matrix.game }}.log 2>&1 || echo "⚠️ Warning: Script for ${{ matrix.game }} failed, proceeding anyway"
+          node index-js/${{ matrix.game }}.js > logs/${{ matrix.game }}.log 2>&1 || echo "Script failed but continuing"
           echo "Contents of links-json/${{ matrix.game }}.json:"
           cat links-json/${{ matrix.game }}.json || echo "No links JSON found"
           echo "Contents of _includes/${{ matrix.game }}.html:"
@@ -87,83 +87,23 @@ jobs:
             ["wsop"]="Gratis Chips"
           )
 
-          GAME_NAME="${{ matrix.game }}"
+          GAME_NAME=${{ matrix.game }}
           GAME_NAME_CAPITALIZED=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
-          GAME_TYPE="${GAME_TYPES[$GAME_NAME]}"
-          CURRENT_DATE=$(date '+%d.%m.%Y %H:%M') # Added time for 30-minute updates
+          GAME_TYPE=${GAME_TYPES[$GAME_NAME]}
+          CURRENT_DATE=$(date +'%d.%m.%Y %H:%M') # Added time for 30-minute updates
 
           POST_FILE="_includes/${GAME_NAME}_post.html"
           FOOTER_FILE="_includes/${GAME_NAME}_footer.html"
 
-          # Updated POST_CONTENT with full content using heredoc
-          cat << EOF > "$POST_FILE"
-# ${GAME_NAME_CAPITALIZED} Gratis ${GAME_TYPE} – Dein Täglicher Bonus
+          # Updated POST_CONTENT with full content
+          POST_CONTENT="# ${GAME_NAME_CAPITALIZED} Gratis ${GAME_TYPE} – Dein Täglicher Bonus\n\nWillkommen bei deiner Quelle für **${GAME_NAME_CAPITALIZED} Gratis ${GAME_TYPE}**! Hier findest du alle 30 Minuten neue Links, um kostenlose ${GAME_TYPE} und Belohnungen zu sammeln – perfekt für deutsche Spieler.\n\n---\n\nBist du ein leidenschaftlicher **${GAME_NAME_CAPITALIZED}**-Spieler? Hier findest du alle 30 Minuten neue **Gratis ${GAME_TYPE}**-Links, um kostenlose Belohnungen zu sammeln – 100% sicher und gratis!\n\nKlicke einfach auf die Links unten, melde dich in deinem **${GAME_NAME_CAPITALIZED}**-Konto an und sichere dir deine **Gratis ${GAME_TYPE}** – sie sind sofort im Spiel verfügbar. Schau regelmäßig vorbei, da die Links schnell ablaufen!\n\n---\n\n## Aktuelle ${GAME_NAME_CAPITALIZED} ${GAME_TYPE} Links"
 
-Willkommen bei deiner Quelle für **${GAME_NAME_CAPITALIZED} Gratis ${GAME_TYPE}**! Hier findest du alle 30 Minuten neue Links, um kostenlose ${GAME_TYPE} und Belohnungen zu sammeln – perfekt für deutsche Spieler.
+          # Updated FOOTER_CONTENT to use consistent formatting
+          FOOTER_CONTENT="---\n\n## Was sind ${GAME_TYPE}-Links?\n\n**${GAME_TYPE}**-Links sind offizielle Belohnungen von den **${GAME_NAME_CAPITALIZED}**-Entwicklern. Sie bieten kostenlose **${GAME_TYPE}** wie Spins, Würfe, Credits oder spezielle Geschenke. Wir sammeln und prüfen diese Links alle 30 Minuten, damit du sie mühelos einlösen kannst.\n\n---\n\n## Warum diese Seite dein ${GAME_NAME_CAPITALIZED}-Begleiter ist\n\nWir helfen dir, in **${GAME_NAME_CAPITALIZED}** vorne zu bleiben:\n\n- **Updates alle 30 Minuten:** Neue **${GAME_TYPE}**-Links so schnell wie möglich (Stand: ${CURRENT_DATE}).\n- **100 % sicher:** Links direkt aus offiziellen **${GAME_NAME_CAPITALIZED}**-Quellen.\n- **Kostenlos:** Keine Gebühren, keine Anmeldung – nur Belohnungen!\n\n---\n\n## Profi-Tipps für mehr ${GAME_TYPE}\n\nMaximiere deine Gratis-Belohnungen mit diesen Tricks:\n\n- **Spins & Würfe sparen:** Nutze sie bei Events mit hohen Gewinnen.\n- **Münzen strategisch einsetzen:** Investiere klug, um schneller voranzukommen.\n- **Regelmäßig checken:** Links sind kurzlebig – sei schnell!\n\n---\n\n## Häufige Fragen zu ${GAME_TYPE}\n\n### Sind diese ${GAME_TYPE}-Links sicher?\n\nJa! Wir teilen ausschließlich Links, die direkt aus offiziellen **${GAME_NAME_CAPITALIZED}**-Aktionen stammen – sie sind völlig sicher und legitim.\n\n### Wie oft werden die Links aktualisiert?\n\nAlle 30 Minuten! Besuche uns regelmäßig für frische **${GAME_TYPE}**.\n\n### Was wenn ein Link nicht funktioniert?\n\nEinige Links haben eine begrenzte Anzahl an Einlösungen oder laufen schnell ab. Falls einer nicht funktioniert, keine Sorge – neue werden bald verfügbar sein!\n\n---\n\n## Haftungsausschluss\n\nWir sind **nicht mit ${GAME_NAME_CAPITALIZED}** oder seinen Entwicklern verbunden. Diese Seite hilft Spielern, kostenlose **${GAME_TYPE}** zu finden und das Spiel zu genießen."
 
----
-
-Bist du ein leidenschaftlicher **${GAME_NAME_CAPITALIZED}**-Spieler? Hier findest du alle 30 Minuten neue **Gratis ${GAME_TYPE}**-Links, um kostenlose Belohnungen zu sammeln – 100% sicher und gratis!
-
-Klicke einfach auf die Links unten, melde dich in deinem **${GAME_NAME_CAPITALIZED}**-Konto an und sichere dir deine **Gratis ${GAME_TYPE}** – sie sind sofort im Spiel verfügbar. Schau regelmäßig vorbei, da die Links schnell ablaufen!
-
----
-
-## Aktuelle ${GAME_NAME_CAPITALIZED} ${GAME_TYPE} Links
-EOF
-
-          # Updated FOOTER_CONTENT using heredoc
-          cat << EOF > "$FOOTER_FILE"
----
-
-## Was sind ${GAME_TYPE}-Links?
-
-**${GAME_TYPE}**-Links sind offizielle Belohnungen von den **${GAME_NAME_CAPITALIZED}**-Entwicklern. Sie bieten kostenlose **${GAME_TYPE}** wie Spins, Würfe, Credits oder spezielle Geschenke. Wir sammeln und prüfen diese Links alle 30 Minuten, damit du sie mühelos einlösen kannst.
-
----
-
-## Warum diese Seite dein ${GAME_NAME_CAPITALIZED}-Begleiter ist
-
-Wir helfen dir, in **${GAME_NAME_CAPITALIZED}** vorne zu bleiben:
-
-- **Updates alle 30 Minuten:** Neue **${GAME_TYPE}**-Links so schnell wie möglich (Stand: ${CURRENT_DATE}).
-- **100 % sicher:** Links direkt aus offiziellen **${GAME_NAME_CAPITALIZED}**-Quellen.
-- **Kostenlos:** Keine Gebühren, keine Anmeldung – nur Belohnungen!
-
----
-
-## Profi-Tipps für mehr ${GAME_TYPE}
-
-Maximiere deine Gratis-Belohnungen mit diesen Tricks:
-
-- **Spins & Würfe sparen:** Nutze sie bei Events mit hohen Gewinnen.
-- **Münzen strategisch einsetzen:** Investiere klug, um schneller voranzukommen.
-- **Regelmäßig checken:** Links sind kurzlebig – sei schnell!
-
----
-
-## Häufige Fragen zu ${GAME_TYPE}
-
-### Sind diese ${GAME_TYPE}-Links sicher?
-
-Ja! Wir teilen ausschließlich Links, die direkt aus offiziellen **${GAME_NAME_CAPITALIZED}**-Aktionen stammen – sie sind völlig sicher und legitim.
-
-### Wie oft werden die Links aktualisiert?
-
-Alle 30 Minuten! Besuche uns regelmäßig für frische **${GAME_TYPE}**.
-
-### Was wenn ein Link nicht funktioniert?
-
-Einige Links haben eine begrenzte Anzahl an Einlösungen oder laufen schnell ab. Falls einer nicht funktioniert, keine Sorge – neue werden bald verfügbar sein!
-
----
-
-## Haftungsausschluss
-
-Wir sind **nicht mit ${GAME_NAME_CAPITALIZED}** oder seinen Entwicklern verbunden. Diese Seite hilft Spielern, kostenlose **${GAME_TYPE}** zu finden und das Spiel zu genießen.
-EOF
-
-          echo "Generated content for ${GAME_NAME}"
+          # Write content to files
+          echo -e "$POST_CONTENT" > "$POST_FILE"
+          echo -e "$FOOTER_CONTENT" > "$FOOTER_FILE"
 
       - name: Configure Git
         run: |
