@@ -2,11 +2,11 @@ name: Update Links and Deployment
 
 on:
   schedule:
-    - cron: "*/30 * * * *" # Runs every 30 minutes
+    - cron: "*/30 * * * *"
   push:
     branches:
       - main
-  workflow_dispatch: # Added for manual triggering
+  workflow_dispatch:
 
 jobs:
   update-links:
@@ -52,17 +52,15 @@ jobs:
       - name: Fetch and update links
         run: |
           echo "Processing ${{ matrix.game }}..."
-          mkdir -p logs # Ensure logs directory exists
-          node index-js/${{ matrix.game }}.js > logs/${{ matrix.game }}.log 2>&1 || echo "⚠️ Warning: Script for ${{ matrix.game }} failed, proceeding anyway"
-          echo "Contents of links-json/${{ matrix.game }}.json:"
+          mkdir -p logs
+          node index-js/${{ matrix.game }}.js > logs/${{ matrix.game }}.log 2>&1 || echo "⚠️ Warning: Script failed, proceeding anyway"
           cat links-json/${{ matrix.game }}.json || echo "No links JSON found"
-          echo "Contents of _includes/${{ matrix.game }}.html:"
           cat _includes/${{ matrix.game }}.html || echo "No HTML include found"
 
       - name: Verify JSON integrity
         run: |
           if ! jq empty links-json/${{ matrix.game }}.json; then
-            echo "Invalid JSON detected in links-json/${{ matrix.game }}.json"
+            echo "Invalid JSON detected"
             exit 1
           fi
 
@@ -90,13 +88,12 @@ jobs:
           GAME_NAME="${{ matrix.game }}"
           GAME_NAME_CAPITALIZED=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
           GAME_TYPE="${GAME_TYPES[$GAME_NAME]}"
-          CURRENT_DATE=$(date '+%d.%m.%Y %H:%M') # Added time for 30-minute updates
+          CURRENT_DATE=$(date '+%d.%m.%Y %H:%M')
 
           POST_FILE="_includes/${GAME_NAME}_post.html"
           FOOTER_FILE="_includes/${GAME_NAME}_footer.html"
 
-          # Updated POST_CONTENT with full content using heredoc
-          cat << EOF > "$POST_FILE"
+          cat << 'EOF' > "$POST_FILE"
 # ${GAME_NAME_CAPITALIZED} Gratis ${GAME_TYPE} – Dein Täglicher Bonus
 
 Willkommen bei deiner Quelle für **${GAME_NAME_CAPITALIZED} Gratis ${GAME_TYPE}**! Hier findest du alle 30 Minuten neue Links, um kostenlose ${GAME_TYPE} und Belohnungen zu sammeln – perfekt für deutsche Spieler.
@@ -112,8 +109,7 @@ Klicke einfach auf die Links unten, melde dich in deinem **${GAME_NAME_CAPITALIZ
 ## Aktuelle ${GAME_NAME_CAPITALIZED} ${GAME_TYPE} Links
 EOF
 
-          # Updated FOOTER_CONTENT using heredoc
-          cat << EOF > "$FOOTER_FILE"
+          cat << 'EOF' > "$FOOTER_FILE"
 ---
 
 ## Was sind ${GAME_TYPE}-Links?
