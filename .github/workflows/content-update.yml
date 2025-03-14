@@ -6,7 +6,6 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch: # Added for manual triggering
 
 jobs:
   update-links:
@@ -125,17 +124,3 @@ jobs:
               sleep 5
             done || echo "❌ All push attempts failed for ${GAME_NAME}"
           fi
-
-      - name: Build Jekyll site
-        run: |
-          gem install bundler
-          bundle install
-          bundle exec jekyll build
-
-      - name: Deploy to GitHub Pages
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./_site
-          commit_message: "Deploy updated site with ${GAME_NAME} content"
