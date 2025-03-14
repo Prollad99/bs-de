@@ -1,15 +1,22 @@
 ---
 layout: post
-title: "House of Fun Free Coins"
-date: 2025-01-19
+title: "House of Fun Gratis Münzen – Links auf Deutsch"
+description: "Sichere dir täglich kostenlose House of Fun Münzen! Neue Gratis-Links für deutsche Spieler – 100% sicher und aktuell."
+date: 2025-03-14
 author: "BonusCollector"
-permalink: /house-of-fun-free-coins/
+permalink: /house-of-fun-gratis-muenzen/
+redirect_from: /house-of-fun-free-coins/
 image: /assets/images/house-of-fun.webp
+alt: "House of Fun Gratis Münzen Belohnung"
 include_file: house-of-fun.html
 manifest: /manifests/house-of-fun.json
-tags: [free coins for house of fun, free coins house of fun game, hof free coins]
+tags: 
+  - "house of fun gratis münzen"
+  - "house of fun kostenlose münzen"
+  - "house of fun tägliche links"
+  - "house of fun münzen gratis heute"
+  - "house of fun belohnungen gratis"
 ---
-
 {% include house-of-fun_post.html %}
 
 {% include house-of-fun.html %}
