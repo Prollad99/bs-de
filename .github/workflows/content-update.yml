@@ -105,6 +105,45 @@ jobs:
           echo -e "$POST_CONTENT" > "$POST_FILE"
           echo -e "$FOOTER_CONTENT" > "$FOOTER_FILE"
 
+      - name: Update last_modified in include_files.yml
+        run: |
+          # Current timestamp in the format YYYY-MM-DD HH:MM:SS
+          CURRENT_TIMESTAMP=$(TZ=America/Los_Angeles date +'%Y-%m-%d %H:%M:%S')
+
+          # File to update
+          INCLUDE_FILES="_data/include_files.yml"
+
+          # Check if the HTML file or JSON file has changed by comparing with the last committed version
+          HTML_FILE="_includes/${{ matrix.game }}.html"
+          JSON_FILE="links-json/${{ matrix.game }}.json"
+
+          # Get the last committed content (if any)
+          if git rev-parse --verify HEAD > /dev/null 2>&1; then
+            PREV_HTML_CONTENT=$(git show HEAD:$HTML_FILE 2>/dev/null || echo "")
+            PREV_JSON_CONTENT=$(git show HEAD:$JSON_FILE 2>/dev/null || echo "")
+          else
+            PREV_HTML_CONTENT=""
+            PREV_JSON_CONTENT=""
+          fi
+
+          # Current content
+          CURRENT_HTML_CONTENT=$(cat $HTML_FILE 2>/dev/null || echo "")
+          CURRENT_JSON_CONTENT=$(cat $JSON_FILE 2>/dev/null || echo "")
+
+          # Check if content has changed
+          if [ "$CURRENT_HTML_CONTENT" != "$PREV_HTML_CONTENT" ] || [ "$CURRENT_JSON_CONTENT" != "$PREV_JSON_CONTENT" ]; then
+            echo "Content changed for ${{ matrix.game }}. Updating last_modified in $INCLUDE_FILES."
+            # Use yq or sed to update the last_modified value
+            if command -v yq >/dev/null 2>&1; then
+              yq e ".${{ matrix.game }}.html.last_modified = \"$CURRENT_TIMESTAMP\"" -i $INCLUDE_FILES
+            else
+              # Fallback to sed if yq is not available
+              sed -i "s/\(${{ matrix.game }}.html:\s*last_modified: \).*/\1$CURRENT_TIMESTAMP/" $INCLUDE_FILES
+            fi
+          else
+            echo "No changes detected for ${{ matrix.game }}. Skipping update of last_modified."
+          fi
+
       - name: Configure Git
         run: |
           git config --global user.email "prolladmail@gmail.com"
@@ -114,11 +153,11 @@ jobs:
         env:
           ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
         run: |
-          git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.html _includes/${{ matrix.game }}_footer.html links-json/${{ matrix.game }}.json logs/${{ matrix.game }}.log
+          git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.html _includes/${{ matrix.game }}_footer.html links-json/${{ matrix.game }}.json logs/${{ matrix.game }}.log _data/include_files.yml
           if git diff --staged --quiet; then
             echo "No changes to commit for ${GAME_NAME}"
           else
-            git commit -m "Update ${GAME_NAME} links and content - $(date '+%Y-%m-%d %H:%M')"
+            git commit -m "Update ${GAME_NAME} links, content, and last_modified - $(date '+%Y-%m-%d %H:%M')"
             for i in {1..5}; do
               git pull --rebase && git push https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git && break
               echo "Attempt $i: Push failed, retrying in 5 seconds..."
