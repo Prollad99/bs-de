@@ -30,11 +30,13 @@ jobs:
       fail-fast: false
 
     steps:
+      # Step 1: Checkout the repository with full history to allow Git operations
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      # Step 2: Cache Node.js dependencies to speed up the workflow
       - name: Cache Node modules
         uses: actions/cache@v3
         with:
@@ -43,13 +45,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
+      # Step 3: Install Node.js dependencies
       - name: Install dependencies
         run: npm ci
 
+      # Step 4: Install Playwright browsers (required only for crazy-coin scraping)
       - name: Install Playwright browsers (only for crazy-coin)
         if: matrix.game == 'crazy-coin'
         run: npx playwright install --with-deps
 
+      # Step 5: Fetch and update links for the current game
       - name: Fetch and update links
         run: |
           mkdir -p logs # Ensure logs directory exists
@@ -59,6 +64,7 @@ jobs:
           echo "Contents of _includes/${{ matrix.game }}.html:"
           cat _includes/${{ matrix.game }}.html || echo "No HTML include found"
 
+      # Step 6: Verify the integrity of the generated JSON file
       - name: Verify JSON integrity
         run: |
           if ! jq empty links-json/${{ matrix.game }}.json; then
@@ -66,9 +72,14 @@ jobs:
             exit 1
           fi
 
+      # Step 7: Update the date in the Markdown file or create a new one if missing
       - name: Update date in Markdown file
         shell: bash
         run: |
+          # Enable debugging output for better troubleshooting
+          set -x
+
+          # Set variables
           GAME_NAME=${{ matrix.game }}
           CURRENT_DATE=$(TZ=America/Los_Angeles date +'%Y-%m-%d') # Format for front matter and filename (YYYY-MM-DD)
           
@@ -111,6 +122,8 @@ jobs:
               mv "$MARKDOWN_FILE" "$NEW_MARKDOWN_FILE"
               echo "Renamed $MARKDOWN_FILE to $NEW_MARKDOWN_FILE"
               MARKDOWN_FILE="$NEW_MARKDOWN_FILE"
+            else
+              echo "Date prefix already matches $CURRENT_DATE, no rename needed"
             fi
           else
             echo "Markdown file for $GAME_NAME not found in _posts, creating new file"
@@ -134,6 +147,10 @@ jobs:
               ["wsop"]="Gratis Chips"
             )
             GAME_TYPE=${GAME_TYPES[$GAME_NAME]}
+            if [ -z "$GAME_TYPE" ]; then
+              echo "Error: GAME_TYPE not found for $GAME_NAME"
+              exit 1
+            fi
             GAME_TYPE_LOWER=$(echo "$GAME_TYPE" | tr '[:upper:]' '[:lower:]')
             cat <<EOL > "$MARKDOWN_FILE"
 ---
@@ -161,6 +178,7 @@ EOL
             echo "Created $MARKDOWN_FILE"
           fi
 
+      # Step 8: Generate dynamic content for the game's post and footer
       - name: Generate dynamic content
         shell: bash
         run: |
@@ -200,11 +218,13 @@ EOL
           echo -e "$POST_CONTENT" > "$POST_FILE"
           echo -e "$FOOTER_CONTENT" > "$FOOTER_FILE"
 
+      # Step 9: Configure Git user for commits
       - name: Configure Git
         run: |
           git config --global user.email "prolladmail@gmail.com"
           git config --global user.name "Prollad99"
 
+      # Step 10: Commit and push changes to the repository
       - name: Commit and push changes
         env:
           ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
