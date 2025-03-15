@@ -104,8 +104,8 @@ layout: default
     <ul class="list-group fixed-height-scroll">
       {% assign sorted_posts = site.posts | sort: 'title' %}
       {% for post in sorted_posts %}
-        <li class="list-group-item">
-          <img src="{{ post.image | default: site.url }}/assets/images/default.webp" alt="{{ post.title }}" class="list-group-item-image" style="max-width: 40px;"/>
+        <li class="list-group-item d-flex align-items-center">
+          <img src="{{ post.image | default: '/assets/images/default.webp' | relative_url }}" alt="{{ post.title }}" class="list-group-item-image mr-2" style="max-width: 40px; max-height: 40px;"/>
           <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
         </li>
       {% endfor %}
