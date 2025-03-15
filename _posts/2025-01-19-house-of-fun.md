@@ -3,6 +3,8 @@ layout: post
 title: "House of Fun Gratis Münzen – Links auf Deutsch"
 description: "Sichere dir täglich kostenlose House of Fun Münzen! Neue Gratis-Links für deutsche Spieler – 100% sicher und aktuell."
 date: 2025-03-14
+game_name: ""House of Fun"
+game_type: "Gratis Münzen"
 author: "BonusCollector"
 permalink: /house-of-fun-gratis-muenzen/
 redirect_from: /house-of-fun-free-coins/
