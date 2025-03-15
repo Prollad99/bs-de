@@ -56,8 +56,8 @@ description: "Deine ultimative Quelle für tägliche Gratis-Belohnungen wie Spin
   </div>
 
   {% assign games = site.data.include_files | values %}
-  {% assign sorted_games = games | sort: "last_modified" | reverse %}
-  {% assign latest_game = sorted_games | first %}
+  {% assign games_with_modified = games | where: "last_modified", "" | sort: "last_modified" | reverse %}
+  {% assign latest_game = games_with_modified | first %}
   {% if latest_game and latest_game.last_modified %}
     {% assign latest_timestamp = latest_game.last_modified %}
     <p class="text-muted mt-3">
