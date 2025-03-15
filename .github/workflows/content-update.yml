@@ -73,6 +73,7 @@ jobs:
           fi
 
       # Step 7: Update the date in the Markdown file or create a new one if missing
+      # Fixed: Added missing EOL delimiter and added debugging with set -x
       - name: Update date in Markdown file
         shell: bash
         run: |
@@ -84,6 +85,7 @@ jobs:
           CURRENT_DATE=$(TZ=America/Los_Angeles date +'%Y-%m-%d') # Format for front matter and filename (YYYY-MM-DD)
           
           # Look for the Markdown file in _posts with the pattern *-game-name.md
+          # Fixed: Targets _posts directory instead of root (resolves pathspec error)
           MARKDOWN_FILE=$(ls _posts/*-${GAME_NAME}.md 2>/dev/null | head -n 1)
 
           if [ -n "$MARKDOWN_FILE" ]; then
