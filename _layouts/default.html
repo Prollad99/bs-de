@@ -149,13 +149,9 @@
   <nav aria-label="Brotkrümel">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="{{ site.baseurl }}/"><i class="bi bi-house-fill"></i> Startseite</a></li>
-      {% if page.categories %}
-        {% for category in page.categories %}
           <li class="breadcrumb-item">
             <a href="{{ site.baseurl }}/{{ category | downcase }}/">{{ category | replace: "-", " " | capitalize }}</a>
           </li>
-        {% endfor %}
-      {% endif %}
       <li class="breadcrumb-item active" aria-current="page">{{ page.title }}</li>
     </ol>
   </nav>
