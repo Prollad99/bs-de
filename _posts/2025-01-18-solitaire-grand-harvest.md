@@ -3,6 +3,8 @@ layout: post
 title: "Solitaire Grand Harvest Gratis Münzen – Links auf Deutsch"
 description: "Sichere dir täglich kostenlose Solitaire Grand Harvest Münzen! Neue Gratis-Links für deutsche Spieler – 100% sicher und aktuell."
 date: 2025-03-14
+game_name: "Solitaire Grand Harvest"
+game_type: "Gratis Münzen"
 author: "BonusCollector"
 permalink: /solitaire-grand-harvest-gratis-muenzen/
 redirect_from: /solitaire-grand-harvest-free-coins/
