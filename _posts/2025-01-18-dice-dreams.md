@@ -3,6 +3,8 @@ layout: post
 title: "Dice Dreams Gratis Würfe – Links auf Deutsch"
 description: "Sichere dir täglich kostenlose Dice Dreams Würfe! Neue Gratis-Links für deutsche Spieler – 100% sicher und aktuell."
 date: 2025-03-14
+game_name: "Dice Dreams"
+game_type: "Gratis Würfe"
 author: "BonusCollector"
 permalink: /dice-dreams-gratis-wuerfe/
 redirect_from: /dice-dreams-free-rolls/
