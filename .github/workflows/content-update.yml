@@ -105,6 +105,11 @@ jobs:
           echo -e "$POST_CONTENT" > "$POST_FILE"
           echo -e "$FOOTER_CONTENT" > "$FOOTER_FILE"
 
+      - name: Install yq
+        run: |
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.44.1/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+
       - name: Update last_modified in include_files.yml
         run: |
           # Current timestamp in the format YYYY-MM-DD HH:MM:SS
@@ -142,9 +147,12 @@ jobs:
             echo "Content changed for ${{ matrix.game }}. Updating last_modified in $INCLUDE_FILES."
             # Use yq to update the last_modified value, ensuring the key exists
             if command -v yq >/dev/null 2>&1; then
-              # Add the game key if it doesn't exist
-              yq e -i ".[\"${{ matrix.game }}.html\"] //= {}" $INCLUDE_FILES
-              yq e -i ".[\"${{ matrix.game }}.html\"].last_modified = \"$CURRENT_TIMESTAMP\"" $INCLUDE_FILES
+              # Check if the key exists, create it if not
+              if ! yq e ".[\"${{ matrix.game }}.html\"]" $INCLUDE_FILES > /dev/null 2>&1; then
+                yq e -i ". += {\"${{ matrix.game }}.html\": {\"last_modified\": \"$CURRENT_TIMESTAMP\"}}" $INCLUDE_FILES
+              else
+                yq e -i ".[\"${{ matrix.game }}.html\"].last_modified = \"$CURRENT_TIMESTAMP\"" $INCLUDE_FILES
+              fi
             else
               # Fallback to sed if yq is not available
               if grep -q "${{ matrix.game }}.html:" $INCLUDE_FILES; then
