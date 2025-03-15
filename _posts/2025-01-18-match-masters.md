@@ -3,6 +3,8 @@ layout: post
 title: "Match Masters Gratis Geschenke – Links auf Deutsch"
 description: "Sichere dir täglich kostenlose Match Masters Geschenke! Neue Gratis-Links für deutsche Spieler – 100% sicher und aktuell."
 date: 2025-03-14
+game_name: "Match Masters"
+game_type: "Gratis Geschenke"
 author: "BonusCollector"
 permalink: /match-masters-gratis-geschenke/
 redirect_from: /match-masters-free-gifts/
