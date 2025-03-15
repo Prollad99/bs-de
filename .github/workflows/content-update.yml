@@ -66,6 +66,43 @@ jobs:
             exit 1
           fi
 
+      - name: Update date in Markdown file
+        shell: bash
+        run: |
+          GAME_NAME=${{ matrix.game }}
+          CURRENT_DATE=$(TZ=America/Los_Angeles date +'%Y-%m-%d') # Format for front matter (YYYY-MM-DD)
+          MARKDOWN_FILE="${GAME_NAME}.md"
+
+          # Check if the Markdown file exists
+          if [ -f "$MARKDOWN_FILE" ]; then
+            # Read the existing front matter and content
+            FULL_CONTENT=$(cat "$MARKDOWN_FILE")
+            
+            # Check if the file has front matter (starts with ---)
+            if [[ $FULL_CONTENT =~ ^---[[:space:]]*[\n](.*)[\n]---[[:space:]]*[\n](.*)$ ]]; then
+              FRONT_MATTER="${BASH_REMATCH[1]}"
+              CONTENT="${BASH_REMATCH[2]}"
+              
+              # Update or add the date field in the front matter
+              if [[ $FRONT_MATTER =~ ^date:[[:space:]]*(.*)$ ]]; then
+                # Replace existing date
+                NEW_FRONT_MATTER=$(echo "$FRONT_MATTER" | sed "s/^date:.*/date: \"$CURRENT_DATE\"/")
+              else
+                # Add date field
+                NEW_FRONT_MATTER="$FRONT_MATTER\ndate: \"$CURRENT_DATE\""
+              fi
+              
+              # Write the updated file
+              echo -e "---\n$NEW_FRONT_MATTER\n---\n$CONTENT" > "$MARKDOWN_FILE"
+            else
+              # No front matter; add it with the date
+              echo -e "---\ndate: \"$CURRENT_DATE\"\n---\n$FULL_CONTENT" > "$MARKDOWN_FILE"
+            fi
+            echo "Updated date in $MARKDOWN_FILE to $CURRENT_DATE"
+          else
+            echo "Markdown file $MARKDOWN_FILE not found"
+          fi
+
       - name: Generate dynamic content
         shell: bash
         run: |
@@ -114,11 +151,11 @@ jobs:
         env:
           ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
         run: |
-          git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.html _includes/${{ matrix.game }}_footer.html links-json/${{ matrix.game }}.json logs/${{ matrix.game }}.log
+          git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.html _includes/${{ matrix.game }}_footer.html links-json/${{ matrix.game }}.json logs/${{ matrix.game }}.log ${{ matrix.game }}.md
           if git diff --staged --quiet; then
             echo "No changes to commit for ${GAME_NAME}"
           else
-            git commit -m "Update ${GAME_NAME} links and content - $(date '+%Y-%m-%d %H:%M')"
+            git commit -m "Update ${GAME_NAME} links, content, and date - $(date '+%Y-%m-%d %H:%M')"
             for i in {1..5}; do
               git pull --rebase && git push https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git && break
               echo "Attempt $i: Push failed, retrying in 5 seconds..."
