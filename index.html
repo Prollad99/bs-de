@@ -55,11 +55,11 @@ description: "Deine ultimative Quelle für tägliche Gratis-Belohnungen wie Spin
     {% endfor %}
   </div>
 
-  {% assign games = site.data.include_files %}
+  {% assign games = site.data.include_files | values %}
   {% assign sorted_games = games | sort: "last_modified" | reverse %}
   {% assign latest_game = sorted_games | first %}
-  {% if latest_game %}
-    {% assign latest_timestamp = latest_game[1].last_modified %}
+  {% if latest_game and latest_game.last_modified %}
+    {% assign latest_timestamp = latest_game.last_modified %}
     <p class="text-muted mt-3">
       Von <strong>BonusCollector</strong> | Zuletzt aktualisiert: <time datetime="{{ latest_timestamp | date_to_xmlschema }}" class="timeago">{{ latest_timestamp }}</time>
     </p>
