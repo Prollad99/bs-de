@@ -15,10 +15,10 @@ function getCurrentDate() {
 // Funktion, um das Datum im Format "MM-DD-YYYY" zu formatieren
 function formatDateCustom(dateString) {
   const date = new Date(dateString);
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Monat holen und mit 0 auffüllen, falls nötig
-  const day = String(date.getDate()).padStart(2, '0'); // Tag holen und mit 0 auffüllen, falls nötig
+  const day = String(date.getDate()).padStart(2, '0'); // Get day and pad with 0 if needed
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Get month and pad with 0 if needed
   const year = date.getFullYear();
-  return `${month}-${day}-${year}`; // Formatiertes Datum zurückgeben
+  return `${day}.${month}.${year}`; // Return formatted date as DD.MM.YYYY
 }
 
 const url = 'https://mosttechs.com/world-series-of-poker-free-chips/';
@@ -75,7 +75,7 @@ async function main() {
     combinedLinks.forEach(link => {
       const formattedDate = formatDateCustom(link.date); // Datum im Format MM-DD-YYYY formatieren
       htmlContent += `  <li class="list-group-item d-flex justify-content-between align-items-center">\n`;
-      htmlContent += `    <span>Free Chips ${formattedDate}</span>\n`; // Benutzerdefinierter Text mit formatiertem Datum
+      htmlContent += `    <span>Gratis Chips ${formattedDate}</span>\n`; // Benutzerdefinierter Text mit formatiertem Datum
       htmlContent += `    <a href="${link.href}" class="btn btn-primary btn-sm">Sammeln</a>\n`;
       htmlContent += `  </li>\n`;
     });
