@@ -3,6 +3,8 @@ layout: post
 title: "Huuuge Casino Gratis Chips – Links auf Deutsch"
 description: "Sichere dir täglich kostenlose Huuuge Casino Chips! Neue Gratis-Links für deutsche Spieler – 100% sicher und aktuell."
 date: 2025-03-14
+game_name: "Huuuge Casino"
+game_type: "Gratis Chips"
 author: "BonusCollector"
 permalink: /huuuge-casino-gratis-chips/
 redirect_from: /huuuge-casino-free-chips/
