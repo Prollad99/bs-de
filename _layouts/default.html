@@ -3,32 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>
-  {% if page.title %}
-    {% if page.layout == "post" %}
-      {% assign current_month = "now" | date: "%B" %}
-      {% assign current_year = "now" | date: "%Y" %}
-      {{ page.title }} {{ site.data.months.months[current_month] }} {{ current_year }} - {{ site.title }}
-    {% else %}
-      {{ page.title }} - {{ site.title }}
-    {% endif %}
-  {% elsif page.url == "/" or page.url == "/index.html" %}
-    {{ site.title }}
-  {% else %}
-    {{ site.title }}
-  {% endif %}
-</title>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-BNX1BVWWSF"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <title>{{ page.title }}</title>
 
-  gtag('config', 'G-BNX1BVWWSF');
-</script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9883001954705974"
-     crossorigin="anonymous"></script>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BNX1BVWWSF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-BNX1BVWWSF');
+  </script>
+
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9883001954705974" crossorigin="anonymous"></script>
 
   {% if page.manifest %}
     <link rel="manifest" href="{{ page.manifest }}">
@@ -48,14 +35,35 @@
       });
     }
   </script>
-{% if page.url == "/" %}
-  <link rel="canonical" href="https://bonuscollector.de/" />
-{% else %}
-  <link rel="canonical" href="https://bonuscollector.de{{ page.url | replace:'index.html','' }}" />
-{% endif %}
-  <!-- Meta-Tags -->
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://bonuscollector.de{{ page.url | replace:'index.html','' | replace:'/index/','/' }}" />
+
+  <!-- Meta Description -->
+  {% if page.description %}
+    <meta name="description" content="{{ page.description }}">
+  {% endif %}
+
+  <!-- Hreflang Tag -->
+  <link rel="alternate" href="https://bonuscollector.de{{ page.url | replace:'index.html','' | replace:'/index/','/' }}" hreflang="de-de" />
+
+  <!-- Open Graph Tags -->
   <meta property="og:url" content="{{ page.url | absolute_url }}">
-  <meta property="og:type" content="website">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="{{ page.title }}">
+  {% if page.description %}
+    <meta property="og:description" content="{{ page.description }}">
+  {% endif %}
+  <meta property="og:image" content="{{ site.url }}/assets/images/{{ page.game | default: 'default' }}.webp">
+  <meta property="og:locale" content="de_DE">
+
+  <!-- Twitter Card Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ page.title }}">
+  {% if page.description %}
+    <meta name="twitter:description" content="{{ page.description }}">
+  {% endif %}
+  <meta name="twitter:image" content="{{ site.url }}/assets/images/{{ page.game | default: 'default' }}.webp">
 
   <!-- Styles und Icons -->
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
@@ -63,6 +71,51 @@
   <link rel="stylesheet" href="{{ '/assets/css/styles.css' | relative_url }}">
   <link rel="icon" href="{{ site.baseurl }}/assets/favicon.ico" type="image/x-icon">
 
+  <!-- Schema Markup -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "{{ page.title }}",
+      "datePublished": "{{ page.date | date_to_xmlschema }}",
+      "dateModified": "{{ page.date | date_to_xmlschema }}",
+      "author": {"@type": "Person", "name": "{{ page.author | default: 'BonusCollector' }}"},
+      "description": "{{ page.description }}",
+      "publisher": {"@type": "Organization", "name": "bonuscollector.de"}
+    }
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Sind diese {{ page.game_type | default: 'Gratis Spins' }}-Links sicher?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ja! Wir teilen ausschließlich Links, die direkt aus offiziellen {{ page.game_name | default: 'Coin Master' }}-Aktionen stammen – sie sind völlig sicher und legitim."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Wie oft werden die Links aktualisiert?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Täglich! Besuche uns regelmäßig für frische {{ page.game_type | default: 'Gratis Spins' }}."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Was wenn ein Link nicht funktioniert?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Einige Links haben eine begrenzte Anzahl an Einlösungen oder laufen schnell ab. Falls einer nicht funktioniert, keine Sorge – neue werden bald verfügbar sein!"
+          }
+        }
+      ]
+    }
+  </script>
 </head>
 <body>
   <header>
@@ -157,7 +210,7 @@
 
   <footer class="bg-primary text-white py-4">
     <div class="container text-center">
-      <p>&copy; {{ site.time | date: "%Y" }} | <a href="{{ site.baseurl }}/" class="text-white"><b>BonusCollector</b></a>. Alle Rechte vorbehalten.</p>
+      <p>© {{ site.time | date: "%Y" }} | <a href="{{ site.baseurl }}/" class="text-white"><b>BonusCollector</b></a>. Alle Rechte vorbehalten.</p>
       <p>
         <a href="{{ site.baseurl }}/uber-uns/" class="text-white"><i class="bi bi-file-person"></i> Über uns</a> |
         <a href="{{ site.baseurl }}/kontakt/" class="text-white"><i class="bi bi-person-lines-fill"></i> Kontakt</a> |
