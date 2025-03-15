@@ -79,9 +79,11 @@
       "@type": "Article",
       "headline": "{{ page.title | default: site.title }}",
       {% if page.game %}
-        {% assign include_file = site.data.include_files[page.game] %}
+        {% capture game_key %}{{ page.game }}{% endcapture %}
+        {% assign include_file = site.data.include_files[game_key] %}
         {% if include_file == nil %}
-          {% assign include_file = site.data.include_files[page.game | append: '.html'] %}
+          {% capture game_key_with_html %}{{ page.game | append: '.html' }}{% endcapture %}
+          {% assign include_file = site.data.include_files[game_key_with_html] %}
         {% endif %}
         {% if include_file and include_file.last_modified %}
           "datePublished": "{{ include_file.last_modified | date_to_xmlschema }}",
