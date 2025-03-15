@@ -2,9 +2,6 @@
 layout: post
 title: "Coin Master Gratis Spins – Links auf Deutsch"
 description: "Sichere dir täglich kostenlose Coin Master Spins! Neue Gratis-Links für deutsche Spieler – 100% sicher und aktuell."
-date: 2025-03-14
-game_name: "Coin Master"
-game_type: "Gratis Spins"
 author: "BonusCollector"
 permalink: /coin-master-gratis-spins/
 redirect_from: /coin-master-free-spin/
