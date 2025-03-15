@@ -79,7 +79,10 @@
       "@type": "Article",
       "headline": "{{ page.title | default: site.title }}",
       {% if page.game %}
-        {% assign include_file = site.data.include_files[page.game] | default: site.data.include_files[page.game | append: '.html'] %}
+        {% assign include_file = site.data.include_files[page.game] %}
+        {% if include_file == nil %}
+          {% assign include_file = site.data.include_files[page.game | append: '.html'] %}
+        {% endif %}
         {% if include_file and include_file.last_modified %}
           "datePublished": "{{ include_file.last_modified | date_to_xmlschema }}",
           "dateModified": "{{ include_file.last_modified | date_to_xmlschema }}",
