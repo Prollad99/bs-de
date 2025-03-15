@@ -3,6 +3,8 @@ layout: post
 title: "Slotomania Gratis Münzen – Links auf Deutsch"
 description: "Sichere dir täglich kostenlose Slotomania Münzen! Neue Gratis-Links für deutsche Spieler – 100% sicher und aktuell."
 date: 2025-03-14
+game_name: "Slotomania"
+game_type: "Gratis Münzen"
 author: "BonusCollector"
 permalink: /slotomania-gratis-muenzen/
 redirect_from: /slotomania-free-coins/
