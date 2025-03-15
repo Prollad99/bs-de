@@ -3,6 +3,8 @@ layout: post
 title: "Monopoly Go Gratis Würfel – Links auf Deutsch"
 description: "Sichere dir täglich kostenlose Monopoly Go Würfel! Neue Gratis-Links für deutsche Spieler – 100% sicher und aktuell."
 date: 2025-03-14
+game_name: "Monopoly Go"
+game_type: "Gratis Würfel"
 author: "BonusCollector"
 permalink: /monopoly-go-wurfel/
 image: /assets/images/monopoly-go.webp
