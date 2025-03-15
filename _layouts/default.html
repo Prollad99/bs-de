@@ -77,8 +77,8 @@
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "{{ page.title }}",
-      "datePublished": "{{ page.date | date_to_xmlschema }}",
-      "dateModified": "{{ page.date | date_to_xmlschema }}",
+      "datePublished": "{{ page.date | default: site.time | date_to_xmlschema }}",
+      "dateModified": "{{ page.date | default: site.time | date_to_xmlschema }}",
       "author": {"@type": "Person", "name": "{{ page.author | default: 'BonusCollector' }}"},
       "description": "{{ page.description }}",
       "publisher": {"@type": "Organization", "name": "bonuscollector.de"}
