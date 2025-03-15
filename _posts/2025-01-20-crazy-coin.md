@@ -3,6 +3,8 @@ layout: post
 title: "Crazy Coin Gratis Spins – Links auf Deutsch"
 description: "Sichere dir täglich kostenlose Crazy Coin Spins! Neue Gratis-Links für deutsche Spieler – 100% sicher und aktuell."
 date: 2025-03-14
+game_name: "Crazy Coin"
+game_type: "Gratis Spins"
 author: "BonusCollector"
 permalink: /crazy-coin-gratis-spins/
 redirect_from: /crazy-coin-free-spins/
