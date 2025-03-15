@@ -18,6 +18,8 @@ collections:
 permalink: pretty
 
 # SEO and Social Media Settings
+twitter_username: BonusCollectorDE
+facebook_username: BonusCollectorDE
 google_analytics: G-BNX1BVWWSF
 
 # Default Front Matter for Pages
@@ -27,7 +29,6 @@ defaults:
     values:
       layout: default
       author: "BonusCollector"
-      date: "{{ site.time | date_to_xmlschema }}"
       image: "/assets/images/default.webp"
       game_name: "BonusCollector"
       game_type: "Gratis Belohnungen"
