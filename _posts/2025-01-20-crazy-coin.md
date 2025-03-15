@@ -1,15 +1,22 @@
 ---
 layout: post
-title: "Crazy Coin Free Spins Link Deutsch"
-date: 2025-01-20
+title: "Crazy Coin Gratis Spins – Links auf Deutsch"
+description: "Sichere dir täglich kostenlose Crazy Coin Spins! Neue Gratis-Links für deutsche Spieler – 100% sicher und aktuell."
+date: 2025-03-14
 author: "BonusCollector"
-permalink: /crazy-coin-free-spins/
+permalink: /crazy-coin-gratis-spins/
+redirect_from: /crazy-coin-free-spins/
 image: /assets/images/crazy-coin.webp
+alt: "Crazy Coin Gratis Spins Belohnung"
 include_file: crazy-coin.html
 manifest: /manifests/crazy-coin.json
-tags: [crazy coin free spins gratis, free spins crazy coin, crazy coin codes]
+tags: 
+  - "crazy coin gratis spins"
+  - "crazy coin kostenlose spins"
+  - "crazy coin tägliche links"
+  - "crazy coin spins gratis heute"
+  - "crazy coin belohnungen gratis"
 ---
-
 {% include crazy-coin_post.html %}
 
 {% include crazy-coin.html %}
