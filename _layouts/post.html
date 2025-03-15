@@ -6,32 +6,20 @@ layout: default
   <div class="card-body">
 
     <p class="card-subtitle text-muted mb-3">
-  Von <strong>{{ page.author }}</strong> | 
-  {% assign include_file = page.include_file | prepend: "_includes/" %}
-  {% if site.data.include_files[page.include_file].last_modified %}
-    Zuletzt aktualisiert: 
-    <strong id="last-updated" data-last-modified="{{ site.data.include_files[page.include_file].last_modified | date: "%Y-%m-%dT%H:%M:%SZ" }}">
-      {% assign last_modified = site.data.include_files[page.include_file].last_modified %}
-      {% assign day = last_modified | date: "%d" %}
-      {% assign month = last_modified | date: "%B" %}
-      {% assign year = last_modified | date: "%Y" %}
-      {{ day }}. {{ site.data.months.months[month] }} {{ year }}
-    </strong>
-  {% else %}
-    Zuletzt aktualisiert: 
-    <strong>
-      {% assign day = page.last_modified_at | date: "%d" %}
-      {% assign month = page.last_modified_at | date: "%B" %}
-      {% assign year = page.last_modified_at | date: "%Y" %}
-      {{ day }}. {{ site.data.months.months[month] }} {{ year }}
-    </strong>
-  {% endif %}
-</p>
+      Von <strong>{{ page.author | default: 'BonusCollector' }}</strong> |
+      {% assign include_file = page.include_file %}
+      {% assign file_info = site.data.include_files[include_file] %}
+      {% if file_info and file_info.last_modified %}
+        Zuletzt aktualisiert: <time datetime="{{ file_info.last_modified | date_to_xmlschema }}" class="timeago">{{ file_info.last_modified }}</time>
+      {% else %}
+        Zuletzt aktualisiert: <time datetime="{{ page.last_modified_at | default: site.time | date_to_xmlschema }}" class="timeago">{{ page.last_modified_at | default: site.time }}</time>
+      {% endif %}
+    </p>
 
     {% if page.title %}
     <!-- App-Installationsbereich -->
     <div class="d-flex align-items-center mb-3 mt-3 p-2 border rounded" style="background-color: #f8f9fa;">
-      <img src="{{ page.app_logo | default: '/assets/icons/icon-512x512.png' }}" alt="{{ page.alt }} Logo" class="mr-2" style="max-width: 40px;">
+      <img src="{{ page.app_logo | default: '/assets/icons/icon-512x512.png' }}" alt="{{ page.alt | default: page.title }} Logo" class="mr-2" style="max-width: 40px;">
       <div class="flex-grow-1">
         <span class="font-weight-bold mb-0">{{ page.title }}</span>
       </div>
@@ -117,8 +105,8 @@ layout: default
       {% assign sorted_posts = site.posts | sort: 'title' %}
       {% for post in sorted_posts %}
         <li class="list-group-item">
-          <img src="{{ post.image }}" alt="{{ post.title }}" class="list-group-item-image"/>
-          <a href="{{ post.url }}">{{ post.title }}</a>
+          <img src="{{ post.image | default: site.url }}/assets/images/default.webp" alt="{{ post.title }}" class="list-group-item-image" style="max-width: 40px;"/>
+          <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
         </li>
       {% endfor %}
     </ul>
@@ -146,16 +134,6 @@ layout: default
           });
         });
       });
-
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('{{ site.baseurl }}/assets/sw.js')
-        .then(registration => {
-          console.log('Service Worker registriert mit Scope:', registration.scope);
-        })
-        .catch(error => {
-          console.log('Service Worker-Registrierung fehlgeschlagen:', error);
-        });
-      }
     </script>
 
   </div>
