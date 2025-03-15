@@ -70,11 +70,15 @@ jobs:
         shell: bash
         run: |
           GAME_NAME=${{ matrix.game }}
-          CURRENT_DATE=$(TZ=America/Los_Angeles date +'%Y-%m-%d') # Format for front matter (YYYY-MM-DD)
-          MARKDOWN_FILE="${GAME_NAME}.md"
+          CURRENT_DATE=$(TZ=America/Los_Angeles date +'%Y-%m-%d') # Format for front matter and filename (YYYY-MM-DD)
+          
+          # Look for the Markdown file in _posts with the pattern *-game-name.md
+          MARKDOWN_FILE=$(ls _posts/*-${GAME_NAME}.md 2>/dev/null | head -n 1)
 
-          # Check if the Markdown file exists
-          if [ -f "$MARKDOWN_FILE" ]; then
+          if [ -n "$MARKDOWN_FILE" ]; then
+            # Extract the current date prefix from the filename (e.g., 2025-01-16)
+            CURRENT_DATE_PREFIX=$(basename "$MARKDOWN_FILE" | grep -oE '^[0-9]{4}-[0-9]{2}-[0-9]{2}')
+
             # Read the existing front matter and content
             FULL_CONTENT=$(cat "$MARKDOWN_FILE")
             
@@ -92,15 +96,69 @@ jobs:
                 NEW_FRONT_MATTER="$FRONT_MATTER\ndate: \"$CURRENT_DATE\""
               fi
               
-              # Write the updated file
+              # Write the updated content back to the file
               echo -e "---\n$NEW_FRONT_MATTER\n---\n$CONTENT" > "$MARKDOWN_FILE"
+              echo "Updated date in $MARKDOWN_FILE to $CURRENT_DATE"
             else
               # No front matter; add it with the date
               echo -e "---\ndate: \"$CURRENT_DATE\"\n---\n$FULL_CONTENT" > "$MARKDOWN_FILE"
+              echo "Added front matter with date in $MARKDOWN_FILE"
             fi
-            echo "Updated date in $MARKDOWN_FILE to $CURRENT_DATE"
+
+            # Rename the file if the date prefix doesn't match the current date
+            if [ "$CURRENT_DATE_PREFIX" != "$CURRENT_DATE" ]; then
+              NEW_MARKDOWN_FILE="_posts/${CURRENT_DATE}-${GAME_NAME}.md"
+              mv "$MARKDOWN_FILE" "$NEW_MARKDOWN_FILE"
+              echo "Renamed $MARKDOWN_FILE to $NEW_MARKDOWN_FILE"
+              MARKDOWN_FILE="$NEW_MARKDOWN_FILE"
+            fi
           else
-            echo "Markdown file $MARKDOWN_FILE not found"
+            echo "Markdown file for $GAME_NAME not found in _posts, creating new file"
+            MARKDOWN_FILE="_posts/${CURRENT_DATE}-${GAME_NAME}.md"
+            GAME_NAME_CAPITALIZED=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
+            declare -A GAME_TYPES
+            GAME_TYPES=(
+              ["bingo-bash"]="Gratis Chips"
+              ["bingo-blitz"]="Gratis Credits"
+              ["coin-master"]="Gratis Spins"
+              ["crazy-coin"]="Gratis Spins"
+              ["dice-dreams"]="Gratis Würfe"
+              ["gametwist"]="Gratis Münzen"
+              ["house-of-fun"]="Gratis Münzen"
+              ["huuuge-casino"]="Gratis Chips"
+              ["match-masters"]="Gratis Geschenke"
+              ["monopoly-go"]="Würfel"
+              ["slotomania"]="Gratis Münzen"
+              ["slotpark"]="Bonuscode"
+              ["solitaire-grand-harvest"]="Gratis Münzen"
+              ["wsop"]="Gratis Chips"
+            )
+            GAME_TYPE=${GAME_TYPES[$GAME_NAME]}
+            GAME_TYPE_LOWER=$(echo "$GAME_TYPE" | tr '[:upper:]' '[:lower:]')
+            cat <<EOL > "$MARKDOWN_FILE"
+---
+title: "${GAME_NAME_CAPITALIZED} ${GAME_TYPE} – Links auf Deutsch"
+description: "Sichere dir täglich bis zu 100 kostenlose ${GAME_NAME_CAPITALIZED} ${GAME_TYPE}! Neue Gratis-Links für deutsche Spieler – 100% sicher und aktuell."
+date: "$CURRENT_DATE"
+permalink: /${GAME_NAME}-${GAME_TYPE_LOWER}-links/
+image: /assets/images/${GAME_NAME}.webp
+alt: "${GAME_NAME_CAPITALIZED} ${GAME_TYPE} Belohnung"
+manifest: /manifests/${GAME_NAME}.json
+tags:
+  - "${GAME_NAME} ${GAME_TYPE_LOWER}"
+  - "${GAME_NAME} kostenlose ${GAME_TYPE_LOWER}"
+  - "${GAME_NAME} tägliche links"
+  - "${GAME_NAME} ${GAME_TYPE_LOWER} heute"
+  - "${GAME_NAME} belohnungen gratis"
+  - "${GAME_NAME} ${GAME_TYPE_LOWER} 2025"
+---
+{% include ${GAME_NAME}_post.html %}
+
+{% include ${GAME_NAME}.html %}
+
+{% include ${GAME_NAME}_footer.html %}
+EOL
+            echo "Created $MARKDOWN_FILE"
           fi
 
       - name: Generate dynamic content
@@ -151,14 +209,40 @@ jobs:
         env:
           ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
         run: |
-          git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.html _includes/${{ matrix.game }}_footer.html links-json/${{ matrix.game }}.json logs/${{ matrix.game }}.log ${{ matrix.game }}.md
-          if git diff --staged --quiet; then
-            echo "No changes to commit for ${GAME_NAME}"
+          # Add files that always exist
+          git add _includes/${{ matrix.game }}.html _includes/${{ matrix.game }}_post.html _includes/${{ matrix.game }}_footer.html links-json/${{ matrix.game }}.json logs/${{ matrix.game }}.log
+
+          # Conditionally add the Markdown file if it exists
+          CURRENT_DATE=$(TZ=America/Los_Angeles date +'%Y-%m-%d')
+          MARKDOWN_FILE=$(ls _posts/*-${{ matrix.game }}.md 2>/dev/null | head -n 1)
+          if [ -n "$MARKDOWN_FILE" ]; then
+            git add "$MARKDOWN_FILE"
+            echo "Added $MARKDOWN_FILE to staging"
+            # If the file was renamed, add the new file as well
+            NEW_MARKDOWN_FILE="_posts/${CURRENT_DATE}-${{ matrix.game }}.md"
+            if [ "$MARKDOWN_FILE" != "$NEW_MARKDOWN_FILE" ] && [ -f "$NEW_MARKDOWN_FILE" ]; then
+              git add "$NEW_MARKDOWN_FILE"
+              echo "Added renamed file $NEW_MARKDOWN_FILE to staging"
+            fi
           else
-            git commit -m "Update ${GAME_NAME} links, content, and date - $(date '+%Y-%m-%d %H:%M')"
+            # If the file was created, add it
+            NEW_MARKDOWN_FILE="_posts/${CURRENT_DATE}-${{ matrix.game }}.md"
+            if [ -f "$NEW_MARKDOWN_FILE" ]; then
+              git add "$NEW_MARKDOWN_FILE"
+              echo "Added newly created $NEW_MARKDOWN_FILE to staging"
+            else
+              echo "Markdown file for ${{ matrix.game }} not found, skipping git add"
+            fi
+          fi
+
+          # Commit and push if there are changes
+          if git diff --staged --quiet; then
+            echo "No changes to commit for ${{ matrix.game }}"
+          else
+            git commit -m "Update ${{ matrix.game }} links, content, and date - $(date '+%Y-%m-%d %H:%M')"
             for i in {1..5}; do
               git pull --rebase && git push https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/Prollad99/bs-de.git && break
               echo "Attempt $i: Push failed, retrying in 5 seconds..."
               sleep 5
-            done || echo "❌ All push attempts failed for ${GAME_NAME}"
+            done || echo "❌ All push attempts failed for ${{ matrix.game }}"
           fi
