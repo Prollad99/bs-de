@@ -3,6 +3,8 @@ layout: post
 title: "Bingo Bash Gratis Chips – Links auf Deutsch"
 description: "Sichere dir täglich kostenlose Bingo Bash Chips! Neue Gratis-Links für deutsche Spieler – 100% sicher und aktuell."
 date: 2025-03-14
+game_name: ""Bingo Bash"
+game_type: "Gratis Chips"
 author: "BonusCollector"
 permalink: /bingo-bash-gratis-chips/
 redirect_from: /bingo-bash-free-chips/
