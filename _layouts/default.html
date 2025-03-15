@@ -161,9 +161,6 @@
   <nav aria-label="Brotkrümel">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="{{ site.baseurl }}/"><i class="bi bi-house-fill"></i> Startseite</a></li>
-          <li class="breadcrumb-item">
-            <a href="{{ site.baseurl }}/{{ category | downcase }}/">{{ category | replace: "-", " " | capitalize }}</a>
-          </li>
       <li class="breadcrumb-item active" aria-current="page">{{ page.title | default: site.title }}</li>
     </ol>
   </nav>
