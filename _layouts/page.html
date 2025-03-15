@@ -8,15 +8,13 @@ layout: default
 
     <!-- Autor und zuletzt aktualisiertes Datum -->
     <p class="card-subtitle text-muted mb-3">
-  Von <strong>{{ page.author }}</strong> | 
-  Zuletzt aktualisiert: 
-  <strong>
-    {% assign day = page.last_modified_at | date: "%d" %}
-    {% assign month = page.last_modified_at | date: "%B" %}
-    {% assign year = page.last_modified_at | date: "%Y" %}
-    {{ day }}. {{ site.data.months.months[month] }} {{ year }}
-  </strong>
-</p>
+      Von <strong>{{ page.author | default: 'BonusCollector' }}</strong> |
+      {% if page.include_file and site.data.include_files[page.include_file] and site.data.include_files[page.include_file].last_modified %}
+        Zuletzt aktualisiert: <time datetime="{{ site.data.include_files[page.include_file].last_modified | date_to_xmlschema }}" class="timeago">{{ site.data.include_files[page.include_file].last_modified }}</time>
+      {% else %}
+        Zuletzt aktualisiert: <time datetime="{{ page.last_modified_at | default: site.time | date_to_xmlschema }}" class="timeago">{{ page.last_modified_at | default: site.time }}</time>
+      {% endif %}
+    </p>
 
     <div class="card-text">{{ content }}</div>
   </div>
