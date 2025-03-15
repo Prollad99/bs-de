@@ -14,10 +14,10 @@ function getCurrentDate() {
 // Function to format the date in "MM-DD-YYYY" format
 function formatDateCustom(dateString) {
   const date = new Date(dateString);
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, '0'); // Get day and pad with 0 if needed
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Get month and pad with 0 if needed
   const year = date.getFullYear();
-  return `${month}-${day}-${year}`;
+  return `${day}.${month}.${year}`; // Return formatted date as DD.MM.YYYY
 }
 
 const url = "https://dmartgroup.com/get_data.php?show=OUYOSU";
