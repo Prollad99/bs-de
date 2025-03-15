@@ -89,7 +89,7 @@ async function main() {
     combinedLinks.forEach((link) => {
       const formattedDate = formatDateCustom(link.date);
       htmlContent += `  <li class="list-group-item d-flex justify-content-between align-items-center">\n`;
-      htmlContent += `    <span>Free Spins ${formattedDate}</span>\n`;
+      htmlContent += `    <span>Gratis Spins ${formattedDate}</span>\n`;
       htmlContent += `    <a href="${link.href}" class="btn btn-primary btn-sm">Sammeln</a>\n`;
       htmlContent += `  </li>\n`;
     });
