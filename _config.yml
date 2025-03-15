@@ -1,12 +1,8 @@
 title: "BonusCollector"
-description: "Deine Quelle für tägliche Gratis-Belohnungen! Sichere dir kostenlose Spins, Chips und Münzen für Coin Master, Bingo Bash und viele weitere Spiele – 100% sicher und aktuell."
-
+description: "Deine ultimative Quelle für tägliche Gratis-Belohnungen wie Spins, Chips und Credits für deine Lieblingsspiele – 100% sicher und kostenlos!"
 baseurl: ""
 url: "https://bonuscollector.de"
-
-locale: "de_DE"
-
-timezone: "America/Los_Angeles"
+locale: "de"
 
 markdown: kramdown
 
@@ -14,9 +10,6 @@ plugins:
   - jekyll-sitemap
   - jekyll-last-modified-at
   - jekyll-redirect-from
-  - jekyll-seo-tag
-  - jekyll-feed
-  - jekyll-compress-html
 
 collections:
   pages:
@@ -24,90 +17,27 @@ collections:
 
 permalink: pretty
 
-compress_html:
-  clippings: all
-  comments: ["<!-- ", " -->"]
-  endings: all
-  ignore:
-    envs: [development]
-  blanklines: false
-  profile: false
-  startings: []
+# SEO and Social Media Settings
+google_analytics: G-BNX1BVWWSF
 
+# Default Front Matter for Pages
 defaults:
   - scope:
       path: ""
-      type: "pages"
     values:
-      layout: "default"
+      layout: default
       author: "BonusCollector"
-  - scope:
-      path: "coin-master"
-    values:
-      game_name: "Coin Master"
-      game_type: "Gratis Spins"
-  - scope:
-      path: "bingo-bash"
-    values:
-      game_name: "Bingo Bash"
-      game_type: "Gratis Chips"
-  - scope:
-      path: "bingo-blitz"
-    values:
-      game_name: "Bingo Blitz"
-      game_type: "Gratis Credits"
-  - scope:
-      path: "crazy-coin"
-    values:
-      game_name: "Crazy Coin"
-      game_type: "Gratis Spins"
-  - scope:
-      path: "dice-dreams"
-    values:
-      game_name: "Dice Dreams"
-      game_type: "Gratis Würfe"
-  - scope:
-      path: "gametwist"
-    values:
-      game_name: "Gametwist"
-      game_type: "Gratis Münzen"
-  - scope:
-      path: "house-of-fun"
-    values:
-      game_name: "House of Fun"
-      game_type: "Gratis Münzen"
-  - scope:
-      path: "huuuge-casino"
-    values:
-      game_name: "Huuuge Casino"
-      game_type: "Gratis Chips"
-  - scope:
-      path: "match-masters"
-    values:
-      game_name: "Match Masters"
-      game_type: "Gratis Geschenke"
-  - scope:
-      path: "monopoly-go"
-    values:
-      game_name: "Monopoly Go"
-      game_type: "Würfel"
-  - scope:
-      path: "slotomania"
-    values:
-      game_name: "Slotomania"
-      game_type: "Gratis Münzen"
-  - scope:
-      path: "slotpark"
-    values:
-      game_name: "Slotpark"
-      game_type: "Bonuscode"
-  - scope:
-      path: "solitaire-grand-harvest"
-    values:
-      game_name: "Solitaire Grand Harvest"
-      game_type: "Gratis Münzen"
-  - scope:
-      path: "wsop"
-    values:
-      game_name: "WSOP"
-      game_type: "Gratis Chips"
+      date: "{{ site.time | date_to_xmlschema }}"
+      image: "/assets/images/default.webp"
+      game_name: "BonusCollector"
+      game_type: "Gratis Belohnungen"
+
+# Exclude Files
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - README.md
+  - package.json
+  - package-lock.json
