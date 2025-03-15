@@ -90,7 +90,7 @@ jobs:
           GAME_NAME=${{ matrix.game }}
           GAME_NAME_CAPITALIZED=$(echo "$GAME_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
           GAME_TYPE=${GAME_TYPES[$GAME_NAME]}
-          CURRENT_DATE=$(TZ=America/Los_Angeles date +'%d.%m.%Y') # Removed time, only date
+          CURRENT_DATE=$(TZ=America/Los_Angeles date +'%d.%m.%Y') # Date only for content
 
           POST_FILE="_includes/${GAME_NAME}_post.html"
           FOOTER_FILE="_includes/${GAME_NAME}_footer.html"
@@ -98,7 +98,7 @@ jobs:
           # Updated H1 for better SEO
           POST_CONTENT="# Tägliche ${GAME_NAME_CAPITALIZED} Gratis ${GAME_TYPE} – Jetzt Sammeln!\n\nWillkommen bei deiner Quelle für **${GAME_NAME_CAPITALIZED} Gratis ${GAME_TYPE}**! Hier findest du täglich neue Links, um kostenlose ${GAME_TYPE} und Belohnungen zu sammeln – perfekt für deutsche Spieler.\n\n---\n\nBist du ein leidenschaftlicher **${GAME_NAME_CAPITALIZED}**-Spieler? Hier findest du täglich neue **Gratis ${GAME_TYPE}**-Links, um kostenlose Belohnungen zu sammeln – 100% sicher und gratis!\n\nKlicke einfach auf die Links unten, melde dich in deinem **${GAME_NAME_CAPITALIZED}**-Konto an und sichere dir deine **Gratis ${GAME_TYPE}** – sie sind sofort im Spiel verfügbar. Schau täglich vorbei, da die Links schnell ablaufen!\n\n---\n\n## Aktuelle ${GAME_NAME_CAPITALIZED} ${GAME_TYPE} Links"
 
-          # Updated FOOTER_CONTENT with new section and internal links, removed time from Stand
+          # Updated FOOTER_CONTENT with new section and internal links, time removed from Stand
           FOOTER_CONTENT="---\n\n## Was sind ${GAME_TYPE}-Links?\n\n**${GAME_TYPE}**-Links sind offizielle Belohnungen von den **${GAME_NAME_CAPITALIZED}**-Entwicklern. Sie bieten kostenlose **${GAME_TYPE}** wie Spins, Würfe, Credits oder spezielle Geschenke. Wir sammeln und prüfen diese Links täglich, damit du sie mühelos einlösen kannst.\n\n---\n\n## Warum diese Seite dein ${GAME_NAME_CAPITALIZED}-Begleiter ist\n\nWir helfen dir, in **${GAME_NAME_CAPITALIZED}** vorne zu bleiben:\n\n- **Tägliche Updates:** Neue **${GAME_TYPE}**-Links jeden Tag (Stand: ${CURRENT_DATE}).\n- **100 % sicher:** Links direkt aus offiziellen **${GAME_NAME_CAPITALIZED}**-Quellen.\n- **Kostenlos:** Keine Gebühren, keine Anmeldung – nur Belohnungen!\n\n---\n\n## Wie Man ${GAME_NAME_CAPITALIZED} ${GAME_TYPE} Optimal Nutzt\n\nUm das Beste aus deinen Gratis ${GAME_TYPE} herauszuholen, solltest du strategisch vorgehen. Nutze deine ${GAME_TYPE} während Events wie \"Viking Quest\" oder \"Spin Master\", um höhere Belohnungen zu erzielen. Sammle Münzen, um dein Dorf auszubauen, aber achte darauf, nicht zu viele Münzen zu horten – das macht dich anfälliger für Angriffe. Plane deine ${GAME_TYPE} für Tage, an denen du mehr Zeit hast, um aktiv zu spielen. So maximierst du deinen Fortschritt und genießt ${GAME_NAME_CAPITALIZED} noch mehr!\n\n---\n\n## Profi-Tipps für mehr ${GAME_TYPE}\n\nMaximiere deine Gratis-Belohnungen mit diesen Tricks:\n\n### Spins & Würfe sparen\nNutze sie bei Events mit hohen Gewinnen.\n\n### Münzen strategisch einsetzen\nInvestiere klug, um schneller voranzukommen.\n\n### Täglich checken\nLinks sind kurzlebig – sei schnell!\n\n---\n\n## Häufige Fragen zu ${GAME_TYPE}\n\n### Sind diese ${GAME_TYPE}-Links sicher?\n\nJa! Wir teilen ausschließlich Links, die direkt aus offiziellen **${GAME_NAME_CAPITALIZED}**-Aktionen stammen – sie sind völlig sicher und legitim.\n\n### Wie oft werden die Links aktualisiert?\n\nTäglich! Besuche uns regelmäßig für frische **${GAME_TYPE}**.\n\n### Was wenn ein Link nicht funktioniert?\n\nEinige Links haben eine begrenzte Anzahl an Einlösungen oder laufen schnell ab. Falls einer nicht funktioniert, keine Sorge – neue werden bald verfügbar sein!\n\n---\n\n## Entdecke Mehr Gratis-Links\n\n- [Bingo Bash Gratis Chips](/bingo-bash-gratis-chips/)\n- [Slotomania Gratis Münzen](/slotomania-gratis-muenzen/)\n\n---\n\n## Haftungsausschluss\n\nWir sind **nicht mit ${GAME_NAME_CAPITALIZED}** oder seinen Entwicklern verbunden. Diese Seite hilft Spielern, kostenlose **${GAME_TYPE}** zu finden und das Spiel zu genießen."
 
           # Write content to files
@@ -112,6 +112,13 @@ jobs:
 
           # File to update
           INCLUDE_FILES="_data/include_files.yml"
+
+          # Ensure the include_files.yml exists
+          if [ ! -f "$INCLUDE_FILES" ]; then
+            echo "Creating $INCLUDE_FILES as it does not exist."
+            mkdir -p _data
+            echo "{}" > $INCLUDE_FILES
+          fi
 
           # Check if the HTML file or JSON file has changed by comparing with the last committed version
           HTML_FILE="_includes/${{ matrix.game }}.html"
@@ -133,12 +140,20 @@ jobs:
           # Check if content has changed
           if [ "$CURRENT_HTML_CONTENT" != "$PREV_HTML_CONTENT" ] || [ "$CURRENT_JSON_CONTENT" != "$PREV_JSON_CONTENT" ]; then
             echo "Content changed for ${{ matrix.game }}. Updating last_modified in $INCLUDE_FILES."
-            # Use yq or sed to update the last_modified value
+            # Use yq to update the last_modified value, ensuring the key exists
             if command -v yq >/dev/null 2>&1; then
-              yq e ".${{ matrix.game }}.html.last_modified = \"$CURRENT_TIMESTAMP\"" -i $INCLUDE_FILES
+              # Add the game key if it doesn't exist
+              yq e -i ".[\"${{ matrix.game }}.html\"] //= {}" $INCLUDE_FILES
+              yq e -i ".[\"${{ matrix.game }}.html\"].last_modified = \"$CURRENT_TIMESTAMP\"" $INCLUDE_FILES
             else
               # Fallback to sed if yq is not available
-              sed -i "s/\(${{ matrix.game }}.html:\s*last_modified: \).*/\1$CURRENT_TIMESTAMP/" $INCLUDE_FILES
+              if grep -q "${{ matrix.game }}.html:" $INCLUDE_FILES; then
+                sed -i "s/\(${{ matrix.game }}.html:\s*last_modified: \).*/\1$CURRENT_TIMESTAMP/" $INCLUDE_FILES
+              else
+                # If the game key doesn't exist, append it
+                echo "${{ matrix.game }}.html:" >> $INCLUDE_FILES
+                echo "  last_modified: $CURRENT_TIMESTAMP" >> $INCLUDE_FILES
+              fi
             fi
           else
             echo "No changes detected for ${{ matrix.game }}. Skipping update of last_modified."
