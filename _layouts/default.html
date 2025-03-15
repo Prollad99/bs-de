@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ page.title }}</title>
+  <!-- Use site.title as fallback for homepage, otherwise use page.title -->
+  <title>{{ page.title | default: site.title }}</title>
 
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-BNX1BVWWSF"></script>
@@ -50,7 +51,7 @@
   <!-- Open Graph Tags -->
   <meta property="og:url" content="{{ page.url | absolute_url }}">
   <meta property="og:type" content="article">
-  <meta property="og:title" content="{{ page.title }}">
+  <meta property="og:title" content="{{ page.title | default: site.title }}">
   {% if page.description %}
     <meta property="og:description" content="{{ page.description }}">
   {% endif %}
@@ -59,7 +60,7 @@
 
   <!-- Twitter Card Tags -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="{{ page.title }}">
+  <meta name="twitter:title" content="{{ page.title | default: site.title }}">
   {% if page.description %}
     <meta name="twitter:description" content="{{ page.description }}">
   {% endif %}
@@ -76,9 +77,20 @@
     {
       "@context": "https://schema.org",
       "@type": "Article",
-      "headline": "{{ page.title }}",
-      "datePublished": "{{ page.date | default: site.time | date_to_xmlschema }}",
-      "dateModified": "{{ page.date | default: site.time | date_to_xmlschema }}",
+      "headline": "{{ page.title | default: site.title }}",
+      {% if page.game %}
+        {% assign include_file = site.data.include_files[page.game] | default: site.data.include_files[page.game | append: '.html'] %}
+        {% if include_file and include_file.last_modified %}
+          "datePublished": "{{ include_file.last_modified | date_to_xmlschema }}",
+          "dateModified": "{{ include_file.last_modified | date_to_xmlschema }}",
+        {% else %}
+          "datePublished": "{{ site.time | date_to_xmlschema }}",
+          "dateModified": "{{ site.time | date_to_xmlschema }}",
+        {% endif %}
+      {% else %}
+        "datePublished": "{{ site.time | date_to_xmlschema }}",
+        "dateModified": "{{ site.time | date_to_xmlschema }}",
+      {% endif %}
       "author": {"@type": "Person", "name": "{{ page.author | default: 'BonusCollector' }}"},
       "description": "{{ page.description }}",
       "publisher": {"@type": "Organization", "name": "bonuscollector.de"}
@@ -152,7 +164,7 @@
           <li class="breadcrumb-item">
             <a href="{{ site.baseurl }}/{{ category | downcase }}/">{{ category | replace: "-", " " | capitalize }}</a>
           </li>
-      <li class="breadcrumb-item active" aria-current="page">{{ page.title }}</li>
+      <li class="breadcrumb-item active" aria-current="page">{{ page.title | default: site.title }}</li>
     </ol>
   </nav>
 
